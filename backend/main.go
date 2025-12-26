@@ -3,18 +3,18 @@ package main
 import (
 	"log"
 
-	"Anytime_Trip/backend/config"
-	"Anytime_Trip/backend/internal/database"
-	adminhandlers "Anytime_Trip/backend/internal/handlers/admin"
-	apphandlers "Anytime_Trip/backend/internal/handlers/app"
-	superadminhandlers "Anytime_Trip/backend/internal/handlers/superadmin"
-	"Anytime_Trip/backend/internal/middleware"
-	adminrepo "Anytime_Trip/backend/internal/repository/admin"
-	apprepo "Anytime_Trip/backend/internal/repository/app"
-	superadminrepo "Anytime_Trip/backend/internal/repository/superadmin"
-	adminRoutes "Anytime_Trip/backend/internal/routes/admin"
-	appRoutes "Anytime_Trip/backend/internal/routes/app"
-	superAdminRoutes "Anytime_Trip/backend/internal/routes/superadmin"
+	"Anytime_Travel/backend/config"
+	"Anytime_Travel/backend/internal/database"
+	adminhandlers "Anytime_Travel/backend/internal/handlers/admin"
+	apphandlers "Anytime_Travel/backend/internal/handlers/app"
+	superadminhandlers "Anytime_Travel/backend/internal/handlers/superadmin"
+	"Anytime_Travel/backend/internal/middleware"
+	adminrepo "Anytime_Travel/backend/internal/repository/admin"
+	apprepo "Anytime_Travel/backend/internal/repository/app"
+	superadminrepo "Anytime_Travel/backend/internal/repository/superadmin"
+	adminRoutes "Anytime_Travel/backend/internal/routes/admin"
+	appRoutes "Anytime_Travel/backend/internal/routes/app"
+	superAdminRoutes "Anytime_Travel/backend/internal/routes/superadmin"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -56,14 +56,14 @@ func main() {
 
 	// Admin routes (with middleware)
 	adminGroup := api.Group("/admin")
-	adminGroup.Use(middleware.AuthMiddleware)
-	adminGroup.Use(middleware.AdminMiddleware)
+	adminGroup.Use(middleware.AuthMiddleware())
+	adminGroup.Use(middleware.AdminMiddleware())
 	adminRoutes.SetupRoutes(adminGroup, adminHandler)
 
 	// Super Admin routes (with middleware)
 	superAdminGroup := api.Group("/superadmin")
-	superAdminGroup.Use(middleware.AuthMiddleware)
-	superAdminGroup.Use(middleware.SuperAdminMiddleware)
+	superAdminGroup.Use(middleware.AuthMiddleware())
+	superAdminGroup.Use(middleware.SuperAdminMiddleware())
 	superAdminRoutes.SetupRoutes(superAdminGroup, superAdminHandler)
 
 	log.Printf("Server starting on :%s...", cfg.Port)

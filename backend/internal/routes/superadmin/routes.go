@@ -1,7 +1,7 @@
 package superadmin
 
 import (
-	"Anytime_Trip/backend/internal/handlers/superadmin"
+	"Anytime_Travel/backend/internal/handlers/superadmin"
 
 	"github.com/gofiber/fiber/v2"
 )

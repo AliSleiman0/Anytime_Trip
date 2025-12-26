@@ -1,7 +1,7 @@
 package app
 
 import (
-	"Anytime_Trip/backend/internal/repository/app"
+	"Anytime_Travel/backend/internal/repository/app"
 
 	"github.com/gofiber/fiber/v2"
 )

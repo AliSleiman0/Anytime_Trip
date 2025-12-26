@@ -3,7 +3,7 @@ package admin
 import (
 	"context"
 
-	"Anytime_Trip/backend/internal/models/admin"
+	"Anytime_Travel/backend/internal/models/admin"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

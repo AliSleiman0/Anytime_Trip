@@ -3,7 +3,7 @@ package superadmin
 import (
 	"context"
 
-	"Anytime_Trip/backend/internal/models/superadmin"
+	"Anytime_Travel/backend/internal/models/superadmin"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

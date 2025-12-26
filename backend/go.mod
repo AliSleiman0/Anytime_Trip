@@ -1,4 +1,4 @@
-module Anytime_Trip/backend
+module Anytime_Travel/backend
 
 go 1.21
 

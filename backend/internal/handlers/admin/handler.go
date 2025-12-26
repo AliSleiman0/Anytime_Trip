@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"Anytime_Trip/backend/internal/repository/admin"
+	"Anytime_Travel/backend/internal/repository/admin"
 
 	"github.com/gofiber/fiber/v2"
 )
