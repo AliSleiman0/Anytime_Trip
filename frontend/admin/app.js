@@ -1,4 +1,4 @@
-// Main application JavaScript
+// Admin Application JavaScript
 
 document.addEventListener('DOMContentLoaded', function() {
     const app = document.getElementById('app');
@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
     app.innerHTML = `
         ${header}
         <main>
-            <h1>Welcome to the Application</h1>
-            <p>This is the main content area.</p>
+            <h1>Admin Dashboard</h1>
+            <p>This is the admin control panel.</p>
         </main>
         ${footer}
     `;
