@@ -1,0 +1,543 @@
+<!-- Main container with fixed positioning for sidebar layout -->
+<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+  <main class="">
+    <!-- Dynamic header section loaded via HTMX with booking-specific title and subtitle -->
+    <div
+      hx-get="/admin/header?title=Bookings&subtitle=Manage all bookings here"
+      hx-trigger="load"
+      hx-swap="innerHTML"
+    ></div>
+
+    <!-- inputs -->
+    <div class="p-4 flex justify-between">
+      <input
+        id="date"
+        name="date"
+        type="date"
+        placeholder="Select Date"
+        onblur="if(!this.value){this.type='text'}"
+        class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+      />
+      <div>
+        <select
+          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          name="bookings"
+          id="bookings"
+        >
+          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
+            All Bookings
+          </option>
+        </select>
+        <select
+          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          name="status"
+          id="status"
+        >
+          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
+            All Statuses
+          </option>
+        </select>
+      </div>
+    </div>
+
+
+    <!-- Padding wrapper for content -->
+    <div class="p-4">
+      <!-- Table container with rounded corners and shadow -->
+      <div class="rounded-t-2xl overflow-hidden">
+        <!-- Bookings data table with responsive text sizing -->
+        <table class="w-full text-sm">
+          <!-- Table header with blue background and white text -->
+          <thead class="bg-[#336891] text-white">
+            <tr>
+              <th class="px-2 py-3 text-center font-semibold">Booking ID</th>
+              <th class="px-2 py-3 text-center font-semibold">Type</th>
+              <th class="px-2 py-3 text-center font-semibold">Customer</th>
+              <th class="px-2 py-3 text-center font-semibold">Booking Date</th>
+              <th class="px-2 py-3 text-center font-semibold">Travel Date</th>
+              <th class="px-2 py-3 text-center font-semibold">Details</th>
+              <th class="px-2 py-3 text-center font-semibold">Amount</th>
+              <th class="px-2 py-3 text-center font-semibold">Payment</th>
+              <th class="px-2 py-3 text-center font-semibold">Status</th>
+              <th class="px-2 py-3 text-center font-semibold">Action</th>
+            </tr>
+          </thead>
+
+          <!-- Table body with 3 booking records - each row represents one booking -->
+          <tbody>
+            <!-- Booking row 1: First booking record with gradient border -->
+            <tr
+              style="
+                border-bottom: 1px solid;
+                border-image-source: linear-gradient(
+                  90deg,
+                  rgba(255, 255, 255, 0.68) 0%,
+                  #242424 22.42%,
+                  #1d1d1d 49.66%,
+                  #2d2d2d 81.29%,
+                  rgba(255, 255, 255, 0.47) 99.01%
+                );
+                border-image-slice: 1;
+              "
+            >
+              <td class="px-4 py-3 text-gray-900 text-center">
+                <p class="flex flex-col">
+                  BK001 <span class="text-gray-400">123456</span>
+                </p>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span class="inline-flex items-center justify-center gap-1">
+                  <svg
+                    width="24px"
+                    height="24px"
+                    viewBox="0 0 32 32"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                    xmlns:sketch="http://www.bohemiancoding.com/sketch/ns"
+                  >
+                    <title>airplane</title>
+                    <desc>Created with Sketch Beta.</desc>
+                    <defs></defs>
+                    <g
+                      id="Page-1"
+                      stroke="none"
+                      stroke-width="1"
+                      fill="none"
+                      fill-rule="evenodd"
+                      sketch:type="MSPage"
+                    >
+                      <g
+                        id="Icon-Set"
+                        sketch:type="MSLayerGroup"
+                        transform="translate(-308.000000, -307.000000)"
+                        fill="#336891"
+                      >
+                        <path
+                          d="M337.854,311.163 L330.402,318.642 L334.908,331.037 C335.13,331.747 334.992,332.627 334.705,332.914 C333.89,333.73 333.309,333.342 333,333 L325.795,323.266 L317.819,331.27 L319.255,336.6 C318.688,336.032 315.38,331.602 315.301,331.521 C315.248,331.469 310.896,328.225 310.427,327.753 L315.538,329.133 L323.665,321.152 L314,314 C313.723,313.752 313.358,313.02 314.104,312.271 C314.392,311.984 315.262,311.897 315.97,312.12 L328.311,316.592 L335.864,309.175 C336.392,308.647 337.425,308.701 337.888,309.164 C338.35,309.627 338.382,310.636 337.854,311.163 L337.854,311.163 Z M339.207,307.82 C337.961,306.57 335.771,306.863 334.518,308.119 L328.141,314.481 L316.313,310.061 C315.18,309.768 314.039,309.389 312.634,310.798 C311.917,311.516 310.427,313.01 312.634,315.221 L320.744,321.861 L315.467,327.127 L310.543,325.896 C309.813,325.708 309.321,325.855 308.946,326.269 C308.757,326.505 307.386,327.521 308.342,328.479 L314.067,332.933 L318.521,338.658 C319.213,339.352 319.856,338.919 320.735,338.084 C321.292,337.526 321.172,337.239 321.004,336.426 L319.892,331.536 L325.133,326.277 L331.763,334.389 C333.969,336.6 335.46,335.105 336.177,334.389 C337.583,332.979 337.205,331.837 336.912,330.702 L332.529,318.854 L338.88,312.481 C340.133,311.226 340.454,309.069 339.207,307.82 L339.207,307.82 Z"
+                          id="airplane"
+                          sketch:type="MSShapeGroup"
+                        ></path>
+                      </g>
+                    </g>
+                  </svg>
+                  Flight</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center">
+                <p class="font-semibold text-gray-900">John Smith</p>
+                <p class="text-gray-500 text-xs">john.smith@gmail.com</p>
+              </td>
+              <td class="px-4 py-3 text-gray-700 text-center">1/15/2025</td>
+              <td class="px-4 py-3 text-gray-700 text-center">2/20/2025</td>
+              <td class="px-4 py-3 text-gray-700 text-center">
+                NYC - London (Round trip)<br /><span
+                  class="text-xs text-gray-500 flex items-center justify-center gap-1"
+                  >1DLRT190/6MARSAN-SMITH
+                  <button class="border-0">
+                    <svg
+                      width="10px"
+                      height="10px"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M6 11C6 8.17157 6 6.75736 6.87868 5.87868C7.75736 5 9.17157 5 12 5H15C17.8284 5 19.2426 5 20.1213 5.87868C21 6.75736 21 8.17157 21 11V16C21 18.8284 21 20.2426 20.1213 21.1213C19.2426 22 17.8284 22 15 22H12C9.17157 22 7.75736 22 6.87868 21.1213C6 20.2426 6 18.8284 6 16V11Z"
+                        stroke="#1C274C"
+                        stroke-width="1.5"
+                      />
+                      <path
+                        d="M6 19C4.34315 19 3 17.6569 3 16V10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H15C16.6569 2 18 3.34315 18 5"
+                        stroke="#336891"
+                        stroke-width="1.5"
+                      />
+                    </svg>
+                  </button>
+                </span>
+              </td>
+              <td class="px-4 py-3 font-semibold text-gray-900 text-center">
+                $850.00
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span
+                  class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
+                  >Paid</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span
+                  class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
+                  >Confirmed</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center">
+                <button
+                  class="bg-[#336891] text-white w-6 h-6 rounded-lg inline-flex items-center justify-center hover:bg-blue-600"
+                >
+                  <svg
+                    width="15px"
+                    height="11px"
+                    viewBox="0 0 24 24"
+                    fill="white"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"
+                      fill=""
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2 12C2 13.6394 2.42496 14.1915 3.27489 15.2957C4.97196 17.5004 7.81811 20 12 20C16.1819 20 19.028 17.5004 20.7251 15.2957C21.575 14.1915 22 13.6394 22 12C22 10.3606 21.575 9.80853 20.7251 8.70433C19.028 6.49956 16.1819 4 12 4C7.81811 4 4.97196 6.49956 3.27489 8.70433C2.42496 9.80853 2 10.3606 2 12ZM12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25Z"
+                      fill="white"
+                    />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+            <tr
+              style="
+                border-bottom: 1px solid;
+                border-image-source: linear-gradient(
+                  90deg,
+                  rgba(255, 255, 255, 0.68) 0%,
+                  #242424 22.42%,
+                  #1d1d1d 49.66%,
+                  #2d2d2d 81.29%,
+                  rgba(255, 255, 255, 0.47) 99.01%
+                );
+                border-image-slice: 1;
+              "
+            >
+              <td class="px-4 py-3 text-gray-900 text-center">
+                <p class="flex flex-col">
+                  BK001 <span class="text-gray-400">123456</span>
+                </p>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span class="inline-flex items-center justify-center gap-1">
+                  <svg
+                    width="24px"
+                    height="24px"
+                    viewBox="0 0 32 32"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                    xmlns:sketch="http://www.bohemiancoding.com/sketch/ns"
+                  >
+                    <title>airplane</title>
+                    <desc>Created with Sketch Beta.</desc>
+                    <defs></defs>
+                    <g
+                      id="Page-1"
+                      stroke="none"
+                      stroke-width="1"
+                      fill="none"
+                      fill-rule="evenodd"
+                      sketch:type="MSPage"
+                    >
+                      <g
+                        id="Icon-Set"
+                        sketch:type="MSLayerGroup"
+                        transform="translate(-308.000000, -307.000000)"
+                        fill="#336891"
+                      >
+                        <path
+                          d="M337.854,311.163 L330.402,318.642 L334.908,331.037 C335.13,331.747 334.992,332.627 334.705,332.914 C333.89,333.73 333.309,333.342 333,333 L325.795,323.266 L317.819,331.27 L319.255,336.6 C318.688,336.032 315.38,331.602 315.301,331.521 C315.248,331.469 310.896,328.225 310.427,327.753 L315.538,329.133 L323.665,321.152 L314,314 C313.723,313.752 313.358,313.02 314.104,312.271 C314.392,311.984 315.262,311.897 315.97,312.12 L328.311,316.592 L335.864,309.175 C336.392,308.647 337.425,308.701 337.888,309.164 C338.35,309.627 338.382,310.636 337.854,311.163 L337.854,311.163 Z M339.207,307.82 C337.961,306.57 335.771,306.863 334.518,308.119 L328.141,314.481 L316.313,310.061 C315.18,309.768 314.039,309.389 312.634,310.798 C311.917,311.516 310.427,313.01 312.634,315.221 L320.744,321.861 L315.467,327.127 L310.543,325.896 C309.813,325.708 309.321,325.855 308.946,326.269 C308.757,326.505 307.386,327.521 308.342,328.479 L314.067,332.933 L318.521,338.658 C319.213,339.352 319.856,338.919 320.735,338.084 C321.292,337.526 321.172,337.239 321.004,336.426 L319.892,331.536 L325.133,326.277 L331.763,334.389 C333.969,336.6 335.46,335.105 336.177,334.389 C337.583,332.979 337.205,331.837 336.912,330.702 L332.529,318.854 L338.88,312.481 C340.133,311.226 340.454,309.069 339.207,307.82 L339.207,307.82 Z"
+                          id="airplane"
+                          sketch:type="MSShapeGroup"
+                        ></path>
+                      </g>
+                    </g>
+                  </svg>
+                  Flight</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center">
+                <p class="font-semibold text-gray-900">John Smith</p>
+                <p class="text-gray-500 text-xs">john.smith@gmail.com</p>
+              </td>
+              <td class="px-4 py-3 text-gray-700 text-center">1/15/2025</td>
+              <td class="px-4 py-3 text-gray-700 text-center">2/20/2025</td>
+              <td class="px-4 py-3 text-gray-700 text-center">
+                NYC - London (Round trip)<br /><span
+                  class="text-xs text-gray-500 flex items-center justify-center gap-1"
+                  >1DLRT190/6MARSAN-SMITH
+                  <button class="border-0">
+                    <svg
+                      width="10px"
+                      height="10px"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M6 11C6 8.17157 6 6.75736 6.87868 5.87868C7.75736 5 9.17157 5 12 5H15C17.8284 5 19.2426 5 20.1213 5.87868C21 6.75736 21 8.17157 21 11V16C21 18.8284 21 20.2426 20.1213 21.1213C19.2426 22 17.8284 22 15 22H12C9.17157 22 7.75736 22 6.87868 21.1213C6 20.2426 6 18.8284 6 16V11Z"
+                        stroke="#1C274C"
+                        stroke-width="1.5"
+                      />
+                      <path
+                        d="M6 19C4.34315 19 3 17.6569 3 16V10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H15C16.6569 2 18 3.34315 18 5"
+                        stroke="#336891"
+                        stroke-width="1.5"
+                      />
+                    </svg>
+                  </button>
+                </span>
+              </td>
+              <td class="px-4 py-3 font-semibold text-gray-900 text-center">
+                $850.00
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span
+                  class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
+                  >Paid</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span
+                  class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
+                  >Confirmed</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center">
+                <button
+                  class="bg-[#336891] text-white w-6 h-6 rounded-lg inline-flex items-center justify-center hover:bg-blue-600"
+                >
+                  <svg
+                    width="15px"
+                    height="11px"
+                    viewBox="0 0 24 24"
+                    fill="white"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"
+                      fill=""
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2 12C2 13.6394 2.42496 14.1915 3.27489 15.2957C4.97196 17.5004 7.81811 20 12 20C16.1819 20 19.028 17.5004 20.7251 15.2957C21.575 14.1915 22 13.6394 22 12C22 10.3606 21.575 9.80853 20.7251 8.70433C19.028 6.49956 16.1819 4 12 4C7.81811 4 4.97196 6.49956 3.27489 8.70433C2.42496 9.80853 2 10.3606 2 12ZM12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25Z"
+                      fill="white"
+                    />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+            <tr
+              style="
+                border-bottom: 1px solid;
+                border-image-source: linear-gradient(
+                  90deg,
+                  rgba(255, 255, 255, 0.68) 0%,
+                  #242424 22.42%,
+                  #1d1d1d 49.66%,
+                  #2d2d2d 81.29%,
+                  rgba(255, 255, 255, 0.47) 99.01%
+                );
+                border-image-slice: 1;
+              "
+            >
+              <td class="px-4 py-3 text-gray-900 text-center">
+                <p class="flex flex-col">
+                  BK001 <span class="text-gray-400">123456</span>
+                </p>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span class="inline-flex items-center justify-center gap-1">
+                  <svg
+                    width="24px"
+                    height="24px"
+                    viewBox="0 0 32 32"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                    xmlns:sketch="http://www.bohemiancoding.com/sketch/ns"
+                  >
+                    <title>airplane</title>
+                    <desc>Created with Sketch Beta.</desc>
+                    <defs></defs>
+                    <g
+                      id="Page-1"
+                      stroke="none"
+                      stroke-width="1"
+                      fill="none"
+                      fill-rule="evenodd"
+                      sketch:type="MSPage"
+                    >
+                      <g
+                        id="Icon-Set"
+                        sketch:type="MSLayerGroup"
+                        transform="translate(-308.000000, -307.000000)"
+                        fill="#336891"
+                      >
+                        <path
+                          d="M337.854,311.163 L330.402,318.642 L334.908,331.037 C335.13,331.747 334.992,332.627 334.705,332.914 C333.89,333.73 333.309,333.342 333,333 L325.795,323.266 L317.819,331.27 L319.255,336.6 C318.688,336.032 315.38,331.602 315.301,331.521 C315.248,331.469 310.896,328.225 310.427,327.753 L315.538,329.133 L323.665,321.152 L314,314 C313.723,313.752 313.358,313.02 314.104,312.271 C314.392,311.984 315.262,311.897 315.97,312.12 L328.311,316.592 L335.864,309.175 C336.392,308.647 337.425,308.701 337.888,309.164 C338.35,309.627 338.382,310.636 337.854,311.163 L337.854,311.163 Z M339.207,307.82 C337.961,306.57 335.771,306.863 334.518,308.119 L328.141,314.481 L316.313,310.061 C315.18,309.768 314.039,309.389 312.634,310.798 C311.917,311.516 310.427,313.01 312.634,315.221 L320.744,321.861 L315.467,327.127 L310.543,325.896 C309.813,325.708 309.321,325.855 308.946,326.269 C308.757,326.505 307.386,327.521 308.342,328.479 L314.067,332.933 L318.521,338.658 C319.213,339.352 319.856,338.919 320.735,338.084 C321.292,337.526 321.172,337.239 321.004,336.426 L319.892,331.536 L325.133,326.277 L331.763,334.389 C333.969,336.6 335.46,335.105 336.177,334.389 C337.583,332.979 337.205,331.837 336.912,330.702 L332.529,318.854 L338.88,312.481 C340.133,311.226 340.454,309.069 339.207,307.82 L339.207,307.82 Z"
+                          id="airplane"
+                          sketch:type="MSShapeGroup"
+                        ></path>
+                      </g>
+                    </g>
+                  </svg>
+                  Flight</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center">
+                <p class="font-semibold text-gray-900">John Smith</p>
+                <p class="text-gray-500 text-xs">john.smith@gmail.com</p>
+              </td>
+              <td class="px-4 py-3 text-gray-700 text-center">1/15/2025</td>
+              <td class="px-4 py-3 text-gray-700 text-center">2/20/2025</td>
+              <td class="px-4 py-3 text-gray-700 text-center">
+                NYC - London (Round trip)<br /><span
+                  class="text-xs text-gray-500 flex items-center justify-center gap-1"
+                  >1DLRT190/6MARSAN-SMITH
+                  <button class="border-0">
+                    <svg
+                      width="10px"
+                      height="10px"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M6 11C6 8.17157 6 6.75736 6.87868 5.87868C7.75736 5 9.17157 5 12 5H15C17.8284 5 19.2426 5 20.1213 5.87868C21 6.75736 21 8.17157 21 11V16C21 18.8284 21 20.2426 20.1213 21.1213C19.2426 22 17.8284 22 15 22H12C9.17157 22 7.75736 22 6.87868 21.1213C6 20.2426 6 18.8284 6 16V11Z"
+                        stroke="#1C274C"
+                        stroke-width="1.5"
+                      />
+                      <path
+                        d="M6 19C4.34315 19 3 17.6569 3 16V10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H15C16.6569 2 18 3.34315 18 5"
+                        stroke="#336891"
+                        stroke-width="1.5"
+                      />
+                    </svg>
+                  </button>
+                </span>
+              </td>
+              <td class="px-4 py-3 font-semibold text-gray-900 text-center">
+                $850.00
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span
+                  class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
+                  >Paid</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span
+                  class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
+                  >Confirmed</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center">
+                <button
+                  class="bg-[#336891] text-white w-6 h-6 rounded-lg inline-flex items-center justify-center hover:bg-blue-600"
+                >
+                  <svg
+                    width="15px"
+                    height="11px"
+                    viewBox="0 0 24 24"
+                    fill="white"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"
+                      fill=""
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2 12C2 13.6394 2.42496 14.1915 3.27489 15.2957C4.97196 17.5004 7.81811 20 12 20C16.1819 20 19.028 17.5004 20.7251 15.2957C21.575 14.1915 22 13.6394 22 12C22 10.3606 21.575 9.80853 20.7251 8.70433C19.028 6.49956 16.1819 4 12 4C7.81811 4 4.97196 6.49956 3.27489 8.70433C2.42496 9.80853 2 10.3606 2 12ZM12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25Z"
+                      fill="white"
+                    />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- END TABLE -->
+    </div>
+  </main>
+</div>
+<!-- END BOOKINGS PAGE -->
+
+<!-- SweetAlert2 for booking detail modal -->
+
+<!-- SweetAlert2 for booking detail modal -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  // Renders booking detail modal using SweetAlert2 with static sample data
+  function showBookingDetail() {
+    const detailHtml = `
+      <div class="bg-[#eef5fa] rounded-lg p-4 text-sm text-left">
+        <div class="grid grid-cols-4 gap-4 text-gray-700">
+          <div><p class="text-xs">Flight Name</p><p class="font-semibold">Flight184781-5yt01-084i</p></div>
+          <div><p class="text-xs">Type</p><p class="font-semibold">Flight</p></div>
+          <div><p class="text-xs">Details</p><p class="font-semibold">NYC - London (Round Trip)</p></div>
+          <div><p class="text-xs">Amount</p><p class="font-semibold">$50.00</p></div>
+
+          <div><p class="text-xs">Payment Status</p><span class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold">Paid</span></div>
+          <div><p class="text-xs">Status</p><span class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold">Confirmed</span></div>
+          <div><p class="text-xs">Departure Date</p><p class="font-semibold">01/01/2025 19:32 pm-GMT</p></div>
+          <div><p class="text-xs">Arrival Date</p><p class="font-semibold">01/01/2025 21:32 pm-GMT</p></div>
+
+          <div><p class="text-xs">Seat</p><p class="font-semibold flex items-center gap-2">A23
+            <svg class="bg-[#336891] rounded-lg p-1 " width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M11.4001 18.1612L11.4001 18.1612L18.796 10.7653C17.7894 10.3464 16.5972 9.6582 15.4697 8.53068C14.342 7.40298 13.6537 6.21058 13.2348 5.2039L5.83882 12.5999L5.83879 12.5999C5.26166 13.1771 4.97307 13.4657 4.7249 13.7838C4.43213 14.1592 4.18114 14.5653 3.97634 14.995C3.80273 15.3593 3.67368 15.7465 3.41556 16.5208L2.05445 20.6042C1.92743 20.9852 2.0266 21.4053 2.31063 21.6894C2.59466 21.9734 3.01478 22.0726 3.39584 21.9456L7.47918 20.5844C8.25351 20.3263 8.6407 20.1973 9.00498 20.0237C9.43469 19.8189 9.84082 19.5679 10.2162 19.2751C10.5343 19.0269 10.823 18.7383 11.4001 18.1612Z" fill="#ffffff"/>
+<path d="M20.8482 8.71306C22.3839 7.17735 22.3839 4.68748 20.8482 3.15178C19.3125 1.61607 16.8226 1.61607 15.2869 3.15178L14.3999 4.03882C14.4121 4.0755 14.4246 4.11268 14.4377 4.15035C14.7628 5.0875 15.3763 6.31601 16.5303 7.47002C17.6843 8.62403 18.9128 9.23749 19.85 9.56262C19.8875 9.57563 19.9245 9.58817 19.961 9.60026L20.8482 8.71306Z" fill="#ffffff"/>
+</svg>
+            </p></div>
+          <div><p class="text-xs">Email Address</p><p class="font-semibold flex items-center gap-2">Emailaddress1235@mail.com.qt
+            <svg class="bg-[#336891] rounded-lg p-1 " width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M11.4001 18.1612L11.4001 18.1612L18.796 10.7653C17.7894 10.3464 16.5972 9.6582 15.4697 8.53068C14.342 7.40298 13.6537 6.21058 13.2348 5.2039L5.83882 12.5999L5.83879 12.5999C5.26166 13.1771 4.97307 13.4657 4.7249 13.7838C4.43213 14.1592 4.18114 14.5653 3.97634 14.995C3.80273 15.3593 3.67368 15.7465 3.41556 16.5208L2.05445 20.6042C1.92743 20.9852 2.0266 21.4053 2.31063 21.6894C2.59466 21.9734 3.01478 22.0726 3.39584 21.9456L7.47918 20.5844C8.25351 20.3263 8.6407 20.1973 9.00498 20.0237C9.43469 19.8189 9.84082 19.5679 10.2162 19.2751C10.5343 19.0269 10.823 18.7383 11.4001 18.1612Z" fill="#ffffff"/>
+<path d="M20.8482 8.71306C22.3839 7.17735 22.3839 4.68748 20.8482 3.15178C19.3125 1.61607 16.8226 1.61607 15.2869 3.15178L14.3999 4.03882C14.4121 4.0755 14.4246 4.11268 14.4377 4.15035C14.7628 5.0875 15.3763 6.31601 16.5303 7.47002C17.6843 8.62403 18.9128 9.23749 19.85 9.56262C19.8875 9.57563 19.9245 9.58817 19.961 9.60026L20.8482 8.71306Z" fill="#ffffff"/>
+</svg>
+            </p></div>
+          <div><p class="text-xs">Phone Number</p><p class="font-semibold">+1 (555) 91844 0192</p></div>
+          <div><p class="text-xs">Reference ID</p><p class="font-semibold">123456</p></div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-center gap-3">
+          <div class="relative flex items-center">
+            <label class="absolute -top-2 left-3 px-1 text-[11px] font-medium text-[#336891] bg-[#eef5fa]">Refund Amount</label>
+            <input
+              type="text"
+              value="50.00 $"
+              class="h-10 border border-[#336891] rounded px-3 w-36 text-sm bg-[#eef5fa] focus:outline-none focus:ring-2 focus:ring-[#336891]/40"
+            />
+          </div>
+          <button class="h-10 px-4 border border-gray-300 rounded text-sm">Cancel</button>
+          <button class="h-10 px-4 bg-[#336891] text-white rounded text-sm">Confirm</button>
+        </div>
+      </div>
+    `;
+
+    Swal.fire({
+      html: detailHtml,
+      showConfirmButton: false,
+      showCloseButton: true,
+      width: 1200,
+      background: "#eef5fa",
+      customClass: { popup: "p-0" },
+    });
+  }
+
+  // Attach click handlers to action buttons in the table
+  function initBookingDetailButtons() {
+    const buttons = document.querySelectorAll(
+      "table tbody tr td:last-child button"
+    );
+    buttons.forEach((btn) => {
+      btn.onclick = showBookingDetail;
+      btn.type = "button";
+    });
+  }
+
+  // Init on load and after HTMX swaps
+  document.addEventListener("DOMContentLoaded", initBookingDetailButtons);
+  document.addEventListener("htmx:afterSwap", initBookingDetailButtons);
+</script>

@@ -1,0 +1,334 @@
+<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+  <main class="">
+    <div hx-get="/admin/header?title=Dashboard&subtitle=Here's what's happening today!" hx-trigger="load" hx-swap="innerHTML"></div>
+
+    <!-- inputs -->
+    <div class="p-4 flex justify-between">
+      <input
+        id="date"
+        name="date"
+        type="date"
+        placeholder="Select Date"
+        onblur="if(!this.value){this.type='text'}"
+        class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+      />
+      <div>
+        <select
+          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          name="bookings"
+          id="bookings"
+        >
+          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
+            All Bookings
+          </option>
+        </select>
+        <select
+          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          name="status"
+          id="status"
+        >
+          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
+            All Statuses
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- cards -->
+    <div class="flex items-center justify-center gap-5 flex-wrap">
+      <!-- card 1 -->
+      <div
+        class="flex bg-white rounded-xl w-64 h-32 justify-between items-center px-6 m-4 shadow-[0_4px_4px_0_#0000001A]"
+      >
+        <div class="w-full">
+          <p class="mb-2">New Users</p>
+          <div class="flex justify-between">
+            <p class="text-xl font-bold">71,000</p>
+            <p class="flex items-center gap-1">
+              <span>+11.01%</span>
+              <svg
+                class="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 17l6-6 4 4 7-7"
+                  stroke="#000"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </p>
+          </div>
+          <div class="flex justify-between">
+            <p>today: 678</p>
+            <p class="text-[#009316] flex items-center gap-1">
+              <span>+11.01%</span>
+              <svg
+                class="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 17l6-6 4 4 7-7"
+                  stroke="#009316"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- card 2 -->
+      <div
+        class="flex bg-white rounded-xl w-64 h-32 justify-between items-center px-6 m-4 shadow-[0_4px_4px_0_#0000001A]"
+      >
+        <div class="w-full">
+          <p class="mb-2">Active Users</p>
+          <div class="flex justify-between">
+            <p class="text-xl font-bold">71,000</p>
+            <p class="text-[#009316] flex items-center gap-1">
+              <span>+11.01%</span>
+              <svg
+                class="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 17l6-6 4 4 7-7"
+                  stroke="#009316"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </p>
+          </div>
+          <div class="flex justify-between">
+            <p>today: 678</p>
+            <p class="text-[#009316] flex items-center gap-1">
+              <span>+11.01%</span>
+              <svg
+                class="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 17l6-6 4 4 7-7"
+                  stroke="#009316"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- card 3 -->
+      <div
+        class="flex bg-white rounded-xl w-64 h-32 justify-between items-center px-6 m-4 shadow-[0_4px_4px_0_#0000001A]"
+      >
+        <div class="w-full">
+          <p class="mb-2">Unactive Users</p>
+          <div class="flex justify-between">
+            <p class="text-xl font-bold">71,000</p>
+            <p class="text-[#009316] flex items-center gap-1">
+              <span>+11.01%</span>
+              <svg
+                class="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 17l6-6 4 4 7-7"
+                  stroke="#009316"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </p>
+          </div>
+          <div class="flex justify-between">
+            <p>today: 678</p>
+            <p class="text-[#009316] flex items-center gap-1">
+              <span>+11.01%</span>
+              <svg
+                class="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 17l6-6 4 4 7-7"
+                  stroke="#009316"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- card 4 -->
+      <div
+        class="flex bg-white rounded-xl w-64 h-32 justify-between items-center px-6 m-4 shadow-[0_4px_4px_0_#0000001A]"
+      >
+        <div class="w-full">
+          <p class="mb-2">Visits</p>
+          <div class="flex justify-between">
+            <p class="text-xl font-bold">71,000</p>
+            <p class="text-[#D24124] flex items-center gap-1">
+              <span>-11.01%</span>
+              <svg
+                class="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 7l6 6 4-4 7 7"
+                  stroke="#D24124"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </p>
+          </div>
+          <div class="flex justify-between">
+            <p>today: 678</p>
+            <p class="text-[#D24124] flex items-center gap-1">
+              <span>-11.01%</span>
+              <svg
+                class="w-4 h-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 7l6 6 4-4 7 7"
+                  stroke="#D24124"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="flex items-center justify-center gap-5">
+      <!-- Active Booking Chart -->
+      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-lg font-semibold">Active Booking</h2>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="flex items-center gap-2"
+              ><span
+                class="w-2.5 h-2.5 rounded-full bg-black inline-block"
+              ></span
+              >Last year</span
+            >
+            <span class="flex items-center gap-2"
+              ><span
+                class="w-2.5 h-2.5 rounded-full"
+                style="background-color: #336891"
+              ></span
+              >This year</span
+            >
+          </div>
+        </div>
+        <div class="h-64">
+          <canvas id="activeBookingChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Flights Chart -->
+      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-lg font-semibold">Flights</h2>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="flex items-center gap-2"
+              ><span
+                class="w-2.5 h-2.5 rounded-full bg-black inline-block"
+              ></span
+              >Last year</span
+            >
+            <span class="flex items-center gap-2"
+              ><span
+                class="w-2.5 h-2.5 rounded-full"
+                style="background-color: #336891"
+              ></span
+              >This year</span
+            >
+          </div>
+        </div>
+        <div class="h-64">
+          <canvas id="flightsChart"></canvas>
+        </div>
+      </div>
+
+      
+    </div>
+
+
+    <!-- bars -->
+     <div class="flex justify-center items-center gap-5">
+      <!-- Car Rental Chart -->
+      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">Car Rental</h2>
+          <button class="text-gray-400 hover:text-gray-600">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+            </svg>
+          </button>
+        </div>
+        <div class="h-64">
+          <canvas id="carRentalChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Hotels Bookings Chart -->
+      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">Hotels Bookings</h2>
+          <button class="text-gray-400 hover:text-gray-600">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+            </svg>
+          </button>
+        </div>
+        <div class="h-64">
+          <canvas id="hotelsBookingsChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>

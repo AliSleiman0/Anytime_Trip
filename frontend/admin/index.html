@@ -3,13 +3,498 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
-</head>
-<body>
-    <div id="app"></div>
+    <title>Seven Hives - Building Communities Together</title>
+    <meta name="description" content="Join Seven Hives to create, manage, and grow meaningful communities. Connect with like-minded individuals and build something amazing together.">
     
-    <script src="components/header.js"></script>
-    <script src="components/footer.js"></script>
-    <script src="app.js"></script>
+    <!-- Favicon -->
+    <link rel="icon" href="src/assets/images/favicon.ico" type="image/x-icon">
+    
+    <!-- Splide CSS -->
+    <link rel="stylesheet" href="src/assets/lib/splide.min.css">
+    
+    <!-- Tailwind CSS (compiled) -->
+    <link rel="stylesheet" href="/static/admin/dist/css/admin.css">
+   
+</head>
+<body >
+    <div class="h-screen" style="background-image: url('./src/assets/images/hero_background.jpg'); background-repeat: no-repeat; background-size: cover; background-position: center ; ">
+    <!-- Navigation Header -->
+    <header id="header" class=" top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-24">
+                <!-- Logo -->
+                <div class="shrink-0">
+                    <a href="#home" class="">
+                        <img src="./src/assets/images/logo.png" alt="Seven Hives" class="w-25 h-25 object-contain">
+                    </a>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <ul class="hidden md:flex items-center space-x-8">
+                    <li>
+                        <a href="index.html" class="text-white hover:text-yellow-400 active:text-yellow-500 font-medium transition-colors duration-200">Home</a>
+                    </li>
+                    <li>
+                        <a href="aboutus.html" class="text-white hover:text-yellow-400 active:text-yellow-500 font-medium transition-colors duration-200">About us</a>
+                    </li>
+                    <li>
+                        <a href="contactus.html" class="text-white hover:text-yellow-400 active:text-yellow-500 font-medium transition-colors duration-200">Contact us</a>
+                    </li>
+                    <li>
+                        <a href="help.html" class="text-white hover:text-yellow-400 active:text-yellow-500 font-medium transition-colors duration-200">Help & Support</a>
+                    </li>
+                    <li>
+                        <a href="#" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:bg-primary-800 font-medium transition-colors duration-200">Dashboard</a>
+                    </li>
+                </ul>
+                
+                <!-- Mobile menu button -->
+                <button id="mobile-toggle" type="button" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-colors duration-200" aria-expanded="false" aria-label="Toggle navigation menu">
+                    <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mobile menu -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="index.html" class="block px-4 py-2 text-white hover:bg-gray-100/20 hover:text-yellow-400 active:text-yellow-500 rounded-lg font-medium transition-colors duration-200">Home</a>
+                    </li>
+                    <li>
+                        <a href="aboutus.html" class="block px-4 py-2 text-white hover:bg-gray-100/20 hover:text-yellow-400 active:text-yellow-500 rounded-lg font-medium transition-colors duration-200">About us</a>
+                    </li>
+                    <li>
+                        <a href="contactus.html" class="block px-4 py-2 text-white hover:bg-gray-100/20 hover:text-yellow-400 active:text-yellow-500 rounded-lg font-medium transition-colors duration-200">Contact us</a>
+                    </li>
+                    <li>
+                        <a href="help.html" class="block px-4 py-2 text-white hover:bg-gray-100/20 hover:text-yellow-400 active:text-yellow-500 rounded-lg font-medium transition-colors duration-200">Help & Support</a>
+                    </li>
+                    <li>
+                        <a href="#" class="block px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:bg-primary-800 font-medium text-center transition-colors duration-200">Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+   
+        <!-- Hero Section -->
+        <section id="home" class="flex items-center justify-left  w-full min-h-screen px-4">
+            <div class="max-w-6xl text-left md:ml-24">
+                <h1 class="text-6xl md:text-7xl font-bold text-white mb-6">
+                    Where IT Support<br>
+                    Meets <span class="text-yellow-400">Reliability</span> and <span class="text-yellow-400">Excellence.</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-white/90 mb-8">
+                    Connect with Excellence: Fast, Reliable, and Professional IT Support at Your Fingertips.
+                </p>
+                <a href="help.html">
+                    <button class="border border-yellow-400 text-yellow-500 px-8 py-3 bg-transparent text-gray-900 rounded-full font-semibold hover:bg-yellow-500 transition-colors duration-200 shadow-lg">
+                        Submit A Ticket
+                    </button>
+                </a>
+            </div>
+        </section>
+</div>
+        <!-- About us Section -->
+        <section id="about" class="bg-white py-16 px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-8">About Us</h2>
+                <p class="text-xl text-gray-700  mb-6">
+                    At Seven Hives, we're dedicated to making IT support effortless for businesses and individuals alike. Our platform connects clients directly with skilled IT agents who provide fast, reliable assistance, simply submit your issue, and we'll match you with the right expert to resolve it quickly and professionally.
+              
+                    We combine cutting-edge technology with expert knowledge and a customer-first approach, ensuring every interaction is seamless, transparent, and tailored to your needs. Whether it's troubleshooting, maintenance, or guidance, Tech Hive is your trusted partner for dependable IT support.
+                </p>
+                <div class="flex justify-center mb-8">
+                    <a href="aboutus.html" class="inline-flex items-center justify-center w-12 h-12 rounded-full text-white hover:bg-blue-600 transition-colors duration-200">
+                       <img src="./src/assets/images/arrow.png" alt="Arrow Icon" class="w-12 h-12">
+                    </a>
+                </div>
+                <a href="help.html">
+                    <button class="px-16 py-3 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-600 transition-colors duration-200 shadow-lg">
+                        Submit a Ticket
+                    </button>
+                </a>
+            </div>
+        </section>
+
+        <!-- Seven hives Showcase -->
+        <section class="h-[500px] md:min-h-screen" style="background-image: url('./src/assets/images/7_hives.png'); background-repeat: no-repeat; background-size: contain; background-position: center ; ">
+        </section>
+
+         <style>
+        .hexagon-bg {
+            clip-path: polygon(50% 0%, 100% 20%, 100% 80%, 50% 100%, 0% 80%, 0% 20%);
+          
+        }
+        
+        .hexagon-shape {
+            clip-path: polygon(50% 0%, 100% 20%, 100% 80%, 50% 100%, 0% 80%, 0% 20%);
+        }
+        
+        .hexagon-border-wrapper {
+            position: relative;
+            width: fit-content;
+            padding: 4px;
+        }
+        
+        .hexagon-border-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: #f3b600; /* yellow-300 */
+            clip-path: polygon(50% 0%, 100% 20%, 100% 80%, 50% 100%, 0% 80%, 0% 20%);
+            z-index: 0;
+        }
+        
+        .hexagon-border-wrapper .hexagon-shape {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hexagon-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            clip-path: polygon(50% 0%, 100% 20%, 100% 80%, 50% 100%, 0% 80%, 0% 20%);
+            z-index: 1;
+        }
+        
+        .hexagon-shape .absolute {
+            z-index: 2;
+        }
+    </style>
+
+<div class=" flex items-center justify-center">
+    
+    <!-- Hexagon Carousel -->
+    <div class="container mx-auto px-4 ">
+        <h1 class="text-6xl font-bold text-center mb-6 text-gray-800">Other Services</h1>
+        
+        <div class="splide h-fit py-8" id="hexagon-carousel">
+            <div class="splide__track">
+                <ul class="splide__list">
+                    <!-- Hexagon 1 -->
+                    <li class="splide__slide">
+                        <div class="flex justify-center items-center p-12">
+                            <div class="hexagon-border-wrapper">
+                                <div class="relative w-64 h-64 hexagon-shape cursor-pointer" style="background-image: url('./src/assets/images/hexCarousel.jpg'); background-size: cover; background-position: center;">
+                                    <div class="hexagon-overlay"></div>
+                                    <div class="absolute inset-0 flex justify-center items-center text-white text-xl font-semibold p-8 text-center">
+                                        IT Infrastructure Management
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Hexagon 2 -->
+                    <li class="splide__slide">
+                        <div class="flex justify-center items-center p-12">
+                            <div class="hexagon-border-wrapper">
+                                <div class="relative w-64 h-64 hexagon-shape cursor-pointer" style="background-image: url('./src/assets/images/hexCarousel.jpg'); background-size: cover; background-position: center;">
+                                    <div class="hexagon-overlay"></div>
+                                    <div class="absolute inset-0 flex justify-center items-center text-white text-xl font-semibold p-8 text-center">
+                                        Cloud Solutions
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Hexagon 3 -->
+                    <li class="splide__slide">
+                        <div class="flex justify-center items-center p-12">
+                            <div class="hexagon-border-wrapper">
+                                <div class="relative w-64 h-64 hexagon-shape cursor-pointer" style="background-image: url('./src/assets/images/hexCarousel.jpg'); background-size: cover; background-position: center;">
+                                    <div class="hexagon-overlay"></div>
+                                    <div class="absolute inset-0 flex justify-center items-center text-white text-xl font-semibold p-8 text-center">
+                                        Cybersecurity
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Hexagon 4 -->
+                    <li class="splide__slide">
+                        <div class="flex justify-center items-center p-12">
+                            <div class="hexagon-border-wrapper">
+                                <div class="relative w-64 h-64 hexagon-shape cursor-pointer" style="background-image: url('./src/assets/images/hexCarousel.jpg'); background-size: cover; background-position: center;">
+                                    <div class="hexagon-overlay"></div>
+                                    <div class="absolute inset-0 flex justify-center items-center text-white text-xl font-semibold p-8 text-center">
+                                        Network Support
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Hexagon 5 -->
+                    <li class="splide__slide">
+                        <div class="flex justify-center items-center p-12">
+                            <div class="hexagon-border-wrapper">
+                                <div class="relative w-64 h-64 hexagon-shape cursor-pointer" style="background-image: url('./src/assets/images/hexCarousel.jpg'); background-size: cover; background-position: center;">
+                                    <div class="hexagon-overlay"></div>
+                                    <div class="absolute inset-0 flex justify-center items-center text-white text-xl font-semibold p-8 text-center">
+                                        Data Backup
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <!-- Hexagon 6 -->
+                    <li class="splide__slide">
+                        <div class="flex justify-center items-center p-12">
+                            <div class="hexagon-border-wrapper">
+                                <div class="relative w-64 h-64 hexagon-shape cursor-pointer" style="background-image: url('./src/assets/images/hexCarousel.jpg'); background-size: cover; background-position: center;">
+                                    <div class="hexagon-overlay"></div>
+                                    <div class="absolute inset-0 flex justify-center items-center text-white text-xl font-semibold p-8 text-center">
+                                        Tech Consulting
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                       <!-- CTA Button -->
+                    </ul>
+                    <div class="flex justify-center my-8">
+                        <a href="help.html">
+                            <button class="px-16 py-4 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-600 transition-colors duration-200 shadow-lg text-lg">
+                                Get Started Today
+                            </button>
+                        </a>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Testimonials Section -->
+    <section class="bg-white py-8 px-4">
+        <div class="w-full px-8">
+         
+
+            <!-- Section Title -->
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
+                What Our Clients Say About Us
+            </h2>
+
+            <!-- Testimonials Carousel -->
+            <div class="splide" id="testimonials-carousel">
+                <div class="splide__track">
+                    <ul class="splide__list">
+                        <!-- Testimonial 1 -->
+                        <li class="splide__slide">
+                            <div class="bg-white rounded-xl border-2 border-[#00D4FF] shadow-md p-4 mx-2 min-h-[400px] flex items-center">
+                                <div class="flex flex-col items-center text-center w-full">
+                                    <img src="./src/assets/images/profile.jpg" alt="James Pattinson" class="w-32 h-32 rounded-full mb-4 object-cover">
+                                    <h3 class="font-bold text-gray-900 mb-2">James Pattinson</h3>
+                                    <div class="flex gap-1 mb-4">
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                    </div>
+                                    <p class="text-gray-600 text-sm px-4">
+                                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cursus nibh mauris, nec turpis orci lectus maecenas. Suspendisse sed magna eget nibh in turpis. Consequat duis diam lacus arcu."
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- Testimonial 2 -->
+                        <li class="splide__slide">
+                            <div class="bg-white rounded-xl border-2 border-[#00D4FF] shadow-md p-4 mx-2 min-h-[400px] flex items-center">
+                                <div class="flex flex-col items-center text-center w-full">
+                                    <img src="./src/assets/images/profile.jpg" alt="Greg Smart" class="w-32 h-32 rounded-full mb-4 object-cover">
+                                    <h3 class="font-bold text-gray-900 mb-2">Greg Smart</h3>
+                                    <div class="flex gap-1 mb-4">
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                    </div>
+                                    <p class="text-gray-600 text-sm px-4">
+                                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cursus nibh mauris, nec turpis orci lectus maecenas. Suspendisse sed magna eget nibh in turpis. Consequat duis diam lacus arcu."
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- Testimonial 3 -->
+                        <li class="splide__slide">
+                            <div class="bg-white rounded-xl border-2 border-[#00D4FF] shadow-md p-4 mx-2 min-h-[400px] flex items-center">
+                                <div class="flex flex-col items-center text-center w-full">
+                                    <img src="./src/assets/images/profile.jpg" alt="Trevor Mitchell" class="w-32 h-32 rounded-full mb-4 object-cover">
+                                    <h3 class="font-bold text-gray-900 mb-2">Trevor Mitchell</h3>
+                                    <div class="flex gap-1 mb-4">
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-gray-300 text-3xl">★</span>
+                                        <span class="text-gray-300 text-3xl">★</span>
+                                    </div>
+                                    <p class="text-gray-600 text-sm px-4">
+                                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cursus nibh mauris, nec turpis orci lectus maecenas. Suspendisse sed magna eget nibh in turpis. Consequat duis diam lacus arcu."
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- Testimonial 4 -->
+                        <li class="splide__slide">
+                            <div class="bg-white rounded-xl border-2 border-[#00D4FF] shadow-md p-4 mx-2 min-h-[400px] flex items-center">
+                                <div class="flex flex-col items-center text-center w-full">
+                                    <img src="./src/assets/images/profile.jpg" alt="James Pattinson" class="w-32 h-32 rounded-full mb-4 object-cover">
+                                    <h3 class="font-bold text-gray-900 mb-2">James Pattinson</h3>
+                                    <div class="flex gap-1 mb-4">
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-gray-300 text-3xl">★</span>
+                                    </div>
+                                    <p class="text-gray-600 text-sm px-4">
+                                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cursus nibh mauris, nec turpis orci lectus maecenas. Suspendisse sed magna eget nibh in turpis. Consequat duis diam lacus arcu."
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- Testimonial 5 -->
+                        <li class="splide__slide">
+                            <div class="bg-white rounded-xl border-2 border-[#00D4FF] shadow-md p-4 mx-2 min-h-[400px] flex items-center">
+                                <div class="flex flex-col items-center text-center w-full">
+                                    <img src="./src/assets/images/profile.jpg" alt="Greg Smart" class="w-32 h-32 rounded-full mb-4 object-cover">
+                                    <h3 class="font-bold text-gray-900 mb-2">Greg Smart</h3>
+                                    <div class="flex gap-1 mb-4">
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                        <span class="text-yellow-400 text-3xl">★</span>
+                                    </div>
+                                    <p class="text-gray-600 text-sm px-4">
+                                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cursus nibh mauris, nec turpis orci lectus maecenas. Suspendisse sed magna eget nibh in turpis. Consequat duis diam lacus arcu."
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 py-12 px-4">
+        <div class="max-w-7xl mx-auto">
+            <!-- Footer Grid -->
+            <div class="flex flex-col lg:flex-row gap-12 mb-8">
+                <!-- Left Side: Links Grid -->
+                <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- First Row -->
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-4">Services</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">Web Development</a></li>
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">App Development</a></li>
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">Cloud Solutions</a></li>
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">Cybersecurity</a></li>
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">IT Consulting</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-4">Useful Links</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li><a href="aboutus.html" class="hover:text-blue-500 transition-colors">About Us</a></li>
+                            <li><a href="contactus.html" class="hover:text-blue-500 transition-colors">Contact Us</a></li>
+                            <li><a href="help.html" class="hover:text-blue-500 transition-colors">FAQs</a></li>
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">Terms of Service</a></li>
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Second Row -->
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-4">Resources</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">Blog</a></li>
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">Case Studies</a></li>
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">Documentation</a></li>
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">API Reference</a></li>
+                            <li><a href="help.html" class="hover:text-blue-500 transition-colors">Help Center</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-gray-900 mb-4">Company</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">Careers</a></li>
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">Press</a></li>
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">Partnerships</a></li>
+                            <li><a href="#" class="hover:text-blue-500 transition-colors">Partnerships</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Right Side: Subscribe Box  bg-[#203C860D] -->
+                <div class="lg:w-80 flex flex-col justify-center ">
+                    <h3 class="font-bold text-gray-900 mb-4">Subscribe</h3>
+                    <form class="mb-4">
+                        <div class="relative">
+                            <input 
+                                type="email" 
+                                placeholder="Email" 
+                                class="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:border-blue-500"
+                            />
+                            <button 
+                                type="submit" 
+                                class="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
+                            >
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                    <p class="text-sm text-gray-600 mb-6">
+                        At SEven Hives, our mission is to transform technology into meaningful connections between companies, clients, and communities.
+                    </p>
+                    <!-- Social Icons -->
+                    <div class="flex gap-3">
+                        <a href="#" class="w-10 h-10 rounded-full   flex items-center justify-center hover:bg-blue-50 transition-colors">
+                            <img src="./src/assets/images/facebook.png" class="w-10 h-10"/>
+                        </a>
+                         <a href="#" class="w-10 h-10 rounded-full   flex items-center justify-center hover:bg-blue-50 transition-colors">
+                            <img src="./src/assets/images/twitter.png" class="w-10 h-10"/>
+                        </a>
+                         <a href="#" class="w-10 h-10 rounded-full   flex items-center justify-center hover:bg-blue-50 transition-colors">
+                            <img src="./src/assets/images/linkedin.png" class="w-10 h-10"/>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="border-t border-gray-300 pt-6 text-center">
+                <p class="text-gray-600 text-sm">© 2026 SEven Hives. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="src/assets/lib/htmx.min.js"></script>
+    <script src="src/assets/lib/splide.min.js"></script>
+    <script src="src/assets/lib/anime.min.js"></script>
+    <script src="src/js/main.js"></script>
 </body>
 </html>

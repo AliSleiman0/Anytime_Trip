@@ -1,0 +1,16 @@
+{
+  "name": "anytime-admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i src/components/assets/css/main.css -o dist/css/admin.css --minify",
+    "watch:css": "tailwindcss -i src/components/assets/css/main.css -o dist/css/admin.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.18",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "postcss-cli": "^9.1.0",
+    "tailwindcss": "^4.1.18"
+  }
+}

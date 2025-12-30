@@ -43,9 +43,11 @@ func main() {
 	// Initialize Fiber app
 	fiberApp := fiber.New()
 
-	// Setup static files
-	fiberApp.Static("/static", "../../frontend")
-	fiberApp.Static("/", "../../templates")
+	// Setup static files (relative to backend working dir)
+	fiberApp.Static("/static", "./static")
+	fiberApp.Static("/", "./templates")
+	// Serve admin assets (css/images) under /assets
+	fiberApp.Static("/assets", "../frontend/admin/src/components/assets")
 
 	// Setup API routes
 	api := fiberApp.Group("/api")
@@ -54,8 +56,8 @@ func main() {
 	appGroup := api.Group("/app")
 	appRoutes.SetupRoutes(appGroup, appHandler)
 
-	// Admin routes (with middleware)
-	adminGroup := api.Group("/admin")
+	// Admin routes (with middleware) served under /admin
+	adminGroup := fiberApp.Group("/admin")
 	adminGroup.Use(middleware.AuthMiddleware())
 	adminGroup.Use(middleware.AdminMiddleware())
 	adminRoutes.SetupRoutes(adminGroup, adminHandler)
