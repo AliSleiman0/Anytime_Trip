@@ -17,4 +17,7 @@ func SetupRoutes(router fiber.Router, handler *admin.AdminHandler) {
 	router.Get("/sidebar", handler.GetSidebar)
 	router.Get("/header", handler.GetHeader)
 	router.Get("/users", handler.ManageUsers)
+	router.Get("/user-frag", handler.GetUsersFragment)
+	router.Get("/view-user", handler.ViewUser)
+	router.Get("/view-user-frag", handler.GetViewUserFragment)
 }

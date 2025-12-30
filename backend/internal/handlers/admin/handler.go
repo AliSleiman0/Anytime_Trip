@@ -83,9 +83,41 @@ func (h *AdminHandler) GetBookingsFragment(c *fiber.Ctx) error {
 }
 
 func (h *AdminHandler) ManageUsers(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"message": "Admin User Management",
-	})
+	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "user.html")))
+	if err != nil {
+		return c.Status(500).SendString("Error loading template")
+	}
+
+	data := fiber.Map{
+		"Title": "Users",
+	}
+
+	c.Set("Content-Type", "text/html")
+	return tmpl.Execute(c, data)
+}
+
+// GetUsersFragment serves the user management fragment for HTMX partial loads
+func (h *AdminHandler) GetUsersFragment(c *fiber.Ctx) error {
+	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "user-frag.html")))
+}
+
+func (h *AdminHandler) ViewUser(c *fiber.Ctx) error {
+	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "view-user.html")))
+	if err != nil {
+		return c.Status(500).SendString("Error loading template")
+	}
+
+	data := fiber.Map{
+		"Title": "View User",
+	}
+
+	c.Set("Content-Type", "text/html")
+	return tmpl.Execute(c, data)
+}
+
+// GetViewUserFragment serves the view user fragment for HTMX partial loads
+func (h *AdminHandler) GetViewUserFragment(c *fiber.Ctx) error {
+	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "view-user-frag.html")))
 }
 
 // ServePage returns the admin landing page HTML
