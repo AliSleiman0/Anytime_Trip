@@ -1,0 +1,267 @@
+<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+  <main>
+    <div
+      hx-get="/admin/header?title=Reports and Analytics&subtitle=View detailed insights and performance metrics"
+      hx-trigger="load"
+      hx-swap="innerHTML"
+    ></div>
+
+    <div class="p-4">
+      <!-- Filters -->
+      <div class="flex flex-wrap gap-3 mb-6">
+        <input
+          type="date"
+          class="w-44 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          placeholder="From Date"
+        />
+        <input
+          type="date"
+          class="w-44 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          placeholder="To Date"
+        />
+        <select
+          class="w-52 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+        >
+          <option disabled selected hidden>Report Type</option>
+          <option>Revenue</option>
+          <option>Bookings</option>
+          <option>Users</option>
+          <option>Services</option>
+          <option>Transactions</option>
+        </select>
+        <button
+          class="px-6 h-11 bg-[#336891] text-white font-semibold rounded-lg hover:bg-[#1f3242]"
+        >
+          Generate Report
+        </button>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-2xl p-4 shadow-xl">
+          <div class="text-xs font-semibold text-gray-600 mb-2">
+            Overall Revenue
+          </div>
+          <div class="flex items-end justify-between">
+            <div class="text-2xl font-bold text-[#1f3242]">71,000</div>
+            <div
+              class="flex items-center gap-1 text-[#26CE00] text-xs font-semibold"
+            >
+              <span>+11.01%</span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z"
+                  fill="#009316"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 shadow-xl">
+          <div class="text-xs font-semibold text-gray-600 mb-2">
+            Users Booking Hotels
+          </div>
+          <div class="flex items-end justify-between">
+            <div class="text-2xl font-bold text-[#1f3242]">71,000</div>
+            <div
+              class="flex items-center gap-1 text-[#D24124] text-xs font-semibold"
+            >
+              <span>-11.01%</span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699"
+                  stroke="#D24124"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 shadow-xl">
+          <div class="text-xs font-semibold text-gray-600 mb-2">
+            Users Renting Cars
+          </div>
+          <div class="flex items-end justify-between">
+            <div class="text-2xl font-bold text-[#1f3242]">71,000</div>
+            <div
+              class="flex items-center gap-1 text-[#D24124] text-xs font-semibold"
+            >
+              <span>+11.01%</span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699"
+                  stroke="#D24124"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 shadow-xl">
+          <div class="text-xs font-semibold text-gray-600 mb-2">
+            Users Booking Flights
+          </div>
+          <div class="flex items-end justify-between">
+            <div class="text-2xl font-bold text-[#1f3242]">71,000</div>
+            <div
+              class="flex items-center gap-1 text-[#D24124] text-xs font-semibold"
+            >
+              <span>+11.01%</span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699"
+                  stroke="#D24124"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- #1 hotel booked & #1 car rented-->
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="bg-[#FFFFFF] rounded-2xl p-6 shadow-xl items-center">
+          <h3 class="text-xl font-bold mb-3">The #1 Hotel Booked</h3>
+          <div class="flex gap-5 rounded-xl">
+            <img
+              class="w-80 h-52 rounded-xl"
+              src="/static/admin/images/hotel2.jpg"
+              alt="Hotel Image"
+            />
+            <div>
+              <h4 class="text-lg font-semibold">Hotel Name</h4>
+              <p class="text-xs font-light mb-20">Location</p>
+              <p class="text-lg font-semibold text-[#009316]">71,000</p>
+              <p class="text-lg font-semibold text-[#009316]">Bookings/Year</p>
+              <div
+                class="flex gap-1 justify-end text-[#009316] text-xs text-end font-semibold"
+              >
+                <span>+11.01%</span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z"
+                    fill="#009316"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-[#FFFFFF] rounded-2xl p-6 shadow-xl items-center">
+          <h3 class="text-xl font-bold mb-3">The #1 car Rented</h3>
+          <div class="flex gap-5 rounded-xl">
+            <img
+              class="w-80 h-52 rounded-xl"
+              src="/static/admin/images/car.png"
+              alt="Car Image"
+            />
+            <div>
+              <h4 class="text-lg font-semibold">Car Type</h4>
+              <p class="text-xs font-light mb-20">Location</p>
+              <p class="text-lg font-semibold text-[#009316]">71,000</p>
+              <p class="text-lg font-semibold text-[#009316]">Rents/Year</p>
+              <div
+                class="flex gap-1 justify-end text-[#009316] text-xs text-end font-semibold"
+              >
+                <span>+11.01%</span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z"
+                    fill="#009316"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-[#FFFFFF] rounded-2xl p-6 shadow-xl items-center">
+          <h3 class="text-xl font-bold mb-3">The #1 Flight Destination</h3>
+          <div class="flex gap-5 rounded-xl">
+            <img
+              class="w-80 h-52 rounded-xl"
+              src="/static/admin/images/city.png"
+              alt="City Image"
+            />
+            <div>
+              <h4 class="text-lg font-semibold">Flight Destination</h4>
+              <p class="text-xs font-light mb-20">Location</p>
+              <p class="text-lg font-semibold text-[#009316]">71,000</p>
+              <p class="text-lg font-semibold text-[#009316]">Flights/Year</p>
+              <div
+                class="flex gap-1 justify-end text-[#009316] text-xs text-end font-semibold"
+              >
+                <span>+11.01%</span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z"
+                    fill="#009316"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
