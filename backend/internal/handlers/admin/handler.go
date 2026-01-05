@@ -310,6 +310,44 @@ func (h *AdminHandler) GetCMSPopularLocationsFragment(c *fiber.Ctx) error {
 	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "cms-home-popular-frag.html")))
 }
 
+func (h *AdminHandler) GetSupport(c *fiber.Ctx) error {
+	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "support.html")))
+	if err != nil {
+		return c.Status(500).SendString("Error loading template")
+	}
+
+	data := fiber.Map{
+		"Title": "Customer Support",
+	}
+
+	c.Set("Content-Type", "text/html")
+	return tmpl.Execute(c, data)
+}
+
+// GetSupportFragment serves the support fragment for HTMX partial loads
+func (h *AdminHandler) GetSupportFragment(c *fiber.Ctx) error {
+	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "support-frag.html")))
+}
+
+func (h *AdminHandler) GetSettings(c *fiber.Ctx) error {
+	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "settings.html")))
+	if err != nil {
+		return c.Status(500).SendString("Error loading template")
+	}
+
+	data := fiber.Map{
+		"Title": "Settings",
+	}
+
+	c.Set("Content-Type", "text/html")
+	return tmpl.Execute(c, data)
+}
+
+// GetSettingsFragment serves the settings fragment for HTMX partial loads
+func (h *AdminHandler) GetSettingsFragment(c *fiber.Ctx) error {
+	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "settings-frag.html")))
+}
+
 // ServePage returns the admin landing page HTML
 func (h *AdminHandler) ServePage(c *fiber.Ctx) error {
 	// Serve the shared admin HTML template located under backend/templates
