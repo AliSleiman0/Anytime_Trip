@@ -237,27 +237,80 @@
         </a>
       </li>
       <li>
-        <a
-          href="/admin/content"
-          class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100"
+        <button
+          onclick="toggleCMSDropdown()"
+          class="flex items-center justify-between w-full px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100"
         >
+          <div class="flex items-center gap-3">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18.5 2.75C20.0188 2.75 21.25 3.98122 21.25 5.5V18.5C21.25 20.0188 20.0188 21.25 18.5 21.25H5.5C3.98122 21.25 2.75 20.0188 2.75 18.5V5.5C2.75 3.98122 3.98122 2.75 5.5 2.75H18.5ZM9.25 19.75H18.5C19.1904 19.75 19.75 19.1904 19.75 18.5V5.5C19.75 4.80964 19.1904 4.25 18.5 4.25H9.25V19.75ZM5.5 4.25C4.80964 4.25 4.25 4.80964 4.25 5.5V18.5C4.25 19.1904 4.80964 19.75 5.5 19.75H7.75V4.25H5.5ZM15.5 15.75C15.9142 15.75 16.25 16.0858 16.25 16.5C16.25 16.9142 15.9142 17.25 15.5 17.25H11.5C11.0858 17.25 10.75 16.9142 10.75 16.5C10.75 16.0858 11.0858 15.75 11.5 15.75H15.5ZM15.5 10.75C15.9142 10.75 16.25 11.0858 16.25 11.5C16.25 11.9142 15.9142 12.25 15.5 12.25H11.5C11.0858 12.25 10.75 11.9142 10.75 11.5C10.75 11.0858 11.0858 10.75 11.5 10.75H15.5ZM17.5 6.75C17.9142 6.75 18.25 7.08579 18.25 7.5C18.25 7.91421 17.9142 8.25 17.5 8.25H11.5C11.0858 8.25 10.75 7.91421 10.75 7.5C10.75 7.08579 11.0858 6.75 11.5 6.75H17.5Z"
+                fill="#1D1D1D"
+                stroke="black"
+                stroke-width="0.5"
+              />
+            </svg>
+
+            <span>Content Managing System</span>
+          </div>
           <svg
-            width="24"
-            height="24"
+            id="cmsDropdownIcon"
+            width="20"
+            height="20"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            class="transition-transform duration-200"
           >
             <path
-              d="M18.5 2.75C20.0188 2.75 21.25 3.98122 21.25 5.5V18.5C21.25 20.0188 20.0188 21.25 18.5 21.25H5.5C3.98122 21.25 2.75 20.0188 2.75 18.5V5.5C2.75 3.98122 3.98122 2.75 5.5 2.75H18.5ZM9.25 19.75H18.5C19.1904 19.75 19.75 19.1904 19.75 18.5V5.5C19.75 4.80964 19.1904 4.25 18.5 4.25H9.25V19.75ZM5.5 4.25C4.80964 4.25 4.25 4.80964 4.25 5.5V18.5C4.25 19.1904 4.80964 19.75 5.5 19.75H7.75V4.25H5.5ZM15.5 15.75C15.9142 15.75 16.25 16.0858 16.25 16.5C16.25 16.9142 15.9142 17.25 15.5 17.25H11.5C11.0858 17.25 10.75 16.9142 10.75 16.5C10.75 16.0858 11.0858 15.75 11.5 15.75H15.5ZM15.5 10.75C15.9142 10.75 16.25 11.0858 16.25 11.5C16.25 11.9142 15.9142 12.25 15.5 12.25H11.5C11.0858 12.25 10.75 11.9142 10.75 11.5C10.75 11.0858 11.0858 10.75 11.5 10.75H15.5ZM17.5 6.75C17.9142 6.75 18.25 7.08579 18.25 7.5C18.25 7.91421 17.9142 8.25 17.5 8.25H11.5C11.0858 8.25 10.75 7.91421 10.75 7.5C10.75 7.08579 11.0858 6.75 11.5 6.75H17.5Z"
-              fill="#1D1D1D"
-              stroke="black"
-              stroke-width="0.5"
+              d="M6 9L12 15L18 9"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             />
           </svg>
-
-          <span>Content Managing System</span>
-        </a>
+        </button>
+        <ul id="cmsSubmenu" class="hidden ml-6 mt-1 space-y-1">
+          <li>
+            <a
+              href="/admin/cms/flights"
+              class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 text-sm"
+            >
+              <span>Flights Management</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="/admin/cms/cars"
+              class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 text-sm"
+            >
+              <span>Cars Management</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="/admin/cms/hotels"
+              class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 text-sm"
+            >
+              <span>Hotels Management</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="/admin/cms/homepage/travel"
+              class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 text-sm"
+            >
+              <span>Homepage Management</span>
+            </a>
+          </li>
+        </ul>
       </li>
       <li>
         <a
@@ -372,6 +425,33 @@
   </div>
 
   <script>
+    // CMS Dropdown toggle function
+    function toggleCMSDropdown() {
+      const submenu = document.getElementById('cmsSubmenu');
+      const icon = document.getElementById('cmsDropdownIcon');
+      
+      if (submenu.classList.contains('hidden')) {
+        submenu.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        submenu.classList.add('hidden');
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Auto-expand CMS dropdown if on a CMS page
+    (function() {
+      const currentPath = window.location.pathname;
+      if (currentPath.startsWith('/admin/cms/')) {
+        const submenu = document.getElementById('cmsSubmenu');
+        const icon = document.getElementById('cmsDropdownIcon');
+        if (submenu && icon) {
+          submenu.classList.remove('hidden');
+          icon.style.transform = 'rotate(180deg)';
+        }
+      }
+    })();
+
     // Dynamic active link highlighting
     (function() {
       const currentPath = window.location.pathname;
