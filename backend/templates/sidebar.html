@@ -1,77 +1,485 @@
-<aside class="w-64 min-h-screen bg-white border-r border-gray-200 flex flex-col text-sm">
-	<div class="border-b border-gray-200 px-6 pt-6 pb-4 flex items-center">
-		<!-- Replace src with your provided logo path -->
-		<img class="w-66 h-66" src="/static/admin/images/anytime-logo.png" alt="Anytime Travel Admin" class="h-12 w-auto object-contain" />
-	</div>
+<aside
+  class="w-64 min-h-screen bg-white border-r border-gray-200 flex flex-col text-sm"
+>
+  <div class="border-b border-gray-200 px-6 pt-6 pb-4 flex items-center">
+    <!-- Replace src with your provided logo path -->
+    <img
+      class="w-66 h-66"
+      src="/static/admin/images/anytime-logo.png"
+      alt="Anytime Travel Admin"
+      class="h-12 w-auto object-contain"
+    />
+  </div>
 
-	<nav class="flex-1 border-b border-gray-200 ">
-		<ul class="space-y-1 px-2">
-			<li>
-				<a href="/admin/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100">
-					<img src="/static/admin/images/Home.png" alt="Dashboard" class="h-5 w-5 object-contain" />
-					<span>Dashboard</span>
-				</a>
-			</li>
-			<li>
-				<a href="/admin/bookings" class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100">
-					<img src="/static/admin/images/flight-schedule.png" alt="Bookings Management" class="h-5 w-5 object-contain" />
-					<span>Bookings Management</span>
-				</a>
-			</li>
-			<li>
-				<a href="/admin/users" class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100">
-					<img src="/static/admin/images/users-group.png" alt="User Management" class="h-5 w-5 object-contain" />
-					<span>User Management</span>
-				</a>
-			</li>
-			<li>
-				<a href="/admin/service-providers" class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100">
-					<img src="/static/admin/images/building.png" alt="Service Provider Management" class="h-5 w-5 object-contain" />
-					<span>Service Provider Management</span>
-				</a>
-			</li>
-			<li>
-				<a href="/admin/payments" class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100">
-					<img src="/static/admin/images/money-change.png" alt="Payments and Transactions" class="h-5 w-5 object-contain" />
-					<span>Payments and Transactions</span>
-				</a>
-			</li>
-			<li>
-				<a href="/admin/reports" class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100">
-					<img src="/static/admin/images/reports.png" alt="Reports and Analytics" class="h-5 w-5 object-contain" />
-					<span>Reports and Analytics</span>
-				</a>
-			</li>
-			<li>
-				<a href="/admin/content" class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100">
-					<img src="/static/admin/images/content.png" alt="Content Managing System" class="h-5 w-5 object-contain" />
-					<span>Content Managing System</span>
-				</a>
-			</li>
-			<li>
-				<a href="/admin/accounting" class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100">
-					<img src="/static/admin/images/accounting.png" alt="Accounting" class="h-5 w-5 object-contain" />
-					<span>Accounting</span>
-				</a>
-			</li>
-			<li>
-				<a href="/admin/answers" class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100">
-					<img src="/static/admin/images/message-circle.png" alt="Predefined Answers" class="h-5 w-5 object-contain" />
-					<span>Predefined Answers</span>
-				</a>
-			</li>
-		</ul>
-	</nav>
+  <nav class="flex-1 border-b border-gray-200">
+    <ul class="space-y-1 px-2">
+      <li>
+        <a
+          href="/admin/dashboard"
+          class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M2 12.2039C2 9.91549 2 8.77128 2.5192 7.82274C3.0384 6.87421 3.98695 6.28551 5.88403 5.10813L7.88403 3.86687C9.88939 2.62229 10.8921 2 12 2C13.1079 2 14.1106 2.62229 16.116 3.86687L18.116 5.10812C20.0131 6.28551 20.9616 6.87421 21.4808 7.82274C22 8.77128 22 9.91549 22 12.2039V13.725C22 17.6258 22 19.5763 20.8284 20.7881C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.7881C2 19.5763 2 17.6258 2 13.725V12.2039Z"
+              stroke="#1D1D1D"
+              stroke-width="2"
+            />
+            <path
+              d="M15 18H9"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
 
-	<div class="px-2 pb-4 space-y-1">
-		<div class="my-2"></div>
-		<a href="/admin/support" class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100">
-			<img src="/static/admin/images/qustion-circle.png" alt="Customer Support" class="h-5 w-5 object-contain" />
-			<span>Customer Support</span>
-		</a>
-		<a href="/logout" class="flex items-center gap-3 px-3 py-2 rounded-md text-red-600 hover:bg-red-50">
-			<img src="/static/admin/images/log-out.png" alt="Log out" class="h-5 w-5 object-contain" />
-			<span>Log out</span>
-		</a>
-	</div>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="/admin/bookings"
+          class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g clip-path="url(#clip0_590_2642)">
+              <path
+                d="M18 13C18.1326 13 18.2597 13.0527 18.3535 13.1465C18.4473 13.2403 18.5 13.3674 18.5 13.5V15.1279C18.5001 15.3741 18.6392 15.5989 18.8594 15.709L22.167 17.3633C22.2178 17.3887 22.2499 17.4403 22.25 17.4971V18.1592C22.25 18.2653 22.1425 18.3382 22.0439 18.2988L19.3916 17.2373C18.9646 17.0665 18.5 17.381 18.5 17.8408V19.6748C18.5 19.8794 18.5961 20.0726 18.7598 20.1953L19.9414 21.0811C19.9782 21.1088 19.9999 21.1522 20 21.1982C20 21.2988 19.9011 21.3707 19.8057 21.3389L18.2051 20.8047C18.072 20.7604 17.928 20.7604 17.7949 20.8047L16.1943 21.3389C16.0989 21.3707 16 21.2988 16 21.1982C16.0001 21.1522 16.0218 21.1088 16.0586 21.0811L17.2402 20.1953C17.4039 20.0726 17.5 19.8794 17.5 19.6748V17.8408C17.5 17.381 17.0354 17.0665 16.6084 17.2373L13.9561 18.2988C13.8575 18.3382 13.75 18.2653 13.75 18.1592V17.4971C13.7501 17.4403 13.7822 17.3887 13.833 17.3633L17.1406 15.709C17.3608 15.5989 17.4999 15.3741 17.5 15.1279V13.5C17.5 13.3674 17.5527 13.2403 17.6465 13.1465C17.7403 13.0527 17.8674 13 18 13Z"
+                fill="#1D1D1D"
+                stroke="#1D1D1D"
+                stroke-width="0.5"
+              />
+              <path
+                d="M8.59961 1.40039C8.87575 1.40039 9.09961 1.62425 9.09961 1.90039V2.59961C9.09961 2.76529 9.23471 2.90039 9.40039 2.90039H14.5996C14.7653 2.90039 14.9004 2.76529 14.9004 2.59961V1.90039C14.9004 1.62425 15.1242 1.40039 15.4004 1.40039H16.0996C16.3758 1.40039 16.5996 1.62425 16.5996 1.90039V2.59961C16.5996 2.76529 16.7347 2.90039 16.9004 2.90039H19.5C19.9243 2.90039 20.3318 3.06811 20.6318 3.36816C20.9319 3.66822 21.0996 4.07565 21.0996 4.5V9.34961C21.0996 9.62575 20.8758 9.84961 20.5996 9.84961H19.9004C19.6242 9.84961 19.4004 9.62575 19.4004 9.34961V4.90039C19.4004 4.73471 19.2653 4.59961 19.0996 4.59961H16.9004C16.7347 4.59961 16.5996 4.7347 16.5996 4.90039V5.59961C16.5996 5.87575 16.3758 6.09961 16.0996 6.09961H15.4004C15.1242 6.09961 14.9004 5.87575 14.9004 5.59961V4.90039C14.9004 4.73471 14.7653 4.59961 14.5996 4.59961H9.40039C9.23471 4.59961 9.09961 4.73471 9.09961 4.90039V5.59961C9.09961 5.87575 8.87575 6.09961 8.59961 6.09961H7.90039C7.62425 6.09961 7.40039 5.87575 7.40039 5.59961V4.90039C7.40039 4.73471 7.26529 4.59961 7.09961 4.59961H4.90039C4.73471 4.59961 4.59961 4.73471 4.59961 4.90039V19.0996C4.59961 19.2653 4.73471 19.4004 4.90039 19.4004H11.5996C11.8758 19.4004 12.0996 19.6242 12.0996 19.9004V20.5996C12.0996 20.8758 11.8758 21.0996 11.5996 21.0996H4.5C4.07565 21.0996 3.66822 20.9319 3.36816 20.6318C3.06811 20.3318 2.90039 19.9243 2.90039 19.5V4.5L2.9082 4.3418C2.94459 3.97556 3.10564 3.63069 3.36816 3.36816C3.66822 3.06811 4.07565 2.90039 4.5 2.90039H7.09961C7.26529 2.90039 7.40039 2.76529 7.40039 2.59961V1.90039C7.40039 1.62425 7.62425 1.40039 7.90039 1.40039H8.59961Z"
+                fill="#1D1D1D"
+                stroke="#1D1D1D"
+                stroke-width="0.2"
+              />
+            </g>
+            <defs>
+              <clipPath id="clip0_590_2642">
+                <rect width="24" height="24" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
+
+          <span>Bookings Management</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="/admin/users"
+          class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9 10C11.2091 10 13 8.20914 13 6C13 3.79086 11.2091 2 9 2C6.79086 2 5 3.79086 5 6C5 8.20914 6.79086 10 9 10Z"
+              stroke="#1D1D1D"
+              stroke-width="2"
+            />
+            <path
+              d="M15 9C16.6569 9 18 7.65685 18 6C18 4.34315 16.6569 3 15 3"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <path
+              d="M5.88915 20.5843C6.82627 20.8504 7.88256 21 9 21C12.866 21 16 19.2091 16 17C16 14.7909 12.866 13 9 13C5.13401 13 2 14.7909 2 17C2 17.3453 2.07657 17.6804 2.22053 18"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+            <path
+              d="M18 14C19.7542 14.3847 21 15.3589 21 16.5C21 17.5293 19.9863 18.4229 18.5 18.8704"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+
+          <span>User Management</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="/admin/service-providers"
+          class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M7.5 11H4.6C4.03995 11 3.75992 11 3.54601 11.109C3.35785 11.2049 3.20487 11.3578 3.10899 11.546C3 11.7599 3 12.0399 3 12.6V21M16.5 11H19.4C19.9601 11 20.2401 11 20.454 11.109C20.6422 11.2049 20.7951 11.3578 20.891 11.546C21 11.7599 21 12.0399 21 12.6V21M16.5 21V6.2C16.5 5.0799 16.5 4.51984 16.282 4.09202C16.0903 3.71569 15.7843 3.40973 15.408 3.21799C14.9802 3 14.4201 3 13.3 3H10.7C9.57989 3 9.01984 3 8.59202 3.21799C8.21569 3.40973 7.90973 3.71569 7.71799 4.09202C7.5 4.51984 7.5 5.0799 7.5 6.2V21M22 21H2M11 7H13M11 11H13M11 15H13"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+
+          <span>Service Provider Management</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="/admin/payments"
+          class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M2 11V9C2 5.5 4 4 7 4H17C20 4 22 5.5 22 9V15C22 18.5 20 20 17 20H12"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-miterlimit="10"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M12 14.5C13.3807 14.5 14.5 13.3807 14.5 12C14.5 10.6193 13.3807 9.5 12 9.5C10.6193 9.5 9.5 10.6193 9.5 12C9.5 13.3807 10.6193 14.5 12 14.5Z"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-miterlimit="10"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M18.5 9.5V14.5"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-miterlimit="10"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M2 15.5H7.34003C7.98003 15.5 8.5 16.02 8.5 16.66V17.94"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-miterlimit="10"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M3.21997 14.28L2 15.5L3.21997 16.72"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-miterlimit="10"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M8.5 20.7801H3.15997C2.51997 20.7801 2 20.2601 2 19.6201V18.3401"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-miterlimit="10"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M7.28125 22.0003L8.50122 20.7803L7.28125 19.5603"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-miterlimit="10"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+
+          <span>Payments and Transactions</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="/admin/reports"
+          class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9 21H15M9 21V16M9 21H3.6C3.26863 21 3 20.7314 3 20.4V16.6C3 16.2686 3.26863 16 3.6 16H9M15 21V9M15 21H20.4C20.7314 21 21 20.7314 21 20.4V3.6C21 3.26863 20.7314 3 20.4 3H15.6C15.2686 3 15 3.26863 15 3.6V9M9 16V9.6C9 9.26863 9.26863 9 9.6 9H15"
+              stroke="#1D1D1D"
+              stroke-width="2"
+            />
+          </svg>
+
+          <span>Reports and Analytics</span>
+        </a>
+      </li>
+      <li>
+        <button
+          onclick="toggleCMSDropdown()"
+          class="flex items-center justify-between w-full px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100"
+        >
+          <div class="flex items-center gap-3">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18.5 2.75C20.0188 2.75 21.25 3.98122 21.25 5.5V18.5C21.25 20.0188 20.0188 21.25 18.5 21.25H5.5C3.98122 21.25 2.75 20.0188 2.75 18.5V5.5C2.75 3.98122 3.98122 2.75 5.5 2.75H18.5ZM9.25 19.75H18.5C19.1904 19.75 19.75 19.1904 19.75 18.5V5.5C19.75 4.80964 19.1904 4.25 18.5 4.25H9.25V19.75ZM5.5 4.25C4.80964 4.25 4.25 4.80964 4.25 5.5V18.5C4.25 19.1904 4.80964 19.75 5.5 19.75H7.75V4.25H5.5ZM15.5 15.75C15.9142 15.75 16.25 16.0858 16.25 16.5C16.25 16.9142 15.9142 17.25 15.5 17.25H11.5C11.0858 17.25 10.75 16.9142 10.75 16.5C10.75 16.0858 11.0858 15.75 11.5 15.75H15.5ZM15.5 10.75C15.9142 10.75 16.25 11.0858 16.25 11.5C16.25 11.9142 15.9142 12.25 15.5 12.25H11.5C11.0858 12.25 10.75 11.9142 10.75 11.5C10.75 11.0858 11.0858 10.75 11.5 10.75H15.5ZM17.5 6.75C17.9142 6.75 18.25 7.08579 18.25 7.5C18.25 7.91421 17.9142 8.25 17.5 8.25H11.5C11.0858 8.25 10.75 7.91421 10.75 7.5C10.75 7.08579 11.0858 6.75 11.5 6.75H17.5Z"
+                fill="#1D1D1D"
+                stroke="black"
+                stroke-width="0.5"
+              />
+            </svg>
+
+            <span>Content Managing System</span>
+          </div>
+          <svg
+            id="cmsDropdownIcon"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            class="transition-transform duration-200"
+          >
+            <path
+              d="M6 9L12 15L18 9"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+        <ul id="cmsSubmenu" class="hidden ml-6 mt-1 space-y-1">
+          <li>
+            <a
+              href="/admin/cms/flights"
+              class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 text-sm"
+            >
+              <span>Flights Management</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="/admin/cms/cars"
+              class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 text-sm"
+            >
+              <span>Cars Management</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="/admin/cms/hotels"
+              class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 text-sm"
+            >
+              <span>Hotels Management</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="/admin/cms/homepage/travel"
+              class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 text-sm"
+            >
+              <span>Homepage Management</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a
+          href="/superadmin/accounting"
+          class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g clip-path="url(#clip0_590_789)">
+              <path
+                d="M10.5 2C9.8 2 9.3 2.4 9.1 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H12C12 21.6 12.4 22 13 22H20C20.6 22 21 21.6 21 21V11C21 10.4 20.6 10 20 10H18V5C18 3.9 17.1 3 16 3H11.9C11.7 2.4 11.2 2 10.5 2ZM10.5 3C10.8 3 11 3.2 11 3.5C11 3.8 10.8 4 10.5 4C10.2 4 10 3.8 10 3.5C10 3.2 10.2 3 10.5 3ZM5.5 5H8V6H13V5H15.5C15.8 5 16 5.2 16 5.5V10H13C12.4 10 12 10.4 12 11V19H5.5C5.2 19 5 18.8 5 18.5V5.5C5 5.2 5.2 5 5.5 5ZM10.6 8.4H6.6V10.4H10.6V8.4ZM10.6 11.4H6.6V13.4H10.6V11.4ZM10.6 14.5H6.6V16.5H10.6V14.5ZM14 12H19V14H14V12ZM14 15H16V17H14V15ZM17 15H19V17H17V15ZM14 18H16V20H14V18ZM17 18H19V20H17V18Z"
+                fill="#1D1D1D"
+              />
+            </g>
+            <defs>
+              <clipPath id="clip0_590_789">
+                <rect width="24" height="24" fill="white" />
+              </clipPath>
+            </defs>
+          </svg>
+
+          <span>Accounting</span>
+        </a>
+      </li>
+      <li>
+        <a
+          href="/superadmin/predefined-answers"
+          class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9 12H15M12 9V15M21.0039 12C21.0039 16.9706 16.9745 21 12.0039 21C9.96749 21 3.00463 21 3.00463 21C3.00463 21 4.56382 17.2561 3.93982 16.0008C3.34076 14.7956 3.00391 13.4372 3.00391 12C3.00391 7.02944 7.03334 3 12.0039 3C16.9745 3 21.0039 7.02944 21.0039 12Z"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+
+          <span>Predefined Answers</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="px-2 pb-4 space-y-1">
+    <div class="my-2"></div>
+    <a
+      href="/admin/support"
+      class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100"
+    >
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M12 3.53846C7.32682 3.53846 3.53846 7.32682 3.53846 12C3.53846 16.6732 7.32682 20.4615 12 20.4615C16.6732 20.4615 20.4615 16.6732 20.4615 12C20.4615 7.32682 16.6732 3.53846 12 3.53846ZM2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12Z"
+          fill="#1D1D1D"
+        />
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M12.0002 8.15394C11.2921 8.15394 10.7181 8.72793 10.7181 9.43599C10.7181 9.86082 10.3738 10.2052 9.94892 10.2052C9.52408 10.2052 9.17969 9.86082 9.17969 9.43599C9.17969 7.87826 10.4425 6.61548 12.0002 6.61548C13.5579 6.61548 14.8207 7.87826 14.8207 9.43599C14.8207 9.99633 14.6565 10.5207 14.3733 10.9607C14.196 11.2364 13.9886 11.4995 13.7974 11.7372C13.7624 11.7806 13.7281 11.8232 13.6943 11.865C13.5357 12.0613 13.39 12.2416 13.2555 12.4265C12.9236 12.8827 12.7694 13.2254 12.7694 13.5386C12.7694 13.9634 12.425 14.3078 12.0002 14.3078C11.5754 14.3078 11.231 13.9634 11.231 13.5386C11.231 12.7188 11.6334 12.0409 12.0114 11.5214C12.1712 11.3019 12.3462 11.0854 12.5053 10.8885C12.5372 10.8491 12.5685 10.8104 12.5988 10.7727C12.7887 10.5366 12.9504 10.329 13.0796 10.1283C13.2078 9.929 13.2823 9.69236 13.2823 9.43599C13.2823 8.72793 12.7083 8.15394 12.0002 8.15394Z"
+          fill="#1D1D1D"
+        />
+        <path
+          d="M13.0258 16.6153C13.0258 17.1817 12.5666 17.6409 12.0002 17.6409C11.4338 17.6409 10.9746 17.1817 10.9746 16.6153C10.9746 16.0488 11.4338 15.5896 12.0002 15.5896C12.5666 15.5896 13.0258 16.0488 13.0258 16.6153Z"
+          fill="#1D1D1D"
+        />
+      </svg>
+
+      <span>Customer Support</span>
+    </a>
+    <a
+      href="/logout"
+      class="flex items-center gap-3 px-3 py-2 rounded-md text-red-600 hover:bg-red-50"
+    >
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M12 15L15 12M15 12L12 9M15 12H4M9 7.24859V7.2002C9 6.08009 9 5.51962 9.21799 5.0918C9.40973 4.71547 9.71547 4.40973 10.0918 4.21799C10.5196 4 11.0801 4 12.2002 4H16.8002C17.9203 4 18.4796 4 18.9074 4.21799C19.2837 4.40973 19.5905 4.71547 19.7822 5.0918C20 5.5192 20 6.07899 20 7.19691V16.8036C20 17.9215 20 18.4805 19.7822 18.9079C19.5905 19.2842 19.2837 19.5905 18.9074 19.7822C18.48 20 17.921 20 16.8031 20H12.1969C11.079 20 10.5192 20 10.0918 19.7822C9.71547 19.5905 9.40973 19.2839 9.21799 18.9076C9 18.4798 9 17.9201 9 16.8V16.75"
+          stroke="#D24124"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+
+      <span>Log out</span>
+    </a>
+  </div>
+
+  <script>
+    // CMS Dropdown toggle function
+    function toggleCMSDropdown() {
+      const submenu = document.getElementById('cmsSubmenu');
+      const icon = document.getElementById('cmsDropdownIcon');
+      
+      if (submenu.classList.contains('hidden')) {
+        submenu.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        submenu.classList.add('hidden');
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Auto-expand CMS dropdown if on a CMS page
+    (function() {
+      const currentPath = window.location.pathname;
+      if (currentPath.startsWith('/admin/cms/')) {
+        const submenu = document.getElementById('cmsSubmenu');
+        const icon = document.getElementById('cmsDropdownIcon');
+        if (submenu && icon) {
+          submenu.classList.remove('hidden');
+          icon.style.transform = 'rotate(180deg)';
+        }
+      }
+    })();
+
+    // Dynamic active link highlighting
+    (function() {
+      const currentPath = window.location.pathname;
+      const links = document.querySelectorAll('aside nav a');
+      const activeColor = '#336891';
+      
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        
+        // Check if this link matches the current path
+        if (href === currentPath) {
+          // Add active classes
+          link.classList.remove('text-gray-800');
+          link.classList.add('text-[#336891]', 'border-r-2', 'border-[#336891]');
+          
+          // Update all SVG strokes to active color
+          const svgPaths = link.querySelectorAll('svg path');
+          svgPaths.forEach(path => {
+            path.setAttribute('stroke', activeColor);
+          });
+          
+          // Handle filled paths (like in bookings icon)
+          const filledPaths = link.querySelectorAll('svg path[fill="#1D1D1D"]');
+          filledPaths.forEach(path => {
+            path.setAttribute('fill', activeColor);
+          });
+        }
+      });
+    })();
+  </script>
 </aside>

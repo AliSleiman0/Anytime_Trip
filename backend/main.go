@@ -63,7 +63,7 @@ func main() {
 	adminRoutes.SetupRoutes(adminGroup, adminHandler)
 
 	// Super Admin routes (with middleware)
-	superAdminGroup := api.Group("/superadmin")
+	superAdminGroup := fiberApp.Group("/superadmin")
 	superAdminGroup.Use(middleware.AuthMiddleware())
 	superAdminGroup.Use(middleware.SuperAdminMiddleware())
 	superAdminRoutes.SetupRoutes(superAdminGroup, superAdminHandler)

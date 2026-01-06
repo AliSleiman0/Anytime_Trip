@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} - Seven Hives Admin</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-[#E6F0F9]">
+    <div hx-get="/admin/sidebar" hx-trigger="load" hx-swap="innerHTML"></div>
+    <div id="main-content" hx-get="/admin/reports-frag" hx-trigger="load" hx-swap="innerHTML"></div>
+</body>
+</html>

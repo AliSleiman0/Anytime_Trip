@@ -1,0 +1,475 @@
+<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+  <main>
+    <div
+      hx-get="/admin/header?title=Customer Support&subtitle=Manage customer support tickets and inquiries"
+      hx-trigger="load"
+      hx-swap="innerHTML"
+    ></div>
+
+    <div class="flex justify-end p-4">
+      <div class="flex items-center gap-4">
+        <p class="flex items-center gap-2">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20 5.6001C20 5.04005 19.9996 4.75981 19.8906 4.5459C19.7948 4.35774 19.6423 4.20487 19.4542 4.10899C19.2403 4 18.9597 4 18.3996 4H5.59961C5.03956 4 4.75981 4 4.5459 4.10899C4.35774 4.20487 4.20487 4.35774 4.10899 4.5459C4 4.75981 4 5.04005 4 5.6001V6.33736C4 6.58195 4 6.70433 4.02763 6.81942C4.05213 6.92146 4.09263 7.01893 4.14746 7.1084C4.20928 7.20928 4.29591 7.29591 4.46875 7.46875L9.53149 12.5315C9.70443 12.7044 9.79044 12.7904 9.85228 12.8914C9.90711 12.9808 9.94816 13.0786 9.97266 13.1807C10 13.2946 10 13.4155 10 13.6552V18.411C10 19.2682 10 19.6971 10.1805 19.9552C10.3382 20.1806 10.5814 20.331 10.8535 20.3712C11.1651 20.4172 11.5487 20.2257 12.3154 19.8424L13.1154 19.4424C13.4365 19.2819 13.5966 19.2013 13.7139 19.0815C13.8176 18.9756 13.897 18.8485 13.9453 18.7084C14 18.5499 14 18.37 14 18.011V13.6626C14 13.418 14 13.2958 14.0276 13.1807C14.0521 13.0786 14.0926 12.9808 14.1475 12.8914C14.2089 12.7911 14.2947 12.7053 14.4653 12.5347L14.4688 12.5315L19.5315 7.46875C19.7044 7.2958 19.7904 7.20932 19.8523 7.1084C19.9071 7.01893 19.9482 6.92146 19.9727 6.81942C20 6.70551 20 6.58444 20 6.3448V5.6001Z"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Filter:
+        </p>
+        <select
+          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          name="status"
+          id="status"
+        >
+          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
+            Flights
+          </option>
+        </select>
+        <select
+          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          name="status"
+          id="status"
+        >
+          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
+            All Statuses
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="p-4">
+      <div class="grid grid-cols-3 gap-6 mb-6">
+        <!-- Support Ticket Detail Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 max-w-2xl">
+          <!-- Customer Info -->
+          <div
+            class="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200"
+          >
+            <div
+              class="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
+            >
+              <img
+                src="/static/admin/images/pp1.jpg"
+                alt=""
+                class="rounded-full"
+              />
+            </div>
+            <div class="flex-1">
+              <h3 class="text-lg font-bold text-gray-800">JohnMichaelDoe</h3>
+              <p class="text-sm text-gray-600">JohnMichael@email.com</p>
+            </div>
+          </div>
+
+          <!-- Ticket Info -->
+          <div class="flex items-center justify-between gap-4 mb-6">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-gray-600">Type:</span>
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                >Complaint</span
+              >
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-gray-600"
+                >Ticket ID:</span
+              >
+              <span class="text-sm font-semibold text-gray-800">12345</span>
+            </div>
+          </div>
+
+          <!-- Message Content -->
+          <div class="mb-6 p-4 bg-[#D9D9D9] rounded-lg">
+            <p class="text-sm text-[#1D1D1D] leading-relaxed">
+              Room not cleaned properly...
+            </p>
+          </div>
+
+          <!-- Reply Input -->
+          <div class="flex items-end gap-3 bg-[#D9D9D9] rounded-xl">
+            <input
+              type="text"
+              placeholder="Send reply..."
+              class="flex-1 h-12 bg-[#D9D9D9] rounded-lg px-4 text-sm text-[#1D1D1D] placeholder:text-[#1D1D1D]"
+            />
+            <button
+              class="py-3 rounded-lg hover:bg-[#1D1D1D]/20 transition font-semibold text-sm"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 22 22"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4.03333 17.8063C3.72778 17.9286 3.4375 17.9017 3.1625 17.7257C2.8875 17.5497 2.75 17.2939 2.75 16.9584V12.8334L10.0833 11.0001L2.75 9.16675V5.04175C2.75 4.70564 2.8875 4.44989 3.1625 4.2745C3.4375 4.09911 3.72778 4.07222 4.03333 4.19383L18.15 10.1522C18.5319 10.3202 18.7229 10.6029 18.7229 11.0001C18.7229 11.3973 18.5319 11.6799 18.15 11.848L4.03333 17.8063Z"
+                  fill="#1D1D1D"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <!-- Support Ticket Detail Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 max-w-2xl">
+          <!-- Customer Info -->
+          <div
+            class="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200"
+          >
+            <div
+              class="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
+            >
+              <img
+                src="/static/admin/images/pp1.jpg"
+                alt=""
+                class="rounded-full"
+              />
+            </div>
+            <div class="flex-1">
+              <h3 class="text-lg font-bold text-gray-800">JohnMichaelDoe</h3>
+              <p class="text-sm text-gray-600">JohnMichael@email.com</p>
+            </div>
+          </div>
+
+          <!-- Ticket Info -->
+          <div class="flex items-center justify-between gap-4 mb-6">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-gray-600">Type:</span>
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                >Complaint</span
+              >
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-gray-600"
+                >Ticket ID:</span
+              >
+              <span class="text-sm font-semibold text-gray-800">12345</span>
+            </div>
+          </div>
+
+          <!-- Message Content -->
+          <div class="mb-6 p-4 bg-[#D9D9D9] rounded-lg">
+            <p class="text-sm text-[#1D1D1D] leading-relaxed">
+              Room not cleaned properly...
+            </p>
+          </div>
+
+          <!-- Reply Input -->
+          <div class="flex items-end gap-3 bg-[#D9D9D9] rounded-xl">
+            <input
+              type="text"
+              placeholder="Send reply..."
+              class="flex-1 h-12 bg-[#D9D9D9] rounded-lg px-4 text-sm text-[#1D1D1D] placeholder:text-[#1D1D1D]"
+            />
+            <button
+              class="py-3 rounded-lg hover:bg-[#1D1D1D]/20 transition font-semibold text-sm"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 22 22"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4.03333 17.8063C3.72778 17.9286 3.4375 17.9017 3.1625 17.7257C2.8875 17.5497 2.75 17.2939 2.75 16.9584V12.8334L10.0833 11.0001L2.75 9.16675V5.04175C2.75 4.70564 2.8875 4.44989 3.1625 4.2745C3.4375 4.09911 3.72778 4.07222 4.03333 4.19383L18.15 10.1522C18.5319 10.3202 18.7229 10.6029 18.7229 11.0001C18.7229 11.3973 18.5319 11.6799 18.15 11.848L4.03333 17.8063Z"
+                  fill="#1D1D1D"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <!-- Support Ticket Detail Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 max-w-2xl">
+          <!-- Customer Info -->
+          <div
+            class="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200"
+          >
+            <div
+              class="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
+            >
+              <img
+                src="/static/admin/images/pp1.jpg"
+                alt=""
+                class="rounded-full"
+              />
+            </div>
+            <div class="flex-1">
+              <h3 class="text-lg font-bold text-gray-800">JohnMichaelDoe</h3>
+              <p class="text-sm text-gray-600">JohnMichael@email.com</p>
+            </div>
+          </div>
+
+          <!-- Ticket Info -->
+          <div class="flex items-center justify-between gap-4 mb-6">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-gray-600">Type:</span>
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                >Complaint</span
+              >
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-gray-600"
+                >Ticket ID:</span
+              >
+              <span class="text-sm font-semibold text-gray-800">12345</span>
+            </div>
+          </div>
+
+          <!-- Message Content -->
+          <div class="mb-6 p-4 bg-[#D9D9D9] rounded-lg">
+            <p class="text-sm text-[#1D1D1D] leading-relaxed">
+              Room not cleaned properly...
+            </p>
+          </div>
+
+          <!-- Reply Input -->
+          <div class="flex items-end gap-3 bg-[#D9D9D9] rounded-xl">
+            <input
+              type="text"
+              placeholder="Send reply..."
+              class="flex-1 h-12 bg-[#D9D9D9] rounded-lg px-4 text-sm text-[#1D1D1D] placeholder:text-[#1D1D1D]"
+            />
+            <button
+              class="py-3 rounded-lg hover:bg-[#1D1D1D]/20 transition font-semibold text-sm"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 22 22"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4.03333 17.8063C3.72778 17.9286 3.4375 17.9017 3.1625 17.7257C2.8875 17.5497 2.75 17.2939 2.75 16.9584V12.8334L10.0833 11.0001L2.75 9.16675V5.04175C2.75 4.70564 2.8875 4.44989 3.1625 4.2745C3.4375 4.09911 3.72778 4.07222 4.03333 4.19383L18.15 10.1522C18.5319 10.3202 18.7229 10.6029 18.7229 11.0001C18.7229 11.3973 18.5319 11.6799 18.15 11.848L4.03333 17.8063Z"
+                  fill="#1D1D1D"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <!-- Support Ticket Detail Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 max-w-2xl">
+          <!-- Customer Info -->
+          <div
+            class="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200"
+          >
+            <div
+              class="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
+            >
+              <img
+                src="/static/admin/images/pp1.jpg"
+                alt=""
+                class="rounded-full"
+              />
+            </div>
+            <div class="flex-1">
+              <h3 class="text-lg font-bold text-gray-800">JohnMichaelDoe</h3>
+              <p class="text-sm text-gray-600">JohnMichael@email.com</p>
+            </div>
+          </div>
+
+          <!-- Ticket Info -->
+          <div class="flex items-center justify-between gap-4 mb-6">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-gray-600">Type:</span>
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                >Complaint</span
+              >
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-gray-600"
+                >Ticket ID:</span
+              >
+              <span class="text-sm font-semibold text-gray-800">12345</span>
+            </div>
+          </div>
+
+          <!-- Message Content -->
+          <div class="mb-6 p-4 bg-[#D9D9D9] rounded-lg">
+            <p class="text-sm text-[#1D1D1D] leading-relaxed">
+              Room not cleaned properly...
+            </p>
+          </div>
+
+          <!-- Reply Input -->
+          <div class="flex items-end gap-3 bg-[#D9D9D9] rounded-xl">
+            <input
+              type="text"
+              placeholder="Send reply..."
+              class="flex-1 h-12 bg-[#D9D9D9] rounded-lg px-4 text-sm text-[#1D1D1D] placeholder:text-[#1D1D1D]"
+            />
+            <button
+              class="py-3 rounded-lg hover:bg-[#1D1D1D]/20 transition font-semibold text-sm"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 22 22"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4.03333 17.8063C3.72778 17.9286 3.4375 17.9017 3.1625 17.7257C2.8875 17.5497 2.75 17.2939 2.75 16.9584V12.8334L10.0833 11.0001L2.75 9.16675V5.04175C2.75 4.70564 2.8875 4.44989 3.1625 4.2745C3.4375 4.09911 3.72778 4.07222 4.03333 4.19383L18.15 10.1522C18.5319 10.3202 18.7229 10.6029 18.7229 11.0001C18.7229 11.3973 18.5319 11.6799 18.15 11.848L4.03333 17.8063Z"
+                  fill="#1D1D1D"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <!-- Support Ticket Detail Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 max-w-2xl">
+          <!-- Customer Info -->
+          <div
+            class="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200"
+          >
+            <div
+              class="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
+            >
+              <img
+                src="/static/admin/images/pp1.jpg"
+                alt=""
+                class="rounded-full"
+              />
+            </div>
+            <div class="flex-1">
+              <h3 class="text-lg font-bold text-gray-800">JohnMichaelDoe</h3>
+              <p class="text-sm text-gray-600">JohnMichael@email.com</p>
+            </div>
+          </div>
+
+          <!-- Ticket Info -->
+          <div class="flex items-center justify-between gap-4 mb-6">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-gray-600">Type:</span>
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                >Complaint</span
+              >
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-gray-600"
+                >Ticket ID:</span
+              >
+              <span class="text-sm font-semibold text-gray-800">12345</span>
+            </div>
+          </div>
+
+          <!-- Message Content -->
+          <div class="mb-6 p-4 bg-[#D9D9D9] rounded-lg">
+            <p class="text-sm text-[#1D1D1D] leading-relaxed">
+              Room not cleaned properly...
+            </p>
+          </div>
+
+          <!-- Reply Input -->
+          <div class="flex items-end gap-3 bg-[#D9D9D9] rounded-xl">
+            <input
+              type="text"
+              placeholder="Send reply..."
+              class="flex-1 h-12 bg-[#D9D9D9] rounded-lg px-4 text-sm text-[#1D1D1D] placeholder:text-[#1D1D1D]"
+            />
+            <button
+              class="py-3 rounded-lg hover:bg-[#1D1D1D]/20 transition font-semibold text-sm"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 22 22"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4.03333 17.8063C3.72778 17.9286 3.4375 17.9017 3.1625 17.7257C2.8875 17.5497 2.75 17.2939 2.75 16.9584V12.8334L10.0833 11.0001L2.75 9.16675V5.04175C2.75 4.70564 2.8875 4.44989 3.1625 4.2745C3.4375 4.09911 3.72778 4.07222 4.03333 4.19383L18.15 10.1522C18.5319 10.3202 18.7229 10.6029 18.7229 11.0001C18.7229 11.3973 18.5319 11.6799 18.15 11.848L4.03333 17.8063Z"
+                  fill="#1D1D1D"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <!-- Support Ticket Detail Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 max-w-2xl">
+          <!-- Customer Info -->
+          <div
+            class="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200"
+          >
+            <div
+              class="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
+            >
+              <img
+                src="/static/admin/images/pp1.jpg"
+                alt=""
+                class="rounded-full"
+              />
+            </div>
+            <div class="flex-1">
+              <h3 class="text-lg font-bold text-gray-800">JohnMichaelDoe</h3>
+              <p class="text-sm text-gray-600">JohnMichael@email.com</p>
+            </div>
+          </div>
+
+          <!-- Ticket Info -->
+          <div class="flex items-center justify-between gap-4 mb-6">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-gray-600">Type:</span>
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                >Complaint</span
+              >
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-gray-600"
+                >Ticket ID:</span
+              >
+              <span class="text-sm font-semibold text-gray-800">12345</span>
+            </div>
+          </div>
+
+          <!-- Message Content -->
+          <div class="mb-6 p-4 bg-[#D9D9D9] rounded-lg">
+            <p class="text-sm text-[#1D1D1D] leading-relaxed">
+              Room not cleaned properly...
+            </p>
+          </div>
+
+          <!-- Reply Input -->
+          <div class="flex items-end gap-3 bg-[#D9D9D9] rounded-xl">
+            <input
+              type="text"
+              placeholder="Send reply..."
+              class="flex-1 h-12 bg-[#D9D9D9] rounded-lg px-4 text-sm text-[#1D1D1D] placeholder:text-[#1D1D1D]"
+            />
+            <button
+              class="py-3 rounded-lg hover:bg-[#1D1D1D]/20 transition font-semibold text-sm"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 22 22"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4.03333 17.8063C3.72778 17.9286 3.4375 17.9017 3.1625 17.7257C2.8875 17.5497 2.75 17.2939 2.75 16.9584V12.8334L10.0833 11.0001L2.75 9.16675V5.04175C2.75 4.70564 2.8875 4.44989 3.1625 4.2745C3.4375 4.09911 3.72778 4.07222 4.03333 4.19383L18.15 10.1522C18.5319 10.3202 18.7229 10.6029 18.7229 11.0001C18.7229 11.3973 18.5319 11.6799 18.15 11.848L4.03333 17.8063Z"
+                  fill="#1D1D1D"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

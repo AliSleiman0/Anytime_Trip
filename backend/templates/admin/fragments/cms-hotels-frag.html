@@ -1,0 +1,640 @@
+<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+  <main class="">
+    <!-- header -->
+    <div
+      hx-get="/admin/header?title=Service Management"
+      hx-trigger="load"
+      hx-swap="innerHTML"
+    ></div>
+    <!-- inputs -->
+    <div class="p-4 flex justify-between">
+      <!-- filters -->
+      <div class="flex gap-8">
+        <a href="/admin/cms/flights" class="text-[#336891] w-20 h-8 flex items-center justify-center">Flights</a>
+        <a href="/admin/cms/cars" class="text-[#336891] w-20 h-8 flex items-center justify-center">Cars</a>
+        <a href="/admin/cms/hotels" class="text-[#336891] border-b-4 border-[#336891] w-20 h-8 flex items-center justify-center">
+          Hotels
+        </a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <p class="flex items-center gap-2">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20 5.6001C20 5.04005 19.9996 4.75981 19.8906 4.5459C19.7948 4.35774 19.6423 4.20487 19.4542 4.10899C19.2403 4 18.9597 4 18.3996 4H5.59961C5.03956 4 4.75981 4 4.5459 4.10899C4.35774 4.20487 4.20487 4.35774 4.10899 4.5459C4 4.75981 4 5.04005 4 5.6001V6.33736C4 6.58195 4 6.70433 4.02763 6.81942C4.05213 6.92146 4.09263 7.01893 4.14746 7.1084C4.20928 7.20928 4.29591 7.29591 4.46875 7.46875L9.53149 12.5315C9.70443 12.7044 9.79044 12.7904 9.85228 12.8914C9.90711 12.9808 9.94816 13.0786 9.97266 13.1807C10 13.2946 10 13.4155 10 13.6552V18.411C10 19.2682 10 19.6971 10.1805 19.9552C10.3382 20.1806 10.5814 20.331 10.8535 20.3712C11.1651 20.4172 11.5487 20.2257 12.3154 19.8424L13.1154 19.4424C13.4365 19.2819 13.5966 19.2013 13.7139 19.0815C13.8176 18.9756 13.897 18.8485 13.9453 18.7084C14 18.5499 14 18.37 14 18.011V13.6626C14 13.418 14 13.2958 14.0276 13.1807C14.0521 13.0786 14.0926 12.9808 14.1475 12.8914C14.2089 12.7911 14.2947 12.7053 14.4653 12.5347L14.4688 12.5315L19.5315 7.46875C19.7044 7.2958 19.7904 7.20932 19.8523 7.1084C19.9071 7.01893 19.9482 6.92146 19.9727 6.81942C20 6.70551 20 6.58444 20 6.3448V5.6001Z"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Filter:
+        </p>
+        <select
+          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          name="status"
+          id="status"
+        >
+          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
+            All Statuses
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Hotels management Table -->
+    <div class="px-4">
+      <div class="rounded-t-2xl overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-[#336891] text-white">
+            <tr>
+              <th class="px-2 py-3 text-center font-semibold">Name</th>
+              <th class="px-2 py-3 text-center font-semibold">Type</th>
+              <th class="px-2 py-3 text-center font-semibold">Status</th>
+              <th class="px-2 py-3 text-center font-semibold">
+                Number of Travelers
+              </th>
+              <th class="px-2 py-3 text-center font-semibold">Dates</th>
+              <th class="px-2 py-3 text-center font-semibold">Details</th>
+              <th class="px-2 py-3 text-center font-semibold">Action</th>
+            </tr>
+          </thead>
+
+          <tbody class="bg-white text-gray-900">
+            <tr
+              class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+            >
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">Beirut</div>
+                <div class="text-gray-700">Hotel</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">Deluxe Room,</div>
+                <div class="text-gray-700">1 King Bed</div>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span
+                  class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold"
+                  >Active</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">1 Adult, 2 Children</div>
+                <div class="text-gray-700">1 Room</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">7 Nov 22</div>
+                <div class="text-gray-700">13 Nov 22</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div>Indoor Pool</div>
+                <div>Free WiFi</div>
+                <div>Valet Parking</div>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <div class="flex justify-center gap-2">
+                  <button
+                    class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center"
+                  >
+                    <svg
+                      width="21"
+                      height="21"
+                      viewBox="0 0 21 21"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <tr
+              class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+            >
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">Beirut</div>
+                <div class="text-gray-700">Hotel</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">Deluxe Room,</div>
+                <div class="text-gray-700">1 King Bed</div>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span
+                  class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold"
+                  >Active</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">1 Adult, 2 Children</div>
+                <div class="text-gray-700">1 Room</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">7 Nov 22</div>
+                <div class="text-gray-700">13 Nov 22</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div>Indoor Pool</div>
+                <div>Free WiFi</div>
+                <div>Valet Parking</div>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <div class="flex justify-center gap-2">
+                  <button
+                    class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center"
+                  >
+                    <svg
+                      width="21"
+                      height="21"
+                      viewBox="0 0 21 21"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <tr
+              class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+            >
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">Beirut</div>
+                <div class="text-gray-700">Hotel</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">Deluxe Room,</div>
+                <div class="text-gray-700">1 King Bed</div>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span
+                  class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold"
+                  >Active</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">1 Adult, 2 Children</div>
+                <div class="text-gray-700">1 Room</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">7 Nov 22</div>
+                <div class="text-gray-700">13 Nov 22</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div>Indoor Pool</div>
+                <div>Free WiFi</div>
+                <div>Valet Parking</div>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <div class="flex justify-center gap-2">
+                  <button
+                    class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center"
+                  >
+                    <svg
+                      width="21"
+                      height="21"
+                      viewBox="0 0 21 21"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <tr
+              class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+            >
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">Beirut</div>
+                <div class="text-gray-700">Hotel</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">Deluxe Room,</div>
+                <div class="text-gray-700">1 King Bed</div>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span
+                  class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold"
+                  >Active</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">1 Adult, 2 Children</div>
+                <div class="text-gray-700">1 Room</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">7 Nov 22</div>
+                <div class="text-gray-700">13 Nov 22</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div>Indoor Pool</div>
+                <div>Free WiFi</div>
+                <div>Valet Parking</div>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <div class="flex justify-center gap-2">
+                  <button
+                    class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center"
+                  >
+                    <svg
+                      width="21"
+                      height="21"
+                      viewBox="0 0 21 21"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <tr
+              class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+            >
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">Beirut</div>
+                <div class="text-gray-700">Hotel</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">Deluxe Room,</div>
+                <div class="text-gray-700">1 King Bed</div>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <span
+                  class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold"
+                  >Active</span
+                >
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">1 Adult, 2 Children</div>
+                <div class="text-gray-700">1 Room</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div class="font-semibold">7 Nov 22</div>
+                <div class="text-gray-700">13 Nov 22</div>
+              </td>
+              <td class="px-4 py-3 text-center text-sm text-gray-800">
+                <div>Indoor Pool</div>
+                <div>Free WiFi</div>
+                <div>Valet Parking</div>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <div class="flex justify-center gap-2">
+                  <button
+                    class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center"
+                  >
+                    <svg
+                      width="21"
+                      height="21"
+                      viewBox="0 0 21 21"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
+                        fill="white"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      .swal2-cancel-btn-custom {
+        color: #000 !important;
+        border: 1px solid #000 !important;
+        background-color: transparent !important;
+      }
+
+      /* Ensure action buttons receive clicks even if the row is clickable */
+      tbody tr td:nth-child(7) {
+        position: relative;
+        pointer-events: none;
+      }
+
+      tbody tr td:nth-child(7) button {
+        position: relative;
+        z-index: 10;
+        pointer-events: auto;
+      }
+    </style>
+    <script>
+      function openHotelModal(event) {
+        if (event) {
+          event.stopPropagation();
+          event.preventDefault();
+        }
+
+        const modalHtml = `
+          <div class="flex flex-col gap-4 text-[#1d1d1d] font-sans">
+            <div class="text-center">
+              <div class="text-lg font-bold text-[#1f3242]">Beirut Hotel</div>
+              <div class="text-xs text-[#5b7282] mt-1">1DLRT190/GMARSAN-SMITH</div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-xs font-semibold text-[#5b7282]">Property Details</label>
+              <div class="relative">
+                <textarea class="w-full h-40 rounded-md border border-[#8aaecd] px-3 py-2 text-sm text-[#1d1d1d] placeholder-[#93a7b5] resize-none" placeholder="">Indoor Pool
+Valet Parking Available
+American Restaurant
+Vegetarian Breakfast
+Dogs And Cats Allowed
+Free Wifi</textarea>
+                <div class="absolute bottom-2 right-3 text-xs text-[#5b7282]">481/3000</div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              
+
+              <div class="w-full border-2 border-dashed border-[#8aaecd] rounded-md bg-[#f9fcff] py-8 px-4 flex flex-col items-center justify-center text-center text-sm text-[#1d1d1d]">
+                <svg width="112" height="112" viewBox="0 0 112 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M80.5744 47.672C85.5496 47.7213 90.3072 49.7196 93.8254 53.2378C97.3437 56.7559 99.342 61.5134 99.3915 66.4887C99.4547 71.4004 97.4126 76.0942 94.0911 79.5806C90.5078 83.3417 85.6702 85.2401 80.5744 85.3057C73.1148 85.4015 73.1058 96.978 80.5744 96.882C97.2709 96.6672 110.753 83.1851 110.968 66.4886C111.183 49.7909 96.9473 36.3059 80.5744 36.0956C73.1058 35.9995 73.1148 47.5761 80.5744 47.672ZM31.2005 85.2365C26.2252 85.1872 21.4677 83.1889 17.9494 79.6707C14.4311 76.1524 12.4328 71.3949 12.3834 66.4195C12.3203 61.5076 14.362 56.8139 17.6839 53.3268C21.2669 49.5658 26.1044 47.6681 31.2004 47.6025C38.6598 47.5065 38.669 35.9298 31.2004 36.026C14.5037 36.2406 1.02168 49.7225 0.807083 66.4195C0.592489 83.1171 14.8274 96.6026 31.2005 96.8129C38.6691 96.9087 38.6599 85.3323 31.2005 85.2365Z" fill="#4A5699"/>
+<path d="M37.1522 42.0224C37.2013 37.0471 39.1995 32.2895 42.7177 28.7713C46.2359 25.2531 50.9935 23.2549 55.9687 23.2057C60.8805 23.1426 65.5742 25.1845 69.0607 28.5062C72.8219 32.0893 74.7201 36.9265 74.7857 42.0224C74.8816 49.4816 86.4582 49.4909 86.3623 42.0224C86.1475 25.3259 72.6651 11.8439 55.9687 11.6293C39.2711 11.4148 25.7862 25.6493 25.5758 42.0224C25.4795 49.4909 37.0562 49.4816 37.1522 42.0224Z" fill="#C45FA0"/>
+<path d="M59.6129 51.7427C61.4221 53.552 61.4221 56.4848 59.6129 58.2938L46.1718 71.7355C44.3625 73.5443 41.4296 73.5443 39.6206 71.7355C37.8114 69.9258 37.8114 66.9927 39.6206 65.184L53.0619 51.7427C54.8707 49.9334 57.8039 49.9334 59.6129 51.7427Z" fill="#F39A2B"/>
+<path d="M53.0654 51.7434C54.8741 49.9345 57.8072 49.9345 59.6161 51.7434L73.0578 65.1852C74.8667 66.9935 74.8667 69.927 73.0578 71.7363C71.2486 73.5452 68.3152 73.5452 66.5065 71.7363L53.0654 58.2951C51.2556 56.4857 51.2556 53.5527 53.0654 51.7434Z" fill="#F39A2B"/>
+<path d="M56.225 69.3545C58.8469 69.3545 60.9721 71.48 60.9721 74.1013V93.5794C60.9721 96.2009 58.8467 98.3261 56.225 98.3261C53.6039 98.3261 51.4785 96.2007 51.4785 93.5794V74.1013C51.4786 71.4798 53.604 69.3545 56.225 69.3545Z" fill="#E5594F"/>
+</svg>
+                <div class="w-16 h-16 mb-4 flex items-center justify-center"></div>
+                <div class="font-semibold">Drag & Drop or Upload Photo</div>
+                <div class="text-xs text-[#5b7282] mt-1">Accepted formats: PNG, JPG, or SVG</div>
+                <div class="text-xs text-[#5b7282]">Maximum file size: 2MB</div>
+              </div>
+            </div>
+
+            <div class="flex justify-center gap-3 pt-1">
+              <button class="min-w-[96px] px-4 py-2.5 rounded-lg border border-[#1f3242] text-[#1f3242] font-bold text-sm" id="hotel-modal-cancel">Cancel</button>
+              <button class="min-w-[96px] px-4 py-2.5 rounded-lg border border-[#336891] bg-[#336891] text-white font-bold text-sm" id="hotel-modal-save">Save</button>
+            </div>
+          </div>
+        `;
+
+        Swal.fire({
+          width: "560px",
+          padding: "18px",
+          showConfirmButton: false,
+          showDenyButton: false,
+          showCancelButton: false,
+          html: modalHtml,
+        }).then(() => {});
+
+        setTimeout(() => {
+          const closeModal = () => Swal.close();
+          const cancelBtn = document.getElementById("hotel-modal-cancel");
+          const saveBtn = document.getElementById("hotel-modal-save");
+          if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+          if (saveBtn) saveBtn.addEventListener("click", closeModal);
+        }, 0);
+      }
+
+      function showProviderActions(event) {
+        if (event) {
+          event.stopPropagation();
+        }
+        Swal.fire({
+          width: "300px",
+          icon: "",
+          title: "",
+          html: '<div style="display: flex; flex-direction: column; gap: 10px; align-items: center;"><button id="archive-btn" style="background: none; border: none; color: #336891; font-size: 16px; cursor: pointer; padding: 8px 16px;">Edit</button><button id="freeze-btn" style="background: none; border: none; color: #1C9BFF; font-size: 16px; cursor: pointer; padding: 8px 16px;">Deactivate</button><button id="activate-btn" style="background: none; border: none; color: #009316; font-size: 16px; cursor: pointer; padding: 8px 16px;">Activate</button></div>',
+          showConfirmButton: false,
+          showDenyButton: false,
+          showCancelButton: false,
+          customClass: {
+            container: "swal2-container",
+            popup: "swal2-popup",
+            header: "swal2-header",
+            title: "swal2-title",
+            htmlContainer: "swal2-html-container",
+          },
+          didOpen: () => {
+            document
+              .getElementById("archive-btn")
+              .addEventListener("mouseover", function () {
+                this.style.opacity = "0.7";
+              });
+            document
+              .getElementById("archive-btn")
+              .addEventListener("mouseout", function () {
+                this.style.opacity = "1";
+              });
+            document
+              .getElementById("archive-btn")
+              .addEventListener("click", () => {
+                Swal.close();
+              });
+
+            document
+              .getElementById("freeze-btn")
+              .addEventListener("mouseover", function () {
+                this.style.opacity = "0.7";
+              });
+            document
+              .getElementById("freeze-btn")
+              .addEventListener("mouseout", function () {
+                this.style.opacity = "1";
+              });
+            document
+              .getElementById("freeze-btn")
+              .addEventListener("click", () => {
+                Swal.close();
+              });
+
+            document
+              .getElementById("activate-btn")
+              .addEventListener("mouseover", function () {
+                this.style.opacity = "0.7";
+              });
+            document
+              .getElementById("activate-btn")
+              .addEventListener("mouseout", function () {
+                this.style.opacity = "1";
+              });
+            document
+              .getElementById("activate-btn")
+              .addEventListener("click", () => {
+                Swal.close();
+              });
+          },
+        });
+      }
+
+      function openDeleteModal(event) {
+        if (event) {
+          event.stopPropagation();
+          event.preventDefault();
+        }
+
+        const modalHtml = `
+          <div class="flex flex-col items-center gap-4 text-[#1d1d1d] font-sans">
+            <div class="w-12 h-12 rounded-full bg-[#fdeeed] flex items-center justify-center shadow-[0_8px_32px_0_#fbd3ce]">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 6.25V10.625" stroke="#D24124" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M10 13.75H10.0083" stroke="#D24124" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M9.99935 2.49935C5.39602 2.49935 1.66602 6.22935 1.66602 10.8327C1.66602 15.436 5.39602 19.166 9.99935 19.166C14.6027 19.166 18.3327 15.436 18.3327 10.8327C18.3327 6.22935 14.6027 2.49935 9.99935 2.49935Z" stroke="#D24124" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="text-center flex flex-col gap-1">
+              <div class="text-lg font-bold text-[#1f3242]">Delete Content</div>
+              <div class="text-sm text-[#1d1d1d]">Are you sure you want to delete Content25's service?<br/>This change cannot be undone</div>
+            </div>
+
+            <div class="flex gap-3">
+              <button class="min-w-[120px] px-4 py-2.5 rounded-lg border border-[#1f3242] text-[#1f3242] font-semibold text-sm bg-white" id="hotel-delete-cancel">Cancel</button>
+              <button class="min-w-[120px] px-4 py-2.5 rounded-lg border border-[#d24124] bg-[#d24124] text-white font-semibold text-sm" id="hotel-delete-confirm">Delete content</button>
+            </div>
+          </div>
+        `;
+
+        Swal.fire({
+          width: "420px",
+          padding: "18px",
+          showConfirmButton: false,
+          showDenyButton: false,
+          showCancelButton: false,
+          html: modalHtml,
+        });
+
+        setTimeout(() => {
+          const cancelBtn = document.getElementById("hotel-delete-cancel");
+          const confirmBtn = document.getElementById("hotel-delete-confirm");
+          const closeModal = () => Swal.close();
+          if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+          if (confirmBtn) confirmBtn.addEventListener("click", closeModal);
+        }, 0);
+      }
+
+      document.addEventListener("click", (event) => {
+        const btn = event.target.closest("button");
+        if (!btn) return;
+        const cell = btn.closest("td");
+        if (!cell) return;
+        const row = cell.parentElement;
+        if (!row) return;
+        const cellIndex = Array.from(row.children).indexOf(cell);
+        if (cellIndex !== 6) return; // action column
+        const buttons = Array.from(cell.querySelectorAll("button"));
+        const btnIndex = buttons.indexOf(btn);
+        if (btnIndex === 0) {
+          openDeleteModal(event);
+        }
+        if (btnIndex === 1) {
+          openHotelModal(event);
+        }
+      });
+    </script>
+  </main>
+</div>

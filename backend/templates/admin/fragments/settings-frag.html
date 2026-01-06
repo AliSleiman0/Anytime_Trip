@@ -1,0 +1,291 @@
+<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+  <main>
+    <!-- Back Button and Navigation -->
+    <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-10">
+      <button onclick="window.history.back()" class="flex items-center gap-2 text-[#336891] hover:text-[#254d6f] transition">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 19L8 12L15 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="font-semibold text-sm">Back</span>
+      </button>
+      
+      <div class="flex items-center gap-6">
+        <button onclick="showSettingsSection('admin')" class="settings-nav-btn active-nav text-[#336891] font-semibold text-sm border-b-2 border-[#336891] pb-2">
+          Admin Settings
+        </button>
+        <button onclick="showSettingsSection('notifications')" class="settings-nav-btn text-gray-600 font-semibold text-sm pb-2 hover:text-[#336891]">
+          Notifications
+        </button>
+      </div>
+      
+      <div></div>
+    </div>
+
+    <div class="p-6">
+      <!-- Admin Settings Section -->
+      <div id="admin-section" class="settings-section">
+        <!-- Title -->
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Welcome Back, Admin 313</h1>
+
+        <!-- Profile Section -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+          <div class="flex items-start justify-between mb-8">
+            <!-- Profile Picture -->
+            <div class="flex items-center gap-6">
+              <div class="w-24 h-24 rounded-full bg-[#336891] flex items-center justify-center text-white text-3xl font-bold">
+                JD
+              </div>
+              <div class="flex-1">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Profile Picture</h2>
+                <div class="flex gap-3">
+                  <button class="px-6 py-2 border border-[#D24124] text-[#D24124] rounded-lg hover:bg-red-50 transition font-semibold text-sm">
+                    Delete Photo
+                  </button>
+                  <button class="px-6 py-2 bg-[#336891] text-white rounded-lg hover:bg-[#254d6f] transition font-semibold text-sm">
+                    Upload Photo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Password, Currency, Language -->
+          <div class="grid grid-cols-3 gap-6 mb-8 pb-8 border-b border-gray-200">
+            <div>
+              <label class="block text-sm font-semibold text-gray-600 mb-2">Password</label>
+              <div class="flex items-center gap-2">
+                <input
+                  type="password"
+                  value="••••••••••••••"
+                  class="flex-1 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+                  disabled
+                />
+                <button class="text-[#336891] font-semibold text-sm hover:text-[#254d6f]">Change</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-600 mb-2">Currency</label>
+              <div class="flex items-center gap-2">
+                <input
+                  type="text"
+                  value="USD"
+                  class="flex-1 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+                  disabled
+                />
+                <button class="text-[#336891] font-semibold text-sm hover:text-[#254d6f]">Change</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-600 mb-2">Language</label>
+              <div class="flex items-center gap-2">
+                <input
+                  type="text"
+                  value="English"
+                  class="flex-1 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+                  disabled
+                />
+                <button class="text-[#336891] font-semibold text-sm hover:text-[#254d6f]">Change</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Two-Factor Authentication -->
+          <div class="mb-6">
+            <h3 class="font-semibold text-gray-800 mb-4">Enable Two-Factor Authentication</h3>
+            <div class="flex items-center gap-4">
+              <label class="flex items-center cursor-pointer">
+                <input type="checkbox" class="w-5 h-5 rounded border-[#6FA4CD] text-[#336891]" />
+              </label>
+              <span class="text-sm text-gray-700">Secure your account with two-factor authentication</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Devices Logged In Table -->
+        <div class="rounded-t-2xl overflow-hidden">
+          <table class="w-full text-sm">
+            <thead class="bg-[#336891] text-white">
+              <tr>
+                <th class="px-2 py-3 text-center font-semibold">Device</th>
+                <th class="px-2 py-3 text-center font-semibold">IP Address</th>
+                <th class="px-2 py-3 text-center font-semibold">Last Login Date</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white text-gray-900">
+              <tr class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors">
+                <td class="px-4 py-3 text-center text-sm text-gray-800">
+                  <div class="font-semibold">iPhone 14 Pro</div>
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800">192.1.1.8</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800">10 January, 2020</td>
+              </tr>
+              <tr class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors">
+                <td class="px-4 py-3 text-center text-sm text-gray-800">
+                  <div class="font-semibold">iPhone 14 Pro</div>
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800">192.1.1.8</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800">10 January, 2020</td>
+              </tr>
+              <tr class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors">
+                <td class="px-4 py-3 text-center text-sm text-gray-800">
+                  <div class="font-semibold">iPhone 14 Pro</div>
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800">192.1.1.8</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800">10 January, 2020</td>
+              </tr>
+              <tr class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors">
+                <td class="px-4 py-3 text-center text-sm text-gray-800">
+                  <div class="font-semibold">iPhone 15 Pro</div>
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800">192.1.1.8</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800">10 January, 2020</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Notifications Section -->
+      <div id="notifications-section" class="settings-section hidden">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Notification Preferences</h2>
+        
+        <div class="bg-white rounded-2xl shadow-xl p-6 space-y-8">
+          <!-- Bookings Notification Section -->
+          <div>
+            <h3 class="font-semibold text-gray-800 mb-4">Bookings Notification</h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-700">New Booking Notification</span>
+                <label class="relative inline-block w-12 h-6">
+                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
+                  <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-700">Booking Cancelled</span>
+                <label class="relative inline-block w-12 h-6">
+                  <input type="checkbox" checked class="opacity-0 w-0 h-0 peer" />
+                  <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
+                  <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-700">Booking Confirmation</span>
+                <label class="relative inline-block w-12 h-6">
+                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
+                  <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-700">Booking Rescheduled</span>
+                <label class="relative inline-block w-12 h-6">
+                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
+                  <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-700">Booking Reminder</span>
+                <label class="relative inline-block w-12 h-6">
+                  <input type="checkbox" checked class="opacity-0 w-0 h-0 peer" />
+                  <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
+                  <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-700">Booking Updated</span>
+                <label class="relative inline-block w-12 h-6">
+                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
+                  <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payments Notification Section -->
+          <div>
+            <h3 class="font-semibold text-gray-800 mb-4">Payments Notification</h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-700">Payments Recieved</span>
+                <label class="relative inline-block w-12 h-6">
+                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
+                  <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-700">Payments Confirmed</span>
+                <label class="relative inline-block w-12 h-6">
+                  <input type="checkbox" checked class="opacity-0 w-0 h-0 peer" />
+                  <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
+                  <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-700">Payment Received</span>
+                <label class="relative inline-block w-12 h-6">
+                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
+                  <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-700">Booking Rescheduled</span>
+                <label class="relative inline-block w-12 h-6">
+                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
+                  <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-700">Payment Pending</span>
+                <label class="relative inline-block w-12 h-6">
+                  <input type="checkbox" checked class="opacity-0 w-0 h-0 peer" />
+                  <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
+                  <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-3 pt-4">
+            <button class="px-6 py-3 bg-[#336891] text-white rounded-lg hover:bg-[#254d6f] transition font-semibold text-sm">
+              Save Changes
+            </button>
+            <button class="px-6 py-3 border border-[#6FA4CD] text-gray-800 rounded-lg hover:bg-gray-50 transition font-semibold text-sm">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function showSettingsSection(section) {
+      // Hide all sections
+      document.querySelectorAll('.settings-section').forEach(el => {
+        el.classList.add('hidden');
+      });
+      
+      // Remove active class from all nav buttons
+      document.querySelectorAll('.settings-nav-btn').forEach(btn => {
+        btn.classList.remove('active-nav', 'text-[#336891]', 'border-b-2', 'border-[#336891]');
+        btn.classList.add('text-gray-600');
+      });
+      
+      // Show selected section
+      document.getElementById(section + '-section').classList.remove('hidden');
+      
+      // Add active class to clicked button
+      event.target.classList.remove('text-gray-600');
+      event.target.classList.add('active-nav', 'text-[#336891]', 'border-b-2', 'border-[#336891]');
+    }
+  </script>
+</div>
