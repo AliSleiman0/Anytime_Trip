@@ -1,0 +1,149 @@
+<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+  <main>
+    <div
+      hx-get="/admin/header?title=Accounting&subtitle=Manage financial records and transactions"
+      hx-trigger="load"
+      hx-swap="innerHTML"
+    ></div>
+    <div class="flex justify-end p-4">
+      <div class="flex items-center gap-4">
+        <p class="flex items-center gap-2">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20 5.6001C20 5.04005 19.9996 4.75981 19.8906 4.5459C19.7948 4.35774 19.6423 4.20487 19.4542 4.10899C19.2403 4 18.9597 4 18.3996 4H5.59961C5.03956 4 4.75981 4 4.5459 4.10899C4.35774 4.20487 4.20487 4.35774 4.10899 4.5459C4 4.75981 4 5.04005 4 5.6001V6.33736C4 6.58195 4 6.70433 4.02763 6.81942C4.05213 6.92146 4.09263 7.01893 4.14746 7.1084C4.20928 7.20928 4.29591 7.29591 4.46875 7.46875L9.53149 12.5315C9.70443 12.7044 9.79044 12.7904 9.85228 12.8914C9.90711 12.9808 9.94816 13.0786 9.97266 13.1807C10 13.2946 10 13.4155 10 13.6552V18.411C10 19.2682 10 19.6971 10.1805 19.9552C10.3382 20.1806 10.5814 20.331 10.8535 20.3712C11.1651 20.4172 11.5487 20.2257 12.3154 19.8424L13.1154 19.4424C13.4365 19.2819 13.5966 19.2013 13.7139 19.0815C13.8176 18.9756 13.897 18.8485 13.9453 18.7084C14 18.5499 14 18.37 14 18.011V13.6626C14 13.418 14 13.2958 14.0276 13.1807C14.0521 13.0786 14.0926 12.9808 14.1475 12.8914C14.2089 12.7911 14.2947 12.7053 14.4653 12.5347L14.4688 12.5315L19.5315 7.46875C19.7044 7.2958 19.7904 7.20932 19.8523 7.1084C19.9071 7.01893 19.9482 6.92146 19.9727 6.81942C20 6.70551 20 6.58444 20 6.3448V5.6001Z"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Filter:
+        </p>
+        <select
+          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          name="status"
+          id="status"
+        >
+          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
+            Flights
+          </option>
+        </select>
+        <select
+          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          name="status"
+          id="status"
+        >
+          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
+            All Statuses
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="p-4">
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-2xl p-4 shadow-xl">
+          <div class="text-xs font-semibold text-gray-600 mb-2">Total Revenue</div>
+          <div class="flex items-end justify-between">
+            <div class="text-2xl font-bold text-[#26CE00]">71,000</div>
+            <div class="flex items-center gap-1 text-[#26CE00] text-xs font-semibold">
+              <span>+11.01%</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z" fill="#26CE00"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 shadow-xl">
+          <div class="text-xs font-semibold text-gray-600 mb-2">Total Revenue (This Month)</div>
+          <div class="flex items-end justify-between">
+            <div class="text-2xl font-bold text-[#D24124]">71,000</div>
+            <div class="flex items-center gap-1 text-[#D24124] text-xs font-semibold">
+              <span>-11.01%</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699" stroke="#D24124" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 shadow-xl">
+          <div class="text-xs font-semibold text-gray-600 mb-2">Average Booking Value (ABV)</div>
+          <div class="flex items-end justify-between">
+            <div class="text-2xl font-bold text-[#D24124]">71,000</div>
+            <div class="flex items-center gap-1 text-[#D24124] text-xs font-semibold">
+              <span>+11.01%</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699" stroke="#D24124" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4 shadow-xl">
+          <div class="text-xs font-semibold text-gray-600 mb-2">Cancellation Rate</div>
+          <div class="flex items-end justify-between">
+            <div class="text-2xl font-bold text-[#26CE00]">71,000</div>
+            <div class="flex items-center gap-1 text-[#26CE00] text-xs font-semibold">
+              <span>+11.01%</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z" fill="#26CE00"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl overflow-hidden bg-white border border-[#CAD9EA] shadow-sm">
+        <table class="w-full text-sm">
+          <thead class="bg-[#336891] text-white">
+            <tr>
+              <th class="px-3 py-3 text-left font-semibold">Date</th>
+              <th class="px-3 py-3 text-left font-semibold">Description</th>
+              <th class="px-3 py-3 text-left font-semibold">Type</th>
+              <th class="px-3 py-3 text-left font-semibold">Amount</th>
+              <th class="px-3 py-3 text-left font-semibold">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#E4ECF4] text-gray-800">
+            <tr>
+              <td class="px-3 py-3 font-semibold text-[#1f3242]">Jan 03, 2025</td>
+              <td class="px-3 py-3">Monthly server costs</td>
+              <td class="px-3 py-3">Expense</td>
+              <td class="px-3 py-3">$5,200</td>
+              <td class="px-3 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Paid</span></td>
+            </tr>
+            <tr>
+              <td class="px-3 py-3 font-semibold text-[#1f3242]">Jan 02, 2025</td>
+              <td class="px-3 py-3">Booking commissions</td>
+              <td class="px-3 py-3">Income</td>
+              <td class="px-3 py-3">$45,300</td>
+              <td class="px-3 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Paid</span></td>
+            </tr>
+            <tr>
+              <td class="px-3 py-3 font-semibold text-[#1f3242]">Jan 01, 2025</td>
+              <td class="px-3 py-3">Staff salaries</td>
+              <td class="px-3 py-3">Expense</td>
+              <td class="px-3 py-3">$125,000</td>
+              <td class="px-3 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Paid</span></td>
+            </tr>
+            <tr>
+              <td class="px-3 py-3 font-semibold text-[#1f3242]">Dec 31, 2024</td>
+              <td class="px-3 py-3">Marketing campaign</td>
+              <td class="px-3 py-3">Expense</td>
+              <td class="px-3 py-3">$28,500</td>
+              <td class="px-3 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#FFF0E633] text-[#FF9800]">Pending</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>

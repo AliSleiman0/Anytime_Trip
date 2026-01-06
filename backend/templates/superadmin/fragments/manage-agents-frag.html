@@ -1,0 +1,109 @@
+<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+  <main>
+    <div
+      hx-get="/admin/header?title=Manage Agents&subtitle=View and manage agent accounts"
+      hx-trigger="load"
+      hx-swap="innerHTML"
+    ></div>
+
+    <div class="p-4">
+      <!-- Search and Filter -->
+      <div class="flex gap-3 mb-4">
+        <input
+          type="text"
+          class="flex-1 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          placeholder="Search agents..."
+        />
+        <select
+          class="w-52 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+        >
+          <option disabled selected hidden>Status</option>
+          <option>Active</option>
+          <option>Inactive</option>
+          <option>Suspended</option>
+        </select>
+      </div>
+
+      <div class="rounded-2xl overflow-hidden bg-white border border-[#CAD9EA] shadow-sm">
+        <table class="w-full text-sm">
+          <thead class="bg-[#336891] text-white">
+            <tr>
+              <th class="px-3 py-3 text-left font-semibold">Agent Name</th>
+              <th class="px-3 py-3 text-left font-semibold">Email</th>
+              <th class="px-3 py-3 text-left font-semibold">Bookings</th>
+              <th class="px-3 py-3 text-left font-semibold">Revenue</th>
+              <th class="px-3 py-3 text-left font-semibold">Status</th>
+              <th class="px-3 py-3 text-center font-semibold">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#E4ECF4] text-gray-800">
+            <tr>
+              <td class="px-3 py-3 font-semibold text-[#1f3242]">Ahmed Hassan</td>
+              <td class="px-3 py-3">ahmed@agents.com</td>
+              <td class="px-3 py-3">234</td>
+              <td class="px-3 py-3">$45,600</td>
+              <td class="px-3 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Active</span></td>
+              <td class="px-3 py-3 text-center">
+                <button class="w-8 h-8 rounded-lg bg-[#336891] text-white flex items-center justify-center" aria-label="More options">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="6" r="2" stroke="white" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="2" stroke="white" stroke-width="2"/>
+                    <circle cx="12" cy="18" r="2" stroke="white" stroke-width="2"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="px-3 py-3 font-semibold text-[#1f3242]">Layla Mohamed</td>
+              <td class="px-3 py-3">layla@agents.com</td>
+              <td class="px-3 py-3">189</td>
+              <td class="px-3 py-3">$38,200</td>
+              <td class="px-3 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Active</span></td>
+              <td class="px-3 py-3 text-center">
+                <button class="w-8 h-8 rounded-lg bg-[#336891] text-white flex items-center justify-center" aria-label="More options">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="6" r="2" stroke="white" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="2" stroke="white" stroke-width="2"/>
+                    <circle cx="12" cy="18" r="2" stroke="white" stroke-width="2"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="px-3 py-3 font-semibold text-[#1f3242]">Omar Ibrahim</td>
+              <td class="px-3 py-3">omar@agents.com</td>
+              <td class="px-3 py-3">156</td>
+              <td class="px-3 py-3">$31,800</td>
+              <td class="px-3 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Active</span></td>
+              <td class="px-3 py-3 text-center">
+                <button class="w-8 h-8 rounded-lg bg-[#336891] text-white flex items-center justify-center" aria-label="More options">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="6" r="2" stroke="white" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="2" stroke="white" stroke-width="2"/>
+                    <circle cx="12" cy="18" r="2" stroke="white" stroke-width="2"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="px-3 py-3 font-semibold text-[#1f3242]">Fatima Ali</td>
+              <td class="px-3 py-3">fatima@agents.com</td>
+              <td class="px-3 py-3">0</td>
+              <td class="px-3 py-3">$0</td>
+              <td class="px-3 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#F3F3F333] text-[#9B9B9B]">Inactive</span></td>
+              <td class="px-3 py-3 text-center">
+                <button class="w-8 h-8 rounded-lg bg-[#336891] text-white flex items-center justify-center" aria-label="More options">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="6" r="2" stroke="white" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="2" stroke="white" stroke-width="2"/>
+                    <circle cx="12" cy="18" r="2" stroke="white" stroke-width="2"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
