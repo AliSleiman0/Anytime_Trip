@@ -1,13 +1,12 @@
+{{- with .Provider }}
 <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
-  <main class="">
-    <!-- header -->
+  <main>
     <div
-      hx-get="/admin/header?title=View User"
+      hx-get="/admin/header?title=View Service Provider&subtitle={{.Name}}"
       hx-trigger="load"
       hx-swap="innerHTML"
     ></div>
 
-    <!-- Back Button & filters -->
     <div class="flex justify-between p-4">
       <a
         href="/admin/service-providers"
@@ -25,36 +24,31 @@
         <span class="text-[#336891] text-lg">Back</span>
       </a>
 
-      <div>
+      <div class="flex gap-4">
         <select
           class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           name="bookings"
           id="bookings"
         >
-          <option class="text-[#9B9B9B]" value="" selected>Hotels</option>
+          <option class="text-[#9B9B9B]" value="" selected>{{.Type}}</option>
         </select>
         <select
           class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           name="status"
           id="status"
         >
-          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
-            All Statuses
-          </option>
+          <option class="text-[#9B9B9B]" value="" selected>{{.Status}}</option>
         </select>
         <input
           id="date"
           name="date"
-          type="date"
+          type="text"
           placeholder="Select Date"
-          onblur="if(!this.value){this.type='text'}"
           class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
         />
       </div>
     </div>
 
-    <!-- Service Provider Info Section -->
-    <!-- Profile -->
     <div class="flex justify-between bg-[#33689126] rounded-xl p-4 m-4">
       <div class="flex">
         <img
@@ -64,12 +58,10 @@
         />
 
         <div class="flex flex-col justify-center text-left gap-y-2 ml-6">
-          <h3 class="text-2xl font-semibold">John Doe</h3>
-          <p class="text-[#4A5565]">JohnDoe123@gmail.com</p>
-          <p
-            class="bg-[#DCFCE7] text-[#008236] text-xs rounded-full text-center w-12 h-5"
-          >
-            Active
+          <h3 class="text-2xl font-semibold">{{.Name}}</h3>
+          <p class="text-[#4A5565]">{{.Email}}</p>
+          <p class="text-xs rounded-full text-center px-3 py-1 {{.StatusClass}}">
+            {{.Status}}
           </p>
         </div>
       </div>
@@ -83,95 +75,74 @@
       </div>
     </div>
 
-    <!-- Service Provider Details -->
     <div class="m-10">
       <h3 class="font-bold text-lg my-10">Service Provider Information</h3>
       <div class="flex justify-between">
         <div class="flex flex-col gap-y-5">
           <div>
             <p class="text-sm text-[#6A7282]">Full Name</p>
-            <p class="text-[#101828]">John Doe</p>
+            <p class="text-[#101828]">{{.Name}}</p>
           </div>
           <div>
-            <p class="text-sm text-[#6A7282]">Email Adress</p>
-            <p class="text-[#101828]">JohnDoe123@gmail.com</p>
+            <p class="text-sm text-[#6A7282]">Email Address</p>
+            <p class="text-[#101828]">{{.Email}}</p>
           </div>
           <div>
             <p class="text-sm text-[#6A7282]">Status</p>
-            <p class="text-[#008236]">Active</p>
+            <p class="text-[#101828]">{{.Status}}</p>
           </div>
         </div>
 
         <div class="flex flex-col gap-y-5">
           <div>
             <p class="text-sm text-[#6A7282]">Type</p>
-            <p class="text-[#101828]">Flight Provider</p>
+            <p class="text-[#101828]">{{.Type}}</p>
           </div>
           <div>
             <p class="text-sm text-[#6A7282]">Phone Number</p>
-            <p class="text-[#101828]">+961 70 123 456</p>
+            <p class="text-[#101828]">{{.PhoneNumberDisplay}}</p>
           </div>
           <div>
             <p class="text-sm text-[#6A7282]">Profit From Provider</p>
-            <p class="text-[#008236] flex items-center gap-2">
-              10%
-              <!-- edit button -->
-              <button
-                class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
-                    fill="white"
-                  />
-                </svg>
-              </button>
-            </p>
+            <p class="text-[#008236] flex items-center gap-2">{{.ProfitShareDisplay}}</p>
           </div>
         </div>
 
         <div class="flex flex-col gap-y-5">
           <div>
             <p class="text-sm text-[#6A7282]">Location</p>
-            <p class="text-[#101828]">Atlanta, GA</p>
+            <p class="text-[#101828]">{{.Location}}</p>
           </div>
           <div>
             <p class="text-sm text-[#6A7282]">Added On</p>
-            <p class="text-[#101828]">14 Jan, 2024</p>
+            <p class="text-[#101828]">{{.CreatedAt}}</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Other Information -->
     <div class="m-10">
       <h3 class="font-bold text-lg my-10">Service Provider Information</h3>
       <div class="flex justify-between">
         <div class="flex flex-col gap-y-5">
           <div>
             <p class="text-sm text-[#6A7282]">Total Bookings</p>
-            <p class="text-[#101828]">1,947</p>
+            <p class="text-[#101828]">{{.TotalBookings}}</p>
           </div>
           <div>
             <p class="text-sm text-[#6A7282]">Total Revenue</p>
-            <p class="text-[#101828]">$ 2,194,019</p>
+            <p class="text-[#101828]">{{.Revenue}}</p>
           </div>
         </div>
 
         <div class="flex flex-col gap-y-5">
           <div>
             <p class="text-sm text-[#6A7282]">Total Bookings (This Month)</p>
-            <p class="text-[#101828]">147</p>
+            <p class="text-[#101828]">{{.TotalBookingsThisMonth}}</p>
           </div>
           <div>
             <p class="text-sm text-[#6A7282]">Total Revenue (This Month)</p>
-            <p class="text-[#101828]">$ 219,401</p>
+            <p class="text-[#101828]">{{.RevenueThisMonth}}</p>
           </div>
         </div>
 
@@ -202,7 +173,7 @@
                   </clipPath>
                 </defs>
               </svg>
-              4.5
+              {{.Rating}}
             </p>
           </div>
         </div>
@@ -217,7 +188,7 @@
     Swal.fire({
       icon: "info",
       title: "Freeze Account",
-      html: 'Are you sure you want to freeze <strong>User1958</strong>\'s account?<br><small style="color: #666;">This change cannot be undone</small>',
+      html: 'Are you sure you want to freeze <strong>{{.Name}}</strong>\'s account?<br><small style="color: #666;">This change cannot be undone</small>',
       showCancelButton: true,
       confirmButtonColor: "#1C9BFF",
       confirmButtonText: "Freeze User",
@@ -234,3 +205,4 @@
     });
   }
 </script>
+{{- end }}

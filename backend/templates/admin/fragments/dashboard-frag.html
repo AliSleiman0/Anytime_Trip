@@ -43,7 +43,7 @@
         <div class="w-full">
           <p class="mb-2">New Users</p>
           <div class="flex justify-between">
-            <p class="text-xl font-bold">71,000</p>
+            <p class="text-xl font-bold">{{.TotalUsers}}</p>
             <p class="flex items-center gap-1">
               <span>+11.01%</span>
               <svg
@@ -64,7 +64,7 @@
             </p>
           </div>
           <div class="flex justify-between">
-            <p>today: 678</p>
+            <p>today: {{.NewUsersToday}}</p>
             <p class="text-[#009316] flex items-center gap-1">
               <span>+11.01%</span>
               <svg
@@ -94,7 +94,7 @@
         <div class="w-full">
           <p class="mb-2">Active Users</p>
           <div class="flex justify-between">
-            <p class="text-xl font-bold">71,000</p>
+            <p class="text-xl font-bold">{{.ActiveUsers}}</p>
             <p class="text-[#009316] flex items-center gap-1">
               <span>+11.01%</span>
               <svg
@@ -115,7 +115,7 @@
             </p>
           </div>
           <div class="flex justify-between">
-            <p>today: 678</p>
+            <p>today: {{.NewUsersToday}}</p>
             <p class="text-[#009316] flex items-center gap-1">
               <span>+11.01%</span>
               <svg
@@ -145,7 +145,7 @@
         <div class="w-full">
           <p class="mb-2">Unactive Users</p>
           <div class="flex justify-between">
-            <p class="text-xl font-bold">71,000</p>
+            <p class="text-xl font-bold">{{.UnactiveUsers}}</p>
             <p class="text-[#009316] flex items-center gap-1">
               <span>+11.01%</span>
               <svg
@@ -166,7 +166,7 @@
             </p>
           </div>
           <div class="flex justify-between">
-            <p>today: 678</p>
+            <p>today: 0</p>
             <p class="text-[#009316] flex items-center gap-1">
               <span>+11.01%</span>
               <svg
@@ -196,7 +196,7 @@
         <div class="w-full">
           <p class="mb-2">Visits</p>
           <div class="flex justify-between">
-            <p class="text-xl font-bold">71,000</p>
+            <p class="text-xl font-bold">{{.Visits}}</p>
             <p class="text-[#D24124] flex items-center gap-1">
               <span>-11.01%</span>
               <svg

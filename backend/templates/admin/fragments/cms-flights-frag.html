@@ -1,3 +1,20 @@
+<style>
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #336891;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2a5573;
+  }
+</style>
+
 <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
   <main class="">
     <!-- header -->
@@ -55,24 +72,29 @@
 
     <!-- Flights management Table -->
     <div class="px-4">
-      <div class="rounded-t-2xl overflow-hidden">
+      <div class="rounded-2xl overflow-hidden bg-white border border-[#CAD9EA] shadow-sm">
+        <!-- Fixed Header Table -->
         <table class="w-full text-sm">
           <thead class="bg-[#336891] text-white">
             <tr>
-              <th class="px-2 py-3 text-center font-semibold">Number</th>
-              <th class="px-2 py-3 text-center font-semibold">Airline</th>
-              <th class="px-2 py-3 text-center font-semibold">Status</th>
-              <th class="px-2 py-3 text-center font-semibold">Departure</th>
-              <th class="px-2 py-3 text-center font-semibold">Arrival</th>
-              <th class="px-2 py-3 text-center font-semibold">Top up</th>
-              <th class="px-2 py-3 text-center font-semibold">Cabin</th>
-              <th class="px-2 py-3 text-center font-semibold">Baggage</th>
-              <th class="px-2 py-3 text-center font-semibold">Seat Number</th>
-              <th class="px-2 py-3 text-center font-semibold">Action</th>
+              <th class="px-2 py-3 text-center font-semibold" style="width: 8%;">Number</th>
+              <th class="px-2 py-3 text-center font-semibold" style="width: 10%;">Airline</th>
+              <th class="px-2 py-3 text-center font-semibold" style="width: 8%;">Status</th>
+              <th class="px-2 py-3 text-center font-semibold" style="width: 16%;">Departure</th>
+              <th class="px-2 py-3 text-center font-semibold" style="width: 16%;">Arrival</th>
+              <th class="px-2 py-3 text-center font-semibold" style="width: 12%;">Top up</th>
+              <th class="px-2 py-3 text-center font-semibold" style="width: 8%;">Cabin</th>
+              <th class="px-2 py-3 text-center font-semibold" style="width: 10%;">Baggage</th>
+              <th class="px-2 py-3 text-center font-semibold" style="width: 7%;">Seat Number</th>
+              <th class="px-2 py-3 text-center font-semibold" style="width: 5%;">Action</th>
             </tr>
           </thead>
+        </table>
 
-          <tbody class="bg-white text-gray-900">
+        <!-- Scrollable Body -->
+        <div class="overflow-y-auto custom-scrollbar" style="max-height: 560px;">
+          <table class="w-full text-sm">
+            <tbody class="bg-white text-gray-900">
             <tr
               class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
             >
@@ -427,8 +449,9 @@
                 </div>
               </td>
             </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 

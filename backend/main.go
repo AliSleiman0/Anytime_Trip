@@ -34,10 +34,16 @@ func main() {
 	appRepository := apprepo.NewUserRepository(dbConn.DB)
 	adminRepository := adminrepo.NewAdminRepository(dbConn.DB)
 	superAdminRepository := superadminrepo.NewSystemConfigRepository(dbConn.DB)
+	carBookingRepository := apprepo.NewCarBookingRepository(dbConn.DB)
+	flightBookingRepository := apprepo.NewFlightBookingRepository(dbConn.DB)
+	hotelBookingRepository := apprepo.NewHotelBookingRepository(dbConn.DB)
+	flightRepository := adminrepo.NewFlightRepository(dbConn.DB)
+	carRepository := adminrepo.NewCarRepository(dbConn.DB)
+	hotelRepository := adminrepo.NewHotelRepository(dbConn.DB)
 
 	// Initialize handlers
 	appHandler := apphandlers.NewAppHandler(appRepository)
-	adminHandler := adminhandlers.NewAdminHandler(adminRepository)
+	adminHandler := adminhandlers.NewAdminHandler(adminRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, flightRepository, carRepository, hotelRepository)
 	superAdminHandler := superadminhandlers.NewSuperAdminHandler(superAdminRepository)
 
 	// Initialize Fiber app

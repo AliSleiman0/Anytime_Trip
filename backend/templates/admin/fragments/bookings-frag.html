@@ -1,6 +1,139 @@
 <!-- Main container with fixed positioning for sidebar layout -->
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+<div id="bookings-fragment" class="fixed top-0 left-64 right-0 h-screen overflow-auto">
   <main class="">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #336891;
+        border-radius: 10px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #2a5573;
+      }
+
+      /* Custom Flatpickr styling to match the image */
+      .flatpickr-calendar {
+        border-radius: 12px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+        border: none !important;
+        padding: 10px !important;
+        width: 320px !important;
+      }
+
+      .flatpickr-months {
+        padding: 10px 0 !important;
+      }
+
+      .flatpickr-current-month {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: #1a1a1a !important;
+      }
+
+      .flatpickr-weekdays {
+        margin-top: 10px !important;
+      }
+
+      .flatpickr-weekday {
+        color: #6b7280 !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+      }
+
+      .flatpickr-day {
+        border-radius: 6px !important;
+        color: #374151 !important;
+        font-size: 14px !important;
+        margin: 2px !important;
+      }
+
+      .flatpickr-day.selected {
+        background: #336891 !important;
+        border-color: #336891 !important;
+        color: white !important;
+        font-weight: 600 !important;
+      }
+
+      .flatpickr-day:hover:not(.selected):not(.flatpickr-disabled) {
+        background: rgba(51, 104, 145, 0.1) !important;
+        border-color: rgba(51, 104, 145, 0.2) !important;
+      }
+
+      .flatpickr-day.prevMonthDay,
+      .flatpickr-day.nextMonthDay {
+        color: #d1d5db !important;
+      }
+
+      .flatpickr-months .flatpickr-prev-month:hover svg,
+      .flatpickr-months .flatpickr-next-month:hover svg {
+        fill: #336891 !important;
+      }
+
+      .flatpickr-months .flatpickr-prev-month svg,
+      .flatpickr-months .flatpickr-next-month svg {
+        fill: #6b7280 !important;
+      }
+
+      /* Custom buttons for calendar */
+      .flatpickr-calendar::after {
+        content: '';
+        display: block;
+        height: 60px;
+      }
+
+      .calendar-buttons {
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 20px;
+        gap: 10px;
+      }
+
+      .calendar-buttons button {
+        flex: 1;
+        height: 40px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .calendar-buttons .cancel-btn {
+        background: white;
+        border: 1px solid #d1d5db;
+        color: #374151;
+      }
+
+      .calendar-buttons .cancel-btn:hover {
+        background: #f9fafb;
+      }
+
+      .calendar-buttons .save-btn {
+        background: #336891;
+        border: none;
+        color: white;
+      }
+
+      .calendar-buttons .save-btn:hover {
+        background: #2a5573;
+      }
+
+      /* Hide native date input icon */
+      input[type="text"].date-input::-webkit-calendar-picker-indicator {
+        display: none;
+      }
+    </style>
     <!-- Dynamic header section loaded via HTMX with booking-specific title and subtitle -->
     <div
       hx-get="/admin/header?title=Bookings&subtitle=Manage all bookings here"
@@ -9,41 +142,54 @@
     ></div>
 
     <!-- inputs -->
-    <div class="p-4 flex justify-between">
+    <form
+      class="p-4 flex justify-between flex-wrap gap-4 items-center"
+      hx-get="/admin/bookings-frag"
+      hx-trigger="change, submit"
+      hx-target="#bookings-fragment"
+      hx-swap="outerHTML"
+    >
       <input
         id="date"
         name="date"
-        type="date"
+        type="text"
         placeholder="Select Date"
-        onblur="if(!this.value){this.type='text'}"
-        class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+        value="{{.Filters.Date}}"
+        readonly
+        class="date-input w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891] cursor-pointer"
       />
-      <div>
+      <div class="flex gap-4 flex-wrap">
         <select
           class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           name="bookings"
           id="bookings"
         >
-          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
+          <option class="text-[#9B9B9B]" value="all" {{if or (eq .Filters.Type "") (eq .Filters.Type "all")}}selected{{end}}>
             All Bookings
           </option>
+          <option value="car" {{if eq .Filters.Type "car"}}selected{{end}}>Car Bookings</option>
+          <option value="flight" {{if eq .Filters.Type "flight"}}selected{{end}}>Flight Bookings</option>
+          <option value="hotel" {{if eq .Filters.Type "hotel"}}selected{{end}}>Hotel Bookings</option>
         </select>
         <select
           class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           name="status"
           id="status"
         >
-          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
+          <option class="text-[#9B9B9B]" value="all" {{if or (eq .Filters.Status "") (eq .Filters.Status "all")}}selected{{end}}>
             All Statuses
           </option>
+          <option value="pending" {{if eq .Filters.Status "pending"}}selected{{end}}>Pending</option>
+          <option value="confirmed" {{if eq .Filters.Status "confirmed"}}selected{{end}}>Confirmed</option>
+          <option value="cancelled" {{if eq .Filters.Status "cancelled"}}selected{{end}}>Cancelled</option>
         </select>
       </div>
-    </div>
+    </form>
 
     <!-- Padding wrapper for content -->
     <div class="p-4">
       <!-- Table container with rounded corners and shadow -->
-      <div class="rounded-t-2xl overflow-hidden">
+      <div class="rounded-t-2xl overflow-hidden border border-gray-200">
         <!-- Bookings data table with responsive text sizing -->
         <table class="w-full text-sm">
           <!-- Table header with blue background and white text -->
@@ -61,342 +207,193 @@
               <th class="px-2 py-3 text-center font-semibold">Action</th>
             </tr>
           </thead>
-
-          <!-- Table body with 3 booking records - each row represents one booking -->
-          <tbody>
-            <!-- Booking row 1: First booking record with gradient border -->
-            <tr
-              style="
-                border-bottom: 1px solid;
-                border-image-source: linear-gradient(
-                  90deg,
-                  rgba(255, 255, 255, 0.68) 0%,
-                  #242424 22.42%,
-                  #1d1d1d 49.66%,
-                  #2d2d2d 81.29%,
-                  rgba(255, 255, 255, 0.47) 99.01%
-                );
-                border-image-slice: 1;
-              "
-            >
-              <td class="px-4 py-3 text-gray-900 text-center">
-                <p class="flex flex-col">
-                  BK001 <span class="text-gray-400">123456</span>
-                </p>
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span class="inline-flex items-center justify-center gap-1">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.5 4.49998C17.3284 3.67155 18.6716 3.67155 19.5 4.49998C20.3284 5.32841 20.3284 6.67155 19.5 7.49998L17 9.99998L18.8633 17.4361C18.9482 17.7749 18.8501 18.1335 18.6046 18.382L18.3626 18.6269C17.9174 19.0776 17.1706 19.0059 16.8192 18.4788L13.5 13.5L9.50003 17.5V19.5858C9.50003 19.851 9.39467 20.1054 9.20714 20.2929L8.92581 20.5742C8.45956 21.0405 7.6776 20.9357 7.35046 20.3633L6.00003 18L3.63678 16.6496C3.06428 16.3224 2.95956 15.5405 3.42581 15.0742L3.70714 14.7929C3.89467 14.6054 4.14903 14.5 4.41424 14.5H6.50003L10.5 10.5L5.52128 7.18081C4.99416 6.8294 4.9225 6.08261 5.37319 5.63737L5.61819 5.39533C5.86667 5.14985 6.22523 5.05181 6.56404 5.13671L14 6.99998L16.5 4.49998Z"
-                      stroke="#336891"
-                      stroke-width="1.5"
-                    />
-                  </svg>
-
-                  Flight</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center">
-                <p class="font-semibold text-gray-900">John Smith</p>
-                <p class="text-gray-500 text-xs">john.smith@gmail.com</p>
-              </td>
-              <td class="px-4 py-3 text-gray-700 text-center">1/15/2025</td>
-              <td class="px-4 py-3 text-gray-700 text-center">2/20/2025</td>
-              <td class="px-4 py-3 text-gray-700 text-center">
-                NYC - London (Round trip)<br /><span
-                  class="text-xs text-gray-500 flex items-center justify-center gap-1"
-                  >1DLRT190/6MARSAN-SMITH
-                  <button class="border-0">
-                    <svg
-                      width="10px"
-                      height="10px"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M6 11C6 8.17157 6 6.75736 6.87868 5.87868C7.75736 5 9.17157 5 12 5H15C17.8284 5 19.2426 5 20.1213 5.87868C21 6.75736 21 8.17157 21 11V16C21 18.8284 21 20.2426 20.1213 21.1213C19.2426 22 17.8284 22 15 22H12C9.17157 22 7.75736 22 6.87868 21.1213C6 20.2426 6 18.8284 6 16V11Z"
-                        stroke="#1C274C"
-                        stroke-width="1.5"
-                      />
-                      <path
-                        d="M6 19C4.34315 19 3 17.6569 3 16V10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H15C16.6569 2 18 3.34315 18 5"
-                        stroke="#336891"
-                        stroke-width="1.5"
-                      />
-                    </svg>
-                  </button>
-                </span>
-              </td>
-              <td class="px-4 py-3 font-semibold text-gray-900 text-center">
-                $850.00
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
-                  >Paid</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
-                  >Confirmed</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center">
-                <button
-                  class="bg-[#336891] text-white w-6 h-6 rounded-lg inline-flex items-center justify-center hover:bg-blue-600"
-                >
-                  <svg
-                    width="15px"
-                    height="11px"
-                    viewBox="0 0 24 24"
-                    fill="white"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"
-                      fill=""
-                    />
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M2 12C2 13.6394 2.42496 14.1915 3.27489 15.2957C4.97196 17.5004 7.81811 20 12 20C16.1819 20 19.028 17.5004 20.7251 15.2957C21.575 14.1915 22 13.6394 22 12C22 10.3606 21.575 9.80853 20.7251 8.70433C19.028 6.49956 16.1819 4 12 4C7.81811 4 4.97196 6.49956 3.27489 8.70433C2.42496 9.80853 2 10.3606 2 12ZM12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25Z"
-                      fill="white"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-            <tr
-              style="
-                border-bottom: 1px solid;
-                border-image-source: linear-gradient(
-                  90deg,
-                  rgba(255, 255, 255, 0.68) 0%,
-                  #242424 22.42%,
-                  #1d1d1d 49.66%,
-                  #2d2d2d 81.29%,
-                  rgba(255, 255, 255, 0.47) 99.01%
-                );
-                border-image-slice: 1;
-              "
-            >
-              <td class="px-4 py-3 text-gray-900 text-center">
-                <p class="flex flex-col">
-                  BK001 <span class="text-gray-400">123456</span>
-                </p>
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span class="inline-flex items-center justify-center gap-1">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.5 4.49998C17.3284 3.67155 18.6716 3.67155 19.5 4.49998C20.3284 5.32841 20.3284 6.67155 19.5 7.49998L17 9.99998L18.8633 17.4361C18.9482 17.7749 18.8501 18.1335 18.6046 18.382L18.3626 18.6269C17.9174 19.0776 17.1706 19.0059 16.8192 18.4788L13.5 13.5L9.50003 17.5V19.5858C9.50003 19.851 9.39467 20.1054 9.20714 20.2929L8.92581 20.5742C8.45956 21.0405 7.6776 20.9357 7.35046 20.3633L6.00003 18L3.63678 16.6496C3.06428 16.3224 2.95956 15.5405 3.42581 15.0742L3.70714 14.7929C3.89467 14.6054 4.14903 14.5 4.41424 14.5H6.50003L10.5 10.5L5.52128 7.18081C4.99416 6.8294 4.9225 6.08261 5.37319 5.63737L5.61819 5.39533C5.86667 5.14985 6.22523 5.05181 6.56404 5.13671L14 6.99998L16.5 4.49998Z"
-                      stroke="#336891"
-                      stroke-width="1.5"
-                    />
-                  </svg>
-
-                  Flight</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center">
-                <p class="font-semibold text-gray-900">John Smith</p>
-                <p class="text-gray-500 text-xs">john.smith@gmail.com</p>
-              </td>
-              <td class="px-4 py-3 text-gray-700 text-center">1/15/2025</td>
-              <td class="px-4 py-3 text-gray-700 text-center">2/20/2025</td>
-              <td class="px-4 py-3 text-gray-700 text-center">
-                NYC - London (Round trip)<br /><span
-                  class="text-xs text-gray-500 flex items-center justify-center gap-1"
-                  >1DLRT190/6MARSAN-SMITH
-                  <button class="border-0">
-                    <svg
-                      width="10px"
-                      height="10px"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M6 11C6 8.17157 6 6.75736 6.87868 5.87868C7.75736 5 9.17157 5 12 5H15C17.8284 5 19.2426 5 20.1213 5.87868C21 6.75736 21 8.17157 21 11V16C21 18.8284 21 20.2426 20.1213 21.1213C19.2426 22 17.8284 22 15 22H12C9.17157 22 7.75736 22 6.87868 21.1213C6 20.2426 6 18.8284 6 16V11Z"
-                        stroke="#1C274C"
-                        stroke-width="1.5"
-                      />
-                      <path
-                        d="M6 19C4.34315 19 3 17.6569 3 16V10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H15C16.6569 2 18 3.34315 18 5"
-                        stroke="#336891"
-                        stroke-width="1.5"
-                      />
-                    </svg>
-                  </button>
-                </span>
-              </td>
-              <td class="px-4 py-3 font-semibold text-gray-900 text-center">
-                $850.00
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
-                  >Paid</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
-                  >Confirmed</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center">
-                <button
-                  class="bg-[#336891] text-white w-6 h-6 rounded-lg inline-flex items-center justify-center hover:bg-blue-600"
-                >
-                  <svg
-                    width="15px"
-                    height="11px"
-                    viewBox="0 0 24 24"
-                    fill="white"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"
-                      fill=""
-                    />
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M2 12C2 13.6394 2.42496 14.1915 3.27489 15.2957C4.97196 17.5004 7.81811 20 12 20C16.1819 20 19.028 17.5004 20.7251 15.2957C21.575 14.1915 22 13.6394 22 12C22 10.3606 21.575 9.80853 20.7251 8.70433C19.028 6.49956 16.1819 4 12 4C7.81811 4 4.97196 6.49956 3.27489 8.70433C2.42496 9.80853 2 10.3606 2 12ZM12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25Z"
-                      fill="white"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-            <tr
-              style="
-                border-bottom: 1px solid;
-                border-image-source: linear-gradient(
-                  90deg,
-                  rgba(255, 255, 255, 0.68) 0%,
-                  #242424 22.42%,
-                  #1d1d1d 49.66%,
-                  #2d2d2d 81.29%,
-                  rgba(255, 255, 255, 0.47) 99.01%
-                );
-                border-image-slice: 1;
-              "
-            >
-              <td class="px-4 py-3 text-gray-900 text-center">
-                <p class="flex flex-col">
-                  BK001 <span class="text-gray-400">123456</span>
-                </p>
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span class="inline-flex items-center justify-center gap-1">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.5 4.49998C17.3284 3.67155 18.6716 3.67155 19.5 4.49998C20.3284 5.32841 20.3284 6.67155 19.5 7.49998L17 9.99998L18.8633 17.4361C18.9482 17.7749 18.8501 18.1335 18.6046 18.382L18.3626 18.6269C17.9174 19.0776 17.1706 19.0059 16.8192 18.4788L13.5 13.5L9.50003 17.5V19.5858C9.50003 19.851 9.39467 20.1054 9.20714 20.2929L8.92581 20.5742C8.45956 21.0405 7.6776 20.9357 7.35046 20.3633L6.00003 18L3.63678 16.6496C3.06428 16.3224 2.95956 15.5405 3.42581 15.0742L3.70714 14.7929C3.89467 14.6054 4.14903 14.5 4.41424 14.5H6.50003L10.5 10.5L5.52128 7.18081C4.99416 6.8294 4.9225 6.08261 5.37319 5.63737L5.61819 5.39533C5.86667 5.14985 6.22523 5.05181 6.56404 5.13671L14 6.99998L16.5 4.49998Z"
-                      stroke="#336891"
-                      stroke-width="1.5"
-                    />
-                  </svg>
-
-                  Flight</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center">
-                <p class="font-semibold text-gray-900">John Smith</p>
-                <p class="text-gray-500 text-xs">john.smith@gmail.com</p>
-              </td>
-              <td class="px-4 py-3 text-gray-700 text-center">1/15/2025</td>
-              <td class="px-4 py-3 text-gray-700 text-center">2/20/2025</td>
-              <td class="px-4 py-3 text-gray-700 text-center">
-                NYC - London (Round trip)<br /><span
-                  class="text-xs text-gray-500 flex items-center justify-center gap-1"
-                  >1DLRT190/6MARSAN-SMITH
-                  <button class="border-0">
-                    <svg
-                      width="10px"
-                      height="10px"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M6 11C6 8.17157 6 6.75736 6.87868 5.87868C7.75736 5 9.17157 5 12 5H15C17.8284 5 19.2426 5 20.1213 5.87868C21 6.75736 21 8.17157 21 11V16C21 18.8284 21 20.2426 20.1213 21.1213C19.2426 22 17.8284 22 15 22H12C9.17157 22 7.75736 22 6.87868 21.1213C6 20.2426 6 18.8284 6 16V11Z"
-                        stroke="#1C274C"
-                        stroke-width="1.5"
-                      />
-                      <path
-                        d="M6 19C4.34315 19 3 17.6569 3 16V10C3 6.22876 3 4.34315 4.17157 3.17157C5.34315 2 7.22876 2 11 2H15C16.6569 2 18 3.34315 18 5"
-                        stroke="#336891"
-                        stroke-width="1.5"
-                      />
-                    </svg>
-                  </button>
-                </span>
-              </td>
-              <td class="px-4 py-3 font-semibold text-gray-900 text-center">
-                $850.00
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
-                  >Paid</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="px-2 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
-                  >Confirmed</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center">
-                <button
-                  class="bg-[#336891] text-white w-6 h-6 rounded-lg inline-flex items-center justify-center hover:bg-blue-600"
-                >
-                  <svg
-                    width="15px"
-                    height="11px"
-                    viewBox="0 0 24 24"
-                    fill="white"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"
-                      fill=""
-                    />
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M2 12C2 13.6394 2.42496 14.1915 3.27489 15.2957C4.97196 17.5004 7.81811 20 12 20C16.1819 20 19.028 17.5004 20.7251 15.2957C21.575 14.1915 22 13.6394 22 12C22 10.3606 21.575 9.80853 20.7251 8.70433C19.028 6.49956 16.1819 4 12 4C7.81811 4 4.97196 6.49956 3.27489 8.70433C2.42496 9.80853 2 10.3606 2 12ZM12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25Z"
-                      fill="white"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-          </tbody>
         </table>
+        <div class="overflow-y-auto custom-scrollbar" style="max-height: 560px;">
+          <table class="w-full text-sm">
+            <!-- Table body populated from all booking collections -->
+            <tbody>
+              {{range .Bookings}}
+              <tr
+                style="
+                  border-bottom: 1px solid;
+                  border-image-source: linear-gradient(
+                    90deg,
+                    rgba(255, 255, 255, 0.68) 0%,
+                    #242424 22.42%,
+                    #1d1d1d 49.66%,
+                    #2d2d2d 81.29%,
+                    rgba(255, 255, 255, 0.47) 99.01%
+                  );
+                  border-image-slice: 1;
+                "
+              >
+                <td class="px-4 py-3 text-gray-900 text-center" style="width: 10%;">
+                  <p class="flex flex-col">
+                    {{.BookingID}} <span class="text-gray-400">{{.RefID}}</span>
+                  </p>
+                </td>
+                <td class="px-4 py-3 text-center" style="width: 10%;">
+                <span class="inline-flex items-center justify-center gap-1">
+                  {{if eq .Type "Flight"}}
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M16.5 4.50023C17.3284 3.6718 18.6716 3.6718 19.5 4.50023C20.3284 5.32866 20.3284 6.6718 19.5 7.50023L17 10.0002L18.8633 17.4363C18.9482 17.7751 18.8501 18.1337 18.6046 18.3822L18.3626 18.6271C17.9174 19.0778 17.1706 19.0061 16.8192 18.479L13.5 13.5002L9.50003 17.5002V19.586C9.50003 19.8512 9.39467 20.1056 9.20714 20.2931L8.92581 20.5744C8.45956 21.0407 7.6776 20.9359 7.35046 20.3635L6.00003 18.0002L3.63678 16.6498C3.06428 16.3226 2.95956 15.5407 3.42581 15.0744L3.70714 14.7931C3.89467 14.6056 4.14903 14.5002 4.41424 14.5002H6.50003L10.5 10.5002L5.52128 7.18106C4.99416 6.82965 4.9225 6.08286 5.37319 5.63762L5.61819 5.39558C5.86667 5.1501 6.22523 5.05206 6.56404 5.13696L14 7.00023L16.5 4.50023Z"
+                      stroke="black"
+                      stroke-width="1.5"
+                    />
+                  </svg>
+                  {{else if eq .Type "Hotel"}}
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <mask id="path-1-inside-1_332_3767" fill="white">
+                      <path d="M19.1147 8.91572H14.7947V3.87281C14.7942 1.73334 13.0614 0.00046875 10.9219 0H4.88458C2.74511 0.00046875 1.01223 1.73334 1.01172 3.87281V24H2.74652V3.87281C2.74698 3.27984 2.98464 2.75081 3.37291 2.36114C3.76262 1.97283 4.29161 1.73522 4.88458 1.7347H10.9219C11.5149 1.73517 12.0439 1.97283 12.4336 2.36114C12.8218 2.75081 13.0595 3.27984 13.06 3.87281V24H14.7947V10.6505H19.1147C19.7077 10.6509 20.2367 10.8886 20.6264 11.2769C21.0147 11.6666 21.2523 12.1956 21.2528 12.7886V24H22.9876V12.7885C22.987 10.6491 21.2542 8.91619 19.1147 8.91572Z" />
+                    </mask>
+                    <path
+                      d="M19.1147 8.91572L19.1154 5.91572H19.1147V8.91572ZM14.7947 8.91572H11.7947V11.9157H14.7947V8.91572ZM14.7947 3.87281L17.7947 3.87281V3.87216L14.7947 3.87281ZM10.9219 0L10.9225 -3H10.9219V0ZM4.88458 0V-3H4.88392L4.88458 0ZM1.01172 3.87281L-1.98828 3.87209V3.87281H1.01172ZM1.01172 24H-1.98828V27H1.01172V24ZM2.74652 24V27H5.74652V24H2.74652ZM2.74652 3.87281L-0.253484 3.87044V3.87281H2.74652ZM3.37291 2.36114L1.25541 0.235976L1.24775 0.243658L3.37291 2.36114ZM4.88458 1.7347V-1.2653L4.88197 -1.2653L4.88458 1.7347ZM10.9219 1.7347L10.9243 -1.2653H10.9219V1.7347ZM12.4336 2.36114L14.5587 0.243645L14.5512 0.236117L12.4336 2.36114ZM13.06 3.87281L16.06 3.87281L16.06 3.87044L13.06 3.87281ZM13.06 24H10.06V27H13.06V24ZM14.7947 24V27H17.7947V24H14.7947ZM14.7947 10.6505V7.65047H11.7947V10.6505H14.7947ZM19.1147 10.6505L19.1171 7.65047H19.1147V10.6505ZM20.6264 11.2769L22.7514 9.15928L22.744 9.15188L20.6264 11.2769ZM21.2528 12.7886H24.2528L24.2528 12.786L21.2528 12.7886ZM21.2528 24H18.2528V27H21.2528V24ZM22.9876 24V27H25.9876V24H22.9876ZM22.9876 12.7885L25.9876 12.7885V12.7878L22.9876 12.7885ZM19.1147 8.91572V5.91572H14.7947V8.91572V11.9157H19.1147V8.91572ZM14.7947 8.91572H17.7947V3.87281H14.7947H11.7947V8.91572H14.7947ZM14.7947 3.87281L17.7947 3.87216C17.7939 0.0763462 14.7184 -2.99917 10.9225 -3L10.9219 0L10.9212 3C11.4044 3.00011 11.7946 3.39034 11.7947 3.87347L14.7947 3.87281ZM10.9219 0V-3H4.88458V0V3H10.9219V0ZM4.88458 0L4.88392 -3C1.0881 -2.99917 -1.98737 0.0763441 -1.98828 3.87209L1.01172 3.87281L4.01172 3.87354C4.01184 3.39034 4.40212 3.00011 4.88524 3L4.88458 0ZM1.01172 3.87281H-1.98828V24H1.01172H4.01172V3.87281H1.01172ZM1.01172 24V27H2.74652V24V21H1.01172V24ZM2.74652 24H5.74652V3.87281H2.74652H-0.253484V24H2.74652ZM2.74652 3.87281L5.74651 3.87518C5.74633 4.11084 5.64378 4.33237 5.49806 4.47862L3.37291 2.36114L1.24775 0.243658C0.325501 1.16925 -0.25236 2.44884 -0.253484 3.87044L2.74652 3.87281ZM3.37291 2.36114L5.49039 4.48629C5.34415 4.63201 5.12263 4.7345 4.88719 4.7347L4.88458 1.7347L4.88197 -1.2653C3.46059 -1.26406 2.1811 -0.686351 1.25542 0.23599L3.37291 2.36114ZM4.88458 1.7347V4.7347H10.9219V1.7347V-1.2653H4.88458V1.7347ZM10.9219 1.7347L10.9195 4.7347C10.6838 4.73452 10.4622 4.63195 10.316 4.48616L12.4336 2.36114L14.5512 0.236117C13.6255 -0.686293 12.3459 -1.26417 10.9243 -1.2653L10.9219 1.7347ZM12.4336 2.36114L10.3084 4.47862C10.1627 4.33237 10.0601 4.11085 10.06 3.87518L13.06 3.87281L16.06 3.87044C16.0588 2.44884 15.481 1.16925 14.5587 0.243658L12.4336 2.36114ZM13.06 3.87281H10.06V24H13.06H16.06V3.87281H13.06ZM13.06 24V27H14.7947V24V21H13.06V24ZM14.7947 24H17.7947V10.6505H14.7947H11.7947V24H14.7947ZM14.7947 10.6505V13.6505H19.1147V10.6505V7.65047H14.7947V10.6505ZM19.1147 10.6505L19.1123 13.6505C18.8767 13.6503 18.6551 13.5477 18.5088 13.4019L20.6264 11.2769L22.744 9.15188C21.8183 8.22947 20.5387 7.65159 19.1171 7.65047L19.1147 10.6505ZM20.6264 11.2769L18.5014 13.3945C18.3554 13.2481 18.253 13.0265 18.2528 12.7912L21.2528 12.7886L24.2528 12.786C24.2516 11.3647 23.6739 10.0851 22.7514 9.1593L20.6264 11.2769ZM21.2528 12.7886H18.2528V24H21.2528H24.2528V12.7886H21.2528ZM21.2528 24V27H22.9876V24V21H21.2528V24ZM22.9876 24H25.9876V12.7885H22.9876H19.9876V24H22.9876ZM22.9876 12.7885L25.9876 12.7878C25.9866 8.99206 22.9112 5.91655 19.1154 5.91572L19.1147 8.91572L19.114 11.9157C19.5972 11.9158 19.9874 12.3061 19.9876 12.7893L22.9876 12.7885Z"
+                      fill="black"
+                      mask="url(#path-1-inside-1_332_3767)"
+                    />
+                    <mask id="path-3-inside-2_332_3767" fill="white">
+                      <path d="M6.70877 6.16846H5.21777V8.69858H6.70877V6.16846Z" />
+                    </mask>
+                    <path
+                      d="M5.21777 6.16846V4.16846H3.21777V6.16846H5.21777ZM6.70877 6.16846H8.70877V4.16846H6.70877V6.16846ZM6.70877 8.69858V10.6986H8.70877V8.69858H6.70877ZM5.21777 8.69858H3.21777V10.6986H5.21777V8.69858ZM5.21777 6.16846V8.16846H6.70877V6.16846V4.16846H5.21777V6.16846ZM6.70877 6.16846H4.70877V8.69858H6.70877H8.70877V6.16846H6.70877ZM6.70877 8.69858V6.69858H5.21777V8.69858V10.6986H6.70877V8.69858ZM5.21777 8.69858H7.21777V6.16846H5.21777H3.21777V8.69858H5.21777Z"
+                      fill="black"
+                      mask="url(#path-3-inside-2_332_3767)"
+                    />
+                    <mask id="path-5-inside-3_332_3767" fill="white">
+                      <path d="M10.3953 6.16846H8.9043V8.69858H10.3953V6.16846Z" />
+                    </mask>
+                    <path
+                      d="M8.9043 6.16846V4.16846H6.9043V6.16846H8.9043ZM10.3953 6.16846H12.3953V4.16846H10.3953V6.16846ZM10.3953 8.69858V10.6986H12.3953V8.69858H10.3953ZM8.9043 8.69858H6.9043V10.6986H8.9043V8.69858ZM8.9043 6.16846V8.16846H10.3953V6.16846V4.16846H8.9043V6.16846ZM10.3953 6.16846H8.3953V8.69858H10.3953H12.3953V6.16846H10.3953ZM10.3953 8.69858V6.69858H8.9043V8.69858V10.6986H10.3953V8.69858ZM8.9043 8.69858H10.9043V6.16846H8.9043H6.9043V8.69858H8.9043Z"
+                      fill="black"
+                      mask="url(#path-5-inside-3_332_3767)"
+                    />
+                    <mask id="path-7-inside-4_332_3767" fill="white">
+                      <path d="M6.70877 11.9517H5.21777V14.4818H6.70877V11.9517Z" />
+                    </mask>
+                    <path
+                      d="M5.21777 11.9517V9.95166H3.21777V11.9517H5.21777ZM6.70877 11.9517H8.70877V9.95166H6.70877V11.9517ZM6.70877 14.4818V16.4818H8.70877V14.4818H6.70877ZM5.21777 14.4818H3.21777V16.4818H5.21777V14.4818ZM5.21777 11.9517V13.9517H6.70877V11.9517V9.95166H5.21777V11.9517ZM6.70877 11.9517H4.70877V14.4818H6.70877H8.70877V11.9517H6.70877ZM6.70877 14.4818V12.4818H5.21777V14.4818V16.4818H6.70877V14.4818ZM5.21777 14.4818H7.21777V11.9517H5.21777H3.21777V14.4818H5.21777Z"
+                      fill="black"
+                      mask="url(#path-7-inside-4_332_3767)"
+                    />
+                    <mask id="path-9-inside-5_332_3767" fill="white">
+                      <path d="M10.3953 11.9517H8.9043V14.4818H10.3953V11.9517Z" />
+                    </mask>
+                    <path
+                      d="M8.9043 11.9517V9.95166H6.9043V11.9517H8.9043ZM10.3953 11.9517H12.3953V9.95166H10.3953V11.9517ZM10.3953 14.4818V16.4818H12.3953V14.4818H10.3953ZM8.9043 14.4818H6.9043V16.4818H8.9043V14.4818ZM8.9043 11.9517V13.9517H10.3953V11.9517V9.95166H8.9043V11.9517ZM10.3953 11.9517H8.3953V14.4818H10.3953H12.3953V11.9517H10.3953ZM10.3953 14.4818V12.4818H8.9043V14.4818V16.4818H10.3953V14.4818ZM8.9043 14.4818H10.9043V11.9517H8.9043H6.9043V14.4818H8.9043Z"
+                      fill="black"
+                      mask="url(#path-9-inside-5_332_3767)"
+                    />
+                    <mask id="path-11-inside-6_332_3767" fill="white">
+                      <path d="M6.70877 17.7349H5.21777V20.265H6.70877V17.7349Z" />
+                    </mask>
+                    <path
+                      d="M5.21777 17.7349V15.7349H3.21777V17.7349H5.21777ZM6.70877 17.7349H8.70877V15.7349H6.70877V17.7349ZM6.70877 20.265V22.265H8.70877V20.265H6.70877ZM5.21777 20.265H3.21777V22.265H5.21777V20.265ZM5.21777 17.7349V19.7349H6.70877V17.7349V15.7349H5.21777V17.7349ZM6.70877 17.7349H4.70877V20.265H6.70877H8.70877V17.7349H6.70877ZM6.70877 20.265V18.265H5.21777V20.265V22.265H6.70877V20.265ZM5.21777 20.265H7.21777V17.7349H5.21777H3.21777V20.265H5.21777Z"
+                      fill="black"
+                      mask="url(#path-11-inside-6_332_3767)"
+                    />
+                    <mask id="path-13-inside-7_332_3767" fill="white">
+                      <path d="M10.3953 17.7349H8.9043V20.265H10.3953V17.7349Z" />
+                    </mask>
+                    <path
+                      d="M8.9043 17.7349V15.7349H6.9043V17.7349H8.9043ZM10.3953 17.7349H12.3953V15.7349H10.3953V17.7349ZM10.3953 20.265V22.265H12.3953V20.265H10.3953ZM8.9043 20.265H6.9043V22.265H8.9043V20.265ZM8.9043 17.7349V19.7349H10.3953V17.7349V15.7349H8.9043V17.7349ZM10.3953 17.7349H8.3953V20.265H10.3953H12.3953V17.7349H10.3953ZM10.3953 20.265V18.265H8.9043V20.265V22.265H10.3953V20.265ZM8.9043 20.265H10.9043V17.7349H8.9043H6.9043V20.265H8.9043Z"
+                      fill="black"
+                      mask="url(#path-13-inside-7_332_3767)"
+                    />
+                    <mask id="path-15-inside-8_332_3767" fill="white">
+                      <path d="M18.5281 13.5781H17.0371V16.1082H18.5281V13.5781Z" />
+                    </mask>
+                    <path
+                      d="M17.0371 13.5781V11.5781H15.0371V13.5781H17.0371ZM18.5281 13.5781H20.5281V11.5781H18.5281V13.5781ZM18.5281 16.1082V18.1082H20.5281V16.1082H18.5281ZM17.0371 16.1082H15.0371V18.1082H17.0371V16.1082ZM17.0371 13.5781V15.5781H18.5281V13.5781V11.5781H17.0371V13.5781ZM18.5281 13.5781H16.5281V16.1082H18.5281H20.5281V13.5781H18.5281ZM18.5281 16.1082V14.1082H17.0371V16.1082V18.1082H18.5281V16.1082ZM17.0371 16.1082H19.0371V13.5781H17.0371H15.0371V16.1082H17.0371Z"
+                      fill="black"
+                      mask="url(#path-15-inside-8_332_3767)"
+                    />
+                    <mask id="path-17-inside-9_332_3767" fill="white">
+                      <path d="M18.5281 19.1206H17.0371V21.6507H18.5281V19.1206Z" />
+                    </mask>
+                    <path
+                      d="M17.0371 19.1206V17.1206H15.0371V19.1206H17.0371ZM18.5281 19.1206H20.5281V17.1206H18.5281V19.1206ZM18.5281 21.6507V23.6507H20.5281V21.6507H18.5281ZM17.0371 21.6507H15.0371V23.6507H17.0371V21.6507ZM17.0371 19.1206V21.1206H18.5281V19.1206V17.1206H17.0371V19.1206ZM18.5281 19.1206H16.5281V21.6507H18.5281H20.5281V19.1206H18.5281ZM18.5281 21.6507V19.6507H17.0371V21.6507V23.6507H18.5281V21.6507ZM17.0371 21.6507H19.0371V19.1206H17.0371H15.0371V21.6507H17.0371Z"
+                      fill="black"
+                      mask="url(#path-17-inside-9_332_3767)"
+                    />
+                  </svg>
+                  {{else}}
+                  <svg
+                    width="24"
+                    height="15"
+                    viewBox="0 0 24 15"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M4.94531 0.5H12.4453C13.1858 0.5 13.8808 0.828713 14.3584 1.39941H14.3594L17.2891 4.8916L17.3926 5.01562L17.5488 5.05469L21.6035 6.08594L21.6064 6.08691C22.7165 6.36279 23.5 7.36387 23.5 8.50781V11.25C23.5 11.7942 23.0442 12.25 22.5 12.25H21.2461L21.1484 12.625C20.8688 13.7036 19.9002 14.5 18.75 14.5C17.5998 14.5 16.6312 13.7036 16.3516 12.625L16.2539 12.25H8.49609L8.39844 12.625C8.11876 13.7036 7.15016 14.5 6 14.5C4.80183 14.5 3.7941 13.6438 3.55957 12.5078L3.49707 12.2012L3.19336 12.125L1.24805 11.6328L1.24707 11.6318L1.08887 11.5781C0.736007 11.422 0.5 11.0672 0.5 10.6641V5.69531C0.5 5.34824 0.599257 5.01683 0.790039 4.73047L0.791016 4.73145L2.87695 1.61426V1.61328C3.342 0.915718 4.11257 0.5 4.94531 0.5ZM6 10C4.88597 10 4 10.886 4 12C4 13.114 4.88597 14 6 14C7.11403 14 8 13.114 8 12C8 10.886 7.11403 10 6 10ZM18.75 10C17.636 10 16.75 10.886 16.75 12C16.75 13.114 17.636 14 18.75 14C19.864 14 20.75 13.114 20.75 12C20.75 10.886 19.864 10 18.75 10ZM1 11.0527L1.37695 11.1484L3.04102 11.5703L3.49609 11.6855L3.63965 11.2393C3.96637 10.2274 4.89867 9.5 6 9.5C7.15016 9.5 8.11876 10.2964 8.39844 11.375L8.49609 11.75H16.2539L16.3516 11.375C16.6312 10.2964 17.5998 9.5 18.75 9.5C19.9002 9.5 20.8688 10.2964 21.1484 11.375L21.2461 11.75H23V8.50781C23 7.64967 22.4683 6.89379 21.6611 6.61816L21.4961 6.56934L17.2773 5.51465L17.2178 5.5H1V11.0527ZM4.94531 1C4.28065 1 3.66175 1.31596 3.28711 1.87988L3.20312 2.00488V2.02832L1.74023 4.22266L1.22168 5H8.75V1H4.94531ZM9.25 5H16.7275L16.0391 4.17871L13.9766 1.71777C13.5971 1.26151 13.038 1 12.4453 1H9.25V5Z"
+                      stroke="black"
+                    />
+                  </svg>
+                  {{end}}
+
+                    {{.Type}}</span
+                  >
+                </td>
+                <td class="px-4 py-3 text-center" style="width: 10%;">
+                  <p class="font-semibold text-gray-900">{{.CustomerName}}</p>
+                  <p class="text-gray-500 text-xs">{{.CustomerEmail}}</p>
+                </td>
+                <td class="px-4 py-3 text-gray-700 text-center" style="width: 10%;">{{formatDate .BookingDate}}</td>
+                <td class="px-4 py-3 text-gray-700 text-center" style="width: 10%;">{{formatDate .TravelDate}}</td>
+                <td class="px-4 py-3 text-gray-700 text-center" style="width: 10%;">
+                  {{.Details}}
+                </td>
+                <td class="px-4 py-3 font-semibold text-gray-900 text-center" style="width: 10%;">
+                  {{.Amount}}
+                </td>
+                <td class="px-4 py-3 text-center" style="width: 10%;">
+                  <span class="{{.PaymentClass}}">{{.PaymentStatus}}</span>
+                </td>
+                <td class="px-4 py-3 text-center" style="width: 10%;">
+                  <span class="{{.StatusClass}}">{{.Status}}</span>
+                </td>
+                <td class="px-4 py-3 text-center" style="width: 10%;">
+                <button
+                  class="bg-[#336891] text-white w-6 h-6 rounded-lg inline-flex items-center justify-center hover:bg-blue-600"
+                >
+                  <svg
+                    width="15px"
+                    height="11px"
+                    viewBox="0 0 24 24"
+                    fill="white"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M9.75 12C9.75 10.7574 10.7574 9.75 12 9.75C13.2426 9.75 14.25 10.7574 14.25 12C14.25 13.2426 13.2426 14.25 12 14.25C10.7574 14.25 9.75 13.2426 9.75 12Z"
+                      fill=""
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2 12C2 13.6394 2.42496 14.1915 3.27489 15.2957C4.97196 17.5004 7.81811 20 12 20C16.1819 20 19.028 17.5004 20.7251 15.2957C21.575 14.1915 22 13.6394 22 12C22 10.3606 21.575 9.80853 20.7251 8.70433C19.028 6.49956 16.1819 4 12 4C7.81811 4 4.97196 6.49956 3.27489 8.70433C2.42496 9.80853 2 10.3606 2 12ZM12 8.25C9.92893 8.25 8.25 9.92893 8.25 12C8.25 14.0711 9.92893 15.75 12 15.75C14.0711 15.75 15.75 14.0711 15.75 12C15.75 9.92893 14.0711 8.25 12 8.25Z"
+                      fill="white"
+                    />
+                  </svg>
+                  </button>
+                </td>
+              </tr>
+              {{end}}
+            </tbody>
+          </table>
+        </div>
       </div>
       <!-- END TABLE -->
     </div>
@@ -405,10 +402,49 @@
 <!-- END BOOKINGS PAGE -->
 
 <!-- SweetAlert2 for booking detail modal -->
-
-<!-- SweetAlert2 for booking detail modal -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+  // Initialize Flatpickr calendar
+  function initDatePicker() {
+    const dateInput = document.getElementById('date');
+    if (dateInput && !dateInput._flatpickr) {
+      flatpickr(dateInput, {
+        dateFormat: "Y-m-d",
+        allowInput: false,
+        disableMobile: true,
+        onChange: function(selectedDates, dateStr, instance) {
+          // Trigger form change event
+          dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+        },
+        onReady: function(selectedDates, dateStr, instance) {
+          // Add custom buttons to calendar
+          const calendar = instance.calendarContainer;
+          const buttonsDiv = document.createElement('div');
+          buttonsDiv.className = 'calendar-buttons';
+          buttonsDiv.innerHTML = `
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="button" class="save-btn">Save</button>
+          `;
+          calendar.appendChild(buttonsDiv);
+
+          // Cancel button handler
+          buttonsDiv.querySelector('.cancel-btn').addEventListener('click', function() {
+            instance.close();
+          });
+
+          // Save button handler
+          buttonsDiv.querySelector('.save-btn').addEventListener('click', function() {
+            instance.close();
+            if (dateInput.value) {
+              dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          });
+        }
+      });
+    }
+  }
+
   // Renders booking detail modal using SweetAlert2 with static sample data
   function showBookingDetail() {
     const detailHtml = `
@@ -438,8 +474,14 @@
             </p></div>
           <div><p class="text-xs">Phone Number</p><p class="font-semibold">+1 (555) 91844 0192</p></div>
           <div><p class="text-xs">Reference ID</p><p class="font-semibold">123456</p></div>
-        </div>
-
+        </div>function() {
+    initBookingDetailButtons();
+    initDatePicker();
+  });
+  document.addEventListener("htmx:afterSwap", function() {
+    initBookingDetailButtons();
+    initDatePicker();
+  }
         <div class="mt-4 flex items-center justify-center gap-3">
           <div class="relative flex items-center">
             <label class="absolute -top-2 left-3 px-1 text-[11px] font-medium text-[#336891] bg-[#eef5fa]">Refund Amount</label>
@@ -477,6 +519,13 @@
   }
 
   // Init on load and after HTMX swaps
-  document.addEventListener("DOMContentLoaded", initBookingDetailButtons);
-  document.addEventListener("htmx:afterSwap", initBookingDetailButtons);
+  document.addEventListener("DOMContentLoaded", function() {
+    initBookingDetailButtons();
+    initDatePicker();
+  });
+  
+  document.addEventListener("htmx:afterSwap", function() {
+    initBookingDetailButtons();
+    initDatePicker();
+  });
 </script>

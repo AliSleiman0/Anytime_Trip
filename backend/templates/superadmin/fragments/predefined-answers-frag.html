@@ -1,3 +1,20 @@
+<style>
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #336891;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2a5573;
+  }
+</style>
+
 <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
   <main>
     <div
@@ -15,99 +32,106 @@
       </div>
 
       <div class="rounded-2xl overflow-hidden bg-white border border-[#CAD9EA] shadow-sm">
+        <!-- Fixed Header Table -->
         <table class="w-full text-sm">
           <thead class="bg-[#336891] text-white">
             <tr>
-              <th class="px-3 py-3 text-left font-semibold">Category</th>
-              <th class="px-3 py-3 text-left font-semibold">Title</th>
-              <th class="px-3 py-3 text-left font-semibold">Response</th>
-              <th class="px-3 py-3 text-left font-semibold">Usage Count</th>
-              <th class="px-3 py-3 text-center font-semibold">Action</th>
+              <th class="px-3 py-3 text-left font-semibold" style="width: 18%;">Category</th>
+              <th class="px-3 py-3 text-left font-semibold" style="width: 20%;">Title</th>
+              <th class="px-3 py-3 text-left font-semibold" style="width: 35%;">Response</th>
+              <th class="px-3 py-3 text-left font-semibold" style="width: 12%;">Usage Count</th>
+              <th class="px-3 py-3 text-center font-semibold" style="width: 15%;">Action</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[#E4ECF4] text-gray-800">
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">Booking Issues</td>
-              <td class="px-3 py-3">Cannot Confirm Booking</td>
-              <td class="px-3 py-3 text-sm">Your booking couldn't be confirmed. Please try again...</td>
-              <td class="px-3 py-3">234</td>
-              <td class="px-3 py-3 text-center">
-                <div class="flex justify-center gap-2">
-                  <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
-                    </svg>
-                  </button>
-                  <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">Payment Issues</td>
-              <td class="px-3 py-3">Payment Failed</td>
-              <td class="px-3 py-3 text-sm">Your payment failed. Please check your card details...</td>
-              <td class="px-3 py-3">189</td>
-              <td class="px-3 py-3 text-center">
-                <div class="flex justify-center gap-2">
-                  <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
-                    </svg>
-                  </button>
-                  <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">Account Issues</td>
-              <td class="px-3 py-3">Account Locked</td>
-              <td class="px-3 py-3 text-sm">Your account has been locked for security. Contact support...</td>
-              <td class="px-3 py-3">67</td>
-              <td class="px-3 py-3 text-center">
-                <div class="flex justify-center gap-2">
-                  <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
-                    </svg>
-                  </button>
-                  <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">General</td>
-              <td class="px-3 py-3">Welcome Message</td>
-              <td class="px-3 py-3 text-sm">Welcome to our platform! How can we assist you today?</td>
-              <td class="px-3 py-3">456</td>
-              <td class="px-3 py-3 text-center">
-                <div class="flex justify-center gap-2">
-                  <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
-                    </svg>
-                  </button>
-                  <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
         </table>
+        
+        <!-- Scrollable Body -->
+        <div class="overflow-y-auto custom-scrollbar" style="max-height: 560px;">
+          <table class="w-full text-sm">
+            <tbody class="divide-y divide-[#E4ECF4] text-gray-800">
+              <tr>
+                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 18%;">Booking Issues</td>
+                <td class="px-3 py-3" style="width: 20%;">Cannot Confirm Booking</td>
+                <td class="px-3 py-3 text-sm" style="width: 35%;">Your booking couldn't be confirmed. Please try again...</td>
+                <td class="px-3 py-3" style="width: 12%;">234</td>
+                <td class="px-3 py-3 text-center" style="width: 15%;">
+                <div class="flex justify-center gap-2">
+                  <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
+                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
+                    </svg>
+                  </button>
+                  <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
+                    <svg width="12" height="12" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+              <tr>
+                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 18%;">Payment Issues</td>
+                <td class="px-3 py-3" style="width: 20%;">Payment Failed</td>
+                <td class="px-3 py-3 text-sm" style="width: 35%;">Your payment failed. Please check your card details...</td>
+                <td class="px-3 py-3" style="width: 12%;">189</td>
+                <td class="px-3 py-3 text-center" style="width: 15%;">
+                <div class="flex justify-center gap-2">
+                  <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
+                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
+                    </svg>
+                  </button>
+                  <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
+                    <svg width="12" height="12" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+              <tr>
+                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 18%;">Account Issues</td>
+                <td class="px-3 py-3" style="width: 20%;">Account Locked</td>
+                <td class="px-3 py-3 text-sm" style="width: 35%;">Your account has been locked for security. Contact support...</td>
+                <td class="px-3 py-3" style="width: 12%;">67</td>
+                <td class="px-3 py-3 text-center" style="width: 15%;">
+                <div class="flex justify-center gap-2">
+                  <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
+                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
+                    </svg>
+                  </button>
+                  <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
+                    <svg width="12" height="12" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+              <tr>
+                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 18%;">General</td>
+                <td class="px-3 py-3" style="width: 20%;">Welcome Message</td>
+                <td class="px-3 py-3 text-sm" style="width: 35%;">Welcome to our platform! How can we assist you today?</td>
+                <td class="px-3 py-3" style="width: 12%;">456</td>
+                <td class="px-3 py-3 text-center" style="width: 15%;">
+                <div class="flex justify-center gap-2">
+                  <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
+                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
+                    </svg>
+                  </button>
+                  <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
+                    <svg width="12" height="12" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
+                    </svg>
+                  </button>
+                </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>

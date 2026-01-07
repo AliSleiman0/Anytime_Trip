@@ -21,6 +21,14 @@ type Hotel struct {
 	Status    HotelStatus `json:"status" bson:"status"`
 	Cost      float64     `json:"cost" bson:"cost"`         // Room cost per night
 	Currency  string      `json:"currency" bson:"currency"` // e.g., "USD", "$"
-	CreatedAt time.Time   `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time   `json:"updated_at" bson:"updated_at"`
+	// Provider metadata for admin service-provider table
+	ProviderName  string    `json:"provider_name" bson:"provider_name"`
+	ProviderType  string    `json:"type" bson:"type"` // e.g., "Hotel"
+	Location      string    `json:"location" bson:"location"`
+	ContactEmail  string    `json:"contact_email" bson:"contact_email"`
+	Rating        float64   `json:"rating" bson:"rating"`
+	TotalBookings int64     `json:"total_bookings" bson:"total_bookings"`
+	Revenue       float64   `json:"revenue" bson:"revenue"`
+	CreatedAt     time.Time `json:"created_at" bson:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at" bson:"updated_at"`
 }

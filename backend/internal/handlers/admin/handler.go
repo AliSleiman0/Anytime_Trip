@@ -1,42 +1,86 @@
 package admin
 
 import (
-	"Anytime_Travel/backend/internal/repository/admin"
+	"context"
+	"fmt"
 	"html/template"
 	"path/filepath"
+	"strings"
+
+	"Anytime_Travel/backend/internal/repository/admin"
+	"Anytime_Travel/backend/internal/repository/app"
 
 	"github.com/gofiber/fiber/v2"
 )
 
+// ServiceProviderView is a flattened view model for the table
+type ServiceProviderView struct {
+	ID            string
+	Name          string
+	Type          string
+	Status        string
+	Location      string
+	ContactEmail  string
+	Rating        float64
+	TotalBookings int64
+	Revenue       float64
+	ProviderType  string // flight | car | hotel for filtering
+}
+
+// ProviderDetailView is a simplified view model for the detail screen
+type ProviderDetailView struct {
+	ID                     string
+	Name                   string
+	Email                  string
+	Status                 string
+	StatusClass            string
+	Type                   string
+	Location               string
+	CreatedAt              string
+	Rating                 string
+	TotalBookings          int64
+	Revenue                string
+	ProviderType           string
+	ProfitShareDisplay     string
+	PhoneNumberDisplay     string
+	RevenueThisMonth       string
+	TotalBookingsThisMonth string
+}
+
+func statusBadgeClass(status string) string {
+	switch strings.ToLower(status) {
+	case "active":
+		return "bg-[#DCFCE7] text-[#008236]"
+	case "inactive":
+		return "bg-[#FFE4E6] text-[#DC2626]"
+	default:
+		return "bg-gray-200 text-gray-700"
+	}
+}
+
 // AdminHandler handles admin-level requests
 type AdminHandler struct {
-	adminRepo *admin.AdminRepository
+	adminRepo         *admin.AdminRepository
+	userRepo          *app.UserRepository
+	carBookingRepo    *app.CarBookingRepository
+	flightBookingRepo *app.FlightBookingRepository
+	hotelBookingRepo  *app.HotelBookingRepository
+	flightRepo        *admin.FlightRepository
+	carRepo           *admin.CarRepository
+	hotelRepo         *admin.HotelRepository
 }
 
-func NewAdminHandler(adminRepo *admin.AdminRepository) *AdminHandler {
+func NewAdminHandler(adminRepo *admin.AdminRepository, userRepo *app.UserRepository, carBookingRepo *app.CarBookingRepository, flightBookingRepo *app.FlightBookingRepository, hotelBookingRepo *app.HotelBookingRepository, flightRepo *admin.FlightRepository, carRepo *admin.CarRepository, hotelRepo *admin.HotelRepository) *AdminHandler {
 	return &AdminHandler{
-		adminRepo: adminRepo,
+		adminRepo:         adminRepo,
+		userRepo:          userRepo,
+		carBookingRepo:    carBookingRepo,
+		flightBookingRepo: flightBookingRepo,
+		hotelBookingRepo:  hotelBookingRepo,
+		flightRepo:        flightRepo,
+		carRepo:           carRepo,
+		hotelRepo:         hotelRepo,
 	}
-}
-
-func (h *AdminHandler) GetDashboard(c *fiber.Ctx) error {
-	// Parse and render dashboard template with data
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "dashboard.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Dashboard",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetDashboardFragment serves the dashboard fragment for HTMX partial loads
-func (h *AdminHandler) GetDashboardFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "dashboard-frag.html")))
 }
 
 // GetSidebar serves the sidebar HTML fragment for HTMX partial loads
@@ -62,21 +106,6 @@ func (h *AdminHandler) GetHeader(c *fiber.Ctx) error {
 	c.Set("Content-Type", "text/html")
 	return tmpl.Execute(c, data)
 }
-func (h *AdminHandler) GetBookings(c *fiber.Ctx) error {
-	// Parse and render bookings template with data
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "bookings.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Bookings",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
 func (h *AdminHandler) GetPayments(c *fiber.Ctx) error {
 	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "payments.html")))
 	if err != nil {
@@ -116,10 +145,6 @@ func (h *AdminHandler) GetReportsFragment(c *fiber.Ctx) error {
 }
 
 // GetBookingsFragment serves the bookings fragment for HTMX partial loads
-func (h *AdminHandler) GetBookingsFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "bookings-frag.html")))
-}
-
 func (h *AdminHandler) ManageUsers(c *fiber.Ctx) error {
 	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "user.html")))
 	if err != nil {
@@ -134,28 +159,24 @@ func (h *AdminHandler) ManageUsers(c *fiber.Ctx) error {
 	return tmpl.Execute(c, data)
 }
 
-// GetUsersFragment serves the user management fragment for HTMX partial loads
-func (h *AdminHandler) GetUsersFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "user-frag.html")))
-}
-
 func (h *AdminHandler) ViewUser(c *fiber.Ctx) error {
+	userID := c.Query("id")
+	if strings.TrimSpace(userID) == "" {
+		return c.Status(400).SendString("User id is required")
+	}
+
 	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "view-user.html")))
 	if err != nil {
 		return c.Status(500).SendString("Error loading template")
 	}
 
 	data := fiber.Map{
-		"Title": "View User",
+		"Title":  "View User",
+		"UserID": userID,
 	}
 
 	c.Set("Content-Type", "text/html")
 	return tmpl.Execute(c, data)
-}
-
-// GetViewUserFragment serves the view user fragment for HTMX partial loads
-func (h *AdminHandler) GetViewUserFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "view-user-frag.html")))
 }
 
 func (h *AdminHandler) ManageServiceProviders(c *fiber.Ctx) error {
@@ -174,17 +195,89 @@ func (h *AdminHandler) ManageServiceProviders(c *fiber.Ctx) error {
 
 // GetServiceProvidersFragment serves the service provider management fragment for HTMX partial loads
 func (h *AdminHandler) GetServiceProvidersFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "service-provider-frag.html")))
+	ctx := context.Background()
+
+	flights, _ := h.flightRepo.FindAll(ctx, 0, 0)
+	cars, _ := h.carRepo.FindAll(ctx, 0, 0)
+	hotels, _ := h.hotelRepo.FindAll(ctx, 0, 0)
+
+	providers := make([]ServiceProviderView, 0, len(flights)+len(cars)+len(hotels))
+
+	for _, f := range flights {
+		providers = append(providers, ServiceProviderView{
+			ID:            f.ID,
+			Name:          f.ProviderName,
+			Type:          f.ProviderType,
+			Status:        string(f.Status),
+			Location:      f.Location,
+			ContactEmail:  f.ContactEmail,
+			Rating:        f.Rating,
+			TotalBookings: f.TotalBookings,
+			Revenue:       f.Revenue,
+			ProviderType:  "flight",
+		})
+	}
+
+	for _, car := range cars {
+		providers = append(providers, ServiceProviderView{
+			ID:            car.ID,
+			Name:          car.ProviderName,
+			Type:          car.ProviderType,
+			Status:        string(car.Status),
+			Location:      car.Location,
+			ContactEmail:  car.ContactEmail,
+			Rating:        car.Rating,
+			TotalBookings: car.TotalBookings,
+			Revenue:       car.Revenue,
+			ProviderType:  "car",
+		})
+	}
+
+	for _, htl := range hotels {
+		providers = append(providers, ServiceProviderView{
+			ID:            htl.ID,
+			Name:          htl.ProviderName,
+			Type:          htl.ProviderType,
+			Status:        string(htl.Status),
+			Location:      htl.Location,
+			ContactEmail:  htl.ContactEmail,
+			Rating:        htl.Rating,
+			TotalBookings: htl.TotalBookings,
+			Revenue:       htl.Revenue,
+			ProviderType:  "hotel",
+		})
+	}
+
+	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "service-provider-frag.html")))
+	if err != nil {
+		return c.Status(500).SendString("Error loading template")
+	}
+
+	data := fiber.Map{
+		"Providers": providers,
+	}
+
+	c.Set("Content-Type", "text/html")
+	return tmpl.Execute(c, data)
 }
 
 func (h *AdminHandler) ViewService(c *fiber.Ctx) error {
+	id := strings.TrimSpace(c.Query("id"))
+	providerType := strings.ToLower(strings.TrimSpace(c.Query("type")))
+
+	if id == "" || providerType == "" {
+		return c.Status(400).SendString("provider id and type are required")
+	}
+
 	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "view-service.html")))
 	if err != nil {
 		return c.Status(500).SendString("Error loading template")
 	}
 
 	data := fiber.Map{
-		"Title": "View Service Provider",
+		"Title":        "View Service Provider",
+		"ProviderID":   id,
+		"ProviderType": providerType,
 	}
 
 	c.Set("Content-Type", "text/html")
@@ -193,7 +286,120 @@ func (h *AdminHandler) ViewService(c *fiber.Ctx) error {
 
 // GetViewServiceFragment serves the view service provider fragment for HTMX partial loads
 func (h *AdminHandler) GetViewServiceFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "view-service-frag.html")))
+	id := strings.TrimSpace(c.Query("id"))
+	providerType := strings.ToLower(strings.TrimSpace(c.Query("type")))
+
+	if id == "" || providerType == "" {
+		return c.Status(400).SendString("provider id and type are required")
+	}
+
+	ctx := context.Background()
+
+	var detail ProviderDetailView
+
+	switch providerType {
+	case "flight":
+		flight, err := h.flightRepo.FindByID(ctx, id)
+		if err != nil {
+			return c.Status(404).SendString("flight provider not found")
+		}
+
+		currency := flight.Currency
+		if currency == "" {
+			currency = "$"
+		}
+
+		detail = ProviderDetailView{
+			ID:                     flight.ID,
+			Name:                   flight.ProviderName,
+			Email:                  flight.ContactEmail,
+			Status:                 string(flight.Status),
+			StatusClass:            statusBadgeClass(string(flight.Status)),
+			Type:                   flight.ProviderType,
+			Location:               flight.Location,
+			CreatedAt:              flight.CreatedAt.Format("02 Jan, 2006"),
+			Rating:                 fmt.Sprintf("%.1f", flight.Rating),
+			TotalBookings:          flight.TotalBookings,
+			Revenue:                fmt.Sprintf("%s %.0f", currency, flight.Revenue),
+			ProviderType:           providerType,
+			ProfitShareDisplay:     "N/A",
+			PhoneNumberDisplay:     "N/A",
+			RevenueThisMonth:       "--",
+			TotalBookingsThisMonth: "--",
+		}
+	case "car":
+		car, err := h.carRepo.FindByID(ctx, id)
+		if err != nil {
+			return c.Status(404).SendString("car provider not found")
+		}
+
+		currency := car.Currency
+		if currency == "" {
+			currency = "$"
+		}
+
+		detail = ProviderDetailView{
+			ID:                     car.ID,
+			Name:                   car.ProviderName,
+			Email:                  car.ContactEmail,
+			Status:                 string(car.Status),
+			StatusClass:            statusBadgeClass(string(car.Status)),
+			Type:                   car.ProviderType,
+			Location:               car.Location,
+			CreatedAt:              car.CreatedAt.Format("02 Jan, 2006"),
+			Rating:                 fmt.Sprintf("%.1f", car.Rating),
+			TotalBookings:          car.TotalBookings,
+			Revenue:                fmt.Sprintf("%s %.0f", currency, car.Revenue),
+			ProviderType:           providerType,
+			ProfitShareDisplay:     "N/A",
+			PhoneNumberDisplay:     "N/A",
+			RevenueThisMonth:       "--",
+			TotalBookingsThisMonth: "--",
+		}
+	case "hotel":
+		hotel, err := h.hotelRepo.FindByID(ctx, id)
+		if err != nil {
+			return c.Status(404).SendString("hotel provider not found")
+		}
+
+		currency := hotel.Currency
+		if currency == "" {
+			currency = "$"
+		}
+
+		detail = ProviderDetailView{
+			ID:                     hotel.ID,
+			Name:                   hotel.ProviderName,
+			Email:                  hotel.ContactEmail,
+			Status:                 string(hotel.Status),
+			StatusClass:            statusBadgeClass(string(hotel.Status)),
+			Type:                   hotel.ProviderType,
+			Location:               hotel.Location,
+			CreatedAt:              hotel.CreatedAt.Format("02 Jan, 2006"),
+			Rating:                 fmt.Sprintf("%.1f", hotel.Rating),
+			TotalBookings:          hotel.TotalBookings,
+			Revenue:                fmt.Sprintf("%s %.0f", currency, hotel.Revenue),
+			ProviderType:           providerType,
+			ProfitShareDisplay:     "N/A",
+			PhoneNumberDisplay:     "N/A",
+			RevenueThisMonth:       "--",
+			TotalBookingsThisMonth: "--",
+		}
+	default:
+		return c.Status(400).SendString("invalid provider type")
+	}
+
+	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "view-service-frag.html")))
+	if err != nil {
+		return c.Status(500).SendString("Error loading template")
+	}
+
+	data := fiber.Map{
+		"Provider": detail,
+	}
+
+	c.Set("Content-Type", "text/html")
+	return tmpl.Execute(c, data)
 }
 
 func (h *AdminHandler) CMSFlights(c *fiber.Ctx) error {

@@ -10,4 +10,5 @@ type User struct {
 	PhoneNumber string    `json:"phone_number" bson:"phone_number"`
 	IsActive    bool      `json:"is_active" bson:"is_active"`
 	CreatedAt   time.Time `json:"created_at" bson:"created_at"`
+	LastLogin   time.Time `json:"last_login" bson:"last_login,omitempty"` // New field to track last login
 }
