@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"html/template"
+	"math"
 	"path/filepath"
 	"strings"
 
-	"Anytime_Travel/backend/internal/repository/admin"
+	adminmodels "Anytime_Travel/backend/internal/models/admin"
+	adminrepo "Anytime_Travel/backend/internal/repository/admin"
 	"Anytime_Travel/backend/internal/repository/app"
 
 	"github.com/gofiber/fiber/v2"
@@ -58,19 +60,60 @@ func statusBadgeClass(status string) string {
 	}
 }
 
+// formatCurrency formats a float64 amount into a currency string with thousand separators.
+func formatCurrency(currency string, amount float64) string {
+	if currency == "" {
+		currency = "$"
+	}
+
+	value := int64(math.Round(amount))
+	s := fmt.Sprintf("%d", value)
+	n := len(s)
+	if n <= 3 {
+		return fmt.Sprintf("%s %s", currency, s)
+	}
+
+	var b strings.Builder
+	rem := n % 3
+	if rem == 0 {
+		rem = 3
+	}
+	b.WriteString(s[:rem])
+	for i := rem; i < n; i += 3 {
+		b.WriteString(",")
+		b.WriteString(s[i : i+3])
+	}
+
+	return fmt.Sprintf("%s %s", currency, b.String())
+}
+
+// formatProfitPercent prefers an explicit percent; if missing, derives from profit/revenue.
+func formatProfitPercent(percent float64, profit float64, revenue float64) string {
+	if percent > 0 {
+		return fmt.Sprintf("%.1f%%", percent)
+	}
+
+	if revenue > 0 && profit > 0 {
+		derived := (profit / revenue) * 100
+		return fmt.Sprintf("%.1f%%", derived)
+	}
+
+	return "--"
+}
+
 // AdminHandler handles admin-level requests
 type AdminHandler struct {
-	adminRepo         *admin.AdminRepository
+	adminRepo         *adminrepo.AdminRepository
 	userRepo          *app.UserRepository
 	carBookingRepo    *app.CarBookingRepository
 	flightBookingRepo *app.FlightBookingRepository
 	hotelBookingRepo  *app.HotelBookingRepository
-	flightRepo        *admin.FlightRepository
-	carRepo           *admin.CarRepository
-	hotelRepo         *admin.HotelRepository
+	flightRepo        *adminrepo.FlightRepository
+	carRepo           *adminrepo.CarRepository
+	hotelRepo         *adminrepo.HotelRepository
 }
 
-func NewAdminHandler(adminRepo *admin.AdminRepository, userRepo *app.UserRepository, carBookingRepo *app.CarBookingRepository, flightBookingRepo *app.FlightBookingRepository, hotelBookingRepo *app.HotelBookingRepository, flightRepo *admin.FlightRepository, carRepo *admin.CarRepository, hotelRepo *admin.HotelRepository) *AdminHandler {
+func NewAdminHandler(adminRepo *adminrepo.AdminRepository, userRepo *app.UserRepository, carBookingRepo *app.CarBookingRepository, flightBookingRepo *app.FlightBookingRepository, hotelBookingRepo *app.HotelBookingRepository, flightRepo *adminrepo.FlightRepository, carRepo *adminrepo.CarRepository, hotelRepo *adminrepo.HotelRepository) *AdminHandler {
 	return &AdminHandler{
 		adminRepo:         adminRepo,
 		userRepo:          userRepo,
@@ -320,9 +363,9 @@ func (h *AdminHandler) GetViewServiceFragment(c *fiber.Ctx) error {
 			CreatedAt:              flight.CreatedAt.Format("02 Jan, 2006"),
 			Rating:                 fmt.Sprintf("%.1f", flight.Rating),
 			TotalBookings:          flight.TotalBookings,
-			Revenue:                fmt.Sprintf("%s %.0f", currency, flight.Revenue),
+			Revenue:                formatCurrency(currency, flight.Revenue),
 			ProviderType:           providerType,
-			ProfitShareDisplay:     "N/A",
+			ProfitShareDisplay:     formatProfitPercent(flight.ProfitPercent, flight.Profit, flight.Revenue),
 			PhoneNumberDisplay:     "N/A",
 			RevenueThisMonth:       "--",
 			TotalBookingsThisMonth: "--",
@@ -349,9 +392,9 @@ func (h *AdminHandler) GetViewServiceFragment(c *fiber.Ctx) error {
 			CreatedAt:              car.CreatedAt.Format("02 Jan, 2006"),
 			Rating:                 fmt.Sprintf("%.1f", car.Rating),
 			TotalBookings:          car.TotalBookings,
-			Revenue:                fmt.Sprintf("%s %.0f", currency, car.Revenue),
+			Revenue:                formatCurrency(currency, car.Revenue),
 			ProviderType:           providerType,
-			ProfitShareDisplay:     "N/A",
+			ProfitShareDisplay:     formatProfitPercent(car.ProfitPercent, car.Profit, car.Revenue),
 			PhoneNumberDisplay:     "N/A",
 			RevenueThisMonth:       "--",
 			TotalBookingsThisMonth: "--",
@@ -378,9 +421,9 @@ func (h *AdminHandler) GetViewServiceFragment(c *fiber.Ctx) error {
 			CreatedAt:              hotel.CreatedAt.Format("02 Jan, 2006"),
 			Rating:                 fmt.Sprintf("%.1f", hotel.Rating),
 			TotalBookings:          hotel.TotalBookings,
-			Revenue:                fmt.Sprintf("%s %.0f", currency, hotel.Revenue),
+			Revenue:                formatCurrency(currency, hotel.Revenue),
 			ProviderType:           providerType,
-			ProfitShareDisplay:     "N/A",
+			ProfitShareDisplay:     formatProfitPercent(hotel.ProfitPercent, hotel.Profit, hotel.Revenue),
 			PhoneNumberDisplay:     "N/A",
 			RevenueThisMonth:       "--",
 			TotalBookingsThisMonth: "--",
@@ -418,7 +461,100 @@ func (h *AdminHandler) CMSFlights(c *fiber.Ctx) error {
 
 // GetCMSFlightsFragment serves the flights management fragment for HTMX partial loads
 func (h *AdminHandler) GetCMSFlightsFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "cms-flights-frag.html")))
+	ctx := context.Background()
+
+	// Fetch all flights from database
+	flights, err := h.flightRepo.FindAll(ctx, 100, 0)
+	if err != nil {
+		return c.Status(500).SendString("Error fetching flights")
+	}
+
+	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "cms-flights-frag.html")))
+	if err != nil {
+		return c.Status(500).SendString("Error loading template")
+	}
+
+	data := fiber.Map{
+		"Flights": flights,
+	}
+
+	c.Set("Content-Type", "text/html")
+	return tmpl.Execute(c, data)
+}
+
+// UpdateFlight handles flight update requests from the CMS modal
+func (h *AdminHandler) UpdateFlight(c *fiber.Ctx) error {
+	ctx := context.Background()
+
+	type FlightUpdateRequest struct {
+		ID              string  `json:"id"`
+		FlightNumber    string  `json:"flight_number"`
+		FlightID        string  `json:"flight_id"`
+		Status          string  `json:"status"`
+		Cost            float64 `json:"cost"`
+		ProfitPercent   float64 `json:"profit_percent"`
+		Refundable      bool    `json:"refundable"`
+		AllowChanges    bool    `json:"allow_changes"`
+		AllowSeatChoice bool    `json:"allow_seat_choice"`
+		AllowCarryOn    bool    `json:"allow_carry_on"`
+	}
+
+	var req FlightUpdateRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	// Fetch existing flight
+	flight, err := h.flightRepo.FindByID(ctx, req.ID)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{
+			"error": "Flight not found",
+		})
+	}
+
+	// Update flight fields
+	flight.FlightNumber = req.FlightNumber
+	flight.FlightID = req.FlightID
+	flight.Status = adminmodels.FlightStatus(req.Status)
+	flight.Cost = req.Cost
+	flight.ProfitPercent = req.ProfitPercent
+
+	// Update in database
+	if err := h.flightRepo.Update(ctx, req.ID, flight); err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Failed to update flight",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "Flight updated successfully",
+	})
+}
+
+// DeleteFlight handles flight deletion from CMS
+func (h *AdminHandler) DeleteFlight(c *fiber.Ctx) error {
+	ctx := context.Background()
+	id := c.Query("id")
+
+	if id == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Flight ID is required",
+		})
+	}
+
+	if err := h.flightRepo.Delete(ctx, id); err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Failed to delete flight",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "Flight deleted successfully",
+	})
 }
 
 func (h *AdminHandler) CMSCars(c *fiber.Ctx) error {
@@ -437,7 +573,25 @@ func (h *AdminHandler) CMSCars(c *fiber.Ctx) error {
 
 // GetCMSCarsFragment serves the cars management fragment for HTMX partial loads
 func (h *AdminHandler) GetCMSCarsFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "cms-cars-frag.html")))
+	ctx := context.Background()
+
+	// Fetch all cars from database
+	cars, err := h.carRepo.FindAll(ctx, 100, 0)
+	if err != nil {
+		return c.Status(500).SendString("Error fetching cars")
+	}
+
+	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "cms-cars-frag.html")))
+	if err != nil {
+		return c.Status(500).SendString("Error loading template")
+	}
+
+	data := fiber.Map{
+		"Cars": cars,
+	}
+
+	c.Set("Content-Type", "text/html")
+	return tmpl.Execute(c, data)
 }
 
 func (h *AdminHandler) CMSHotels(c *fiber.Ctx) error {
@@ -456,7 +610,25 @@ func (h *AdminHandler) CMSHotels(c *fiber.Ctx) error {
 
 // GetCMSHotelsFragment serves the hotels management fragment for HTMX partial loads
 func (h *AdminHandler) GetCMSHotelsFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "cms-hotels-frag.html")))
+	ctx := context.Background()
+
+	// Fetch all hotels from database
+	hotels, err := h.hotelRepo.FindAll(ctx, 100, 0)
+	if err != nil {
+		return c.Status(500).SendString("Error fetching hotels")
+	}
+
+	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "cms-hotels-frag.html")))
+	if err != nil {
+		return c.Status(500).SendString("Error loading template")
+	}
+
+	data := fiber.Map{
+		"Hotels": hotels,
+	}
+
+	c.Set("Content-Type", "text/html")
+	return tmpl.Execute(c, data)
 }
 
 func (h *AdminHandler) CMSTravelExperience(c *fiber.Ctx) error {

@@ -15,6 +15,7 @@ import (
 type UserRow struct {
 	ID            string
 	Name          string
+	Initials      string
 	Email         string
 	Phone         string
 	Status        string
@@ -40,6 +41,11 @@ type UserBookingRow struct {
 func (h *AdminHandler) GetUsersFragment(c *fiber.Ctx) error {
 	ctx := c.Context()
 
+	// Get filter parameters
+	createdDate := c.Query("created_date")
+	lastBooking := c.Query("last_booking")
+	statusFilter := c.Query("status")
+
 	users, err := h.userRepo.FindAll(ctx, 200, 0)
 	if err != nil {
 		return c.Status(500).SendString("Error fetching users")
@@ -61,15 +67,86 @@ func (h *AdminHandler) GetUsersFragment(c *fiber.Ctx) error {
 			statusClass = "px-3 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
 		}
 
+		// Apply status filter
+		if statusFilter != "" && statusFilter != "all" {
+			if statusFilter == "active" && !u.IsActive {
+				continue
+			}
+			if statusFilter == "inactive" && u.IsActive {
+				continue
+			}
+		}
+
+		// Apply created date filter
+		if createdDate != "" {
+			filterDate, err := time.Parse("2006-01-02", createdDate)
+			if err == nil {
+				// Filter users created on the selected date
+				if !isSameDay(u.CreatedAt, filterDate) {
+					continue
+				}
+			}
+		}
+
+		// Apply last booking filter
+		if lastBooking != "" && lastBooking != "all" {
+			now := time.Now()
+			switch lastBooking {
+			case "today":
+				if !isSameDay(u.LastBooking, now) {
+					continue
+				}
+			case "this_week":
+				weekAgo := now.AddDate(0, 0, -7)
+				if u.LastBooking.IsZero() || u.LastBooking.Before(weekAgo) {
+					continue
+				}
+			case "this_month":
+				monthAgo := now.AddDate(0, -1, 0)
+				if u.LastBooking.IsZero() || u.LastBooking.Before(monthAgo) {
+					continue
+				}
+			case "older":
+				monthAgo := now.AddDate(0, -1, 0)
+				if u.LastBooking.IsZero() || u.LastBooking.After(monthAgo) {
+					continue
+				}
+			}
+		}
+
+		// Extract initials from name
+		initials := "U"
+		if u.Name != "" {
+			parts := strings.Fields(u.Name)
+			if len(parts) == 1 {
+				initials = strings.ToUpper(string(parts[0][0]))
+			} else if len(parts) >= 2 {
+				initials = strings.ToUpper(string(parts[0][0])) + strings.ToUpper(string(parts[len(parts)-1][0]))
+			}
+		}
+
+		// Format total bookings
+		totalBookingsStr := "0"
+		if u.TotalBookings > 0 {
+			totalBookingsStr = fmt.Sprintf("%d", u.TotalBookings)
+		}
+
+		// Format last booking
+		lastBookingStr := "-"
+		if !u.LastBooking.IsZero() {
+			lastBookingStr = formatDate(u.LastBooking)
+		}
+
 		rows = append(rows, UserRow{
 			ID:            u.ID,
 			Name:          u.Name,
+			Initials:      initials,
 			Email:         u.Email,
 			Phone:         u.PhoneNumber,
 			Status:        status,
 			StatusClass:   statusClass,
-			TotalBookings: "-", // booking counts not modeled yet
-			LastBooking:   "-", // last booking not modeled yet
+			TotalBookings: totalBookingsStr,
+			LastBooking:   lastBookingStr,
 			CreatedOn:     formatDate(u.CreatedAt),
 		})
 	}
@@ -81,10 +158,22 @@ func (h *AdminHandler) GetUsersFragment(c *fiber.Ctx) error {
 
 	data := fiber.Map{
 		"Users": rows,
+		"Filters": fiber.Map{
+			"CreatedDate": createdDate,
+			"LastBooking": lastBooking,
+			"Status":      statusFilter,
+		},
 	}
 
 	c.Set("Content-Type", "text/html")
 	return tmpl.Execute(c, data)
+}
+
+// isSameDay checks if two times are on the same day
+func isSameDay(t1, t2 time.Time) bool {
+	y1, m1, d1 := t1.Date()
+	y2, m2, d2 := t2.Date()
+	return y1 == y2 && m1 == m2 && d1 == d2
 }
 
 // GetViewUserFragment serves the view user fragment populated with the selected user's data.

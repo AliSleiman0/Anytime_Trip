@@ -29,6 +29,8 @@ type Car struct {
 	Rating        float64   `json:"rating" bson:"rating"`
 	TotalBookings int64     `json:"total_bookings" bson:"total_bookings"`
 	Revenue       float64   `json:"revenue" bson:"revenue"`
+	Profit        float64   `json:"profit" bson:"profit"`
+	ProfitPercent float64   `json:"profit_percent" bson:"profit_percent"`
 	CreatedAt     time.Time `json:"created_at" bson:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at" bson:"updated_at"`
 }

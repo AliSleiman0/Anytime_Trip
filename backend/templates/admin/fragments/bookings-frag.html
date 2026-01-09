@@ -119,14 +119,14 @@
         background: #f9fafb;
       }
 
-      .calendar-buttons .save-btn {
-        background: #336891;
+      .calendar-buttons .clear-btn {
+        background: #ef4444;
         border: none;
         color: white;
       }
 
-      .calendar-buttons .save-btn:hover {
-        background: #2a5573;
+      .calendar-buttons .clear-btn:hover {
+        background: #dc2626;
       }
 
       /* Hide native date input icon */
@@ -190,26 +190,23 @@
     <div class="p-4">
       <!-- Table container with rounded corners and shadow -->
       <div class="rounded-t-2xl overflow-hidden border border-gray-200">
-        <!-- Bookings data table with responsive text sizing -->
-        <table class="w-full text-sm">
-          <!-- Table header with blue background and white text -->
-          <thead class="bg-[#336891] text-white">
-            <tr>
-              <th class="px-2 py-3 text-center font-semibold">Booking ID</th>
-              <th class="px-2 py-3 text-center font-semibold">Type</th>
-              <th class="px-2 py-3 text-center font-semibold">Customer</th>
-              <th class="px-2 py-3 text-center font-semibold">Booking Date</th>
-              <th class="px-2 py-3 text-center font-semibold">Travel Date</th>
-              <th class="px-2 py-3 text-center font-semibold">Details</th>
-              <th class="px-2 py-3 text-center font-semibold">Amount</th>
-              <th class="px-2 py-3 text-center font-semibold">Payment</th>
-              <th class="px-2 py-3 text-center font-semibold">Status</th>
-              <th class="px-2 py-3 text-center font-semibold">Action</th>
-            </tr>
-          </thead>
-        </table>
         <div class="overflow-y-auto custom-scrollbar" style="max-height: 560px;">
           <table class="w-full text-sm">
+            <!-- Table header with blue background and white text -->
+            <thead class="bg-[#336891] text-white sticky top-0 z-10">
+              <tr>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Booking ID</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Type</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Customer</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Booking Date</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Travel Date</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Details</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Amount</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Payment</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Status</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Action</th>
+              </tr>
+            </thead>
             <!-- Table body populated from all booking collections -->
             <tbody>
               {{range .Bookings}}
@@ -390,6 +387,10 @@
                   </button>
                 </td>
               </tr>
+              {{else}}
+              <tr>
+                <td colspan="10" class="px-4 py-6 text-center text-gray-500">No bookings found.</td>
+              </tr>
               {{end}}
             </tbody>
           </table>
@@ -424,7 +425,7 @@
           buttonsDiv.className = 'calendar-buttons';
           buttonsDiv.innerHTML = `
             <button type="button" class="cancel-btn">Cancel</button>
-            <button type="button" class="save-btn">Save</button>
+            <button type="button" class="clear-btn">Clear</button>
           `;
           calendar.appendChild(buttonsDiv);
 
@@ -433,12 +434,11 @@
             instance.close();
           });
 
-          // Save button handler
-          buttonsDiv.querySelector('.save-btn').addEventListener('click', function() {
+          // Clear button handler
+          buttonsDiv.querySelector('.clear-btn').addEventListener('click', function() {
+            instance.clear();
             instance.close();
-            if (dateInput.value) {
-              dateInput.dispatchEvent(new Event('change', { bubbles: true }));
-            }
+            dateInput.dispatchEvent(new Event('change', { bubbles: true }));
           });
         }
       });

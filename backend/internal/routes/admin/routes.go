@@ -24,6 +24,8 @@ func SetupRoutes(router fiber.Router, handler *admin.AdminHandler) {
 	router.Get("/settings-frag", handler.GetSettingsFragment)
 	router.Get("/cms/flights", handler.CMSFlights)
 	router.Get("/cms/flights-frag", handler.GetCMSFlightsFragment)
+	router.Post("/cms/flights/update", handler.UpdateFlight)
+	router.Delete("/cms/flights/delete", handler.DeleteFlight)
 	router.Get("/cms/cars", handler.CMSCars)
 	router.Get("/cms/cars-frag", handler.GetCMSCarsFragment)
 	router.Get("/cms/hotels", handler.CMSHotels)

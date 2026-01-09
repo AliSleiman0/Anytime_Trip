@@ -1,5 +1,6 @@
 <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
   <main class="">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
       .custom-scrollbar::-webkit-scrollbar {
         width: 8px;
@@ -19,37 +20,74 @@
     <div hx-get="/admin/header?title=User Management" hx-trigger="load" hx-swap="innerHTML"></div>
 
     <!-- inputs -->
-    <div class="p-4 flex justify-between">
-      <div class="text-lg font-semibold text-gray-800">Users</div>
-      <div class="text-sm text-gray-500">Showing {{len .Users}} users</div>
-    </div>
+    <form
+      class="p-4 flex justify-between flex-wrap gap-4 items-center"
+      hx-get="/admin/user-frag"
+      hx-trigger="change, submit"
+      hx-target="main"
+      hx-swap="innerHTML"
+    >
+      <input
+        id="date"
+        name="created_date"
+        type="text"
+        placeholder="Select Date"
+        value="{{.Filters.CreatedDate}}"
+        readonly
+        class="date-input w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891] cursor-pointer"
+      />
+      <div class="flex gap-4 flex-wrap">
+        <select
+          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          name="last_booking"
+          id="last_booking"
+        >
+          <option class="text-[#9B9B9B]" value="all" {{if or (eq .Filters.LastBooking "") (eq .Filters.LastBooking "all")}}selected{{end}}>
+            Last Booked - All
+          </option>
+          <option value="today" {{if eq .Filters.LastBooking "today"}}selected{{end}}>Today</option>
+          <option value="this_week" {{if eq .Filters.LastBooking "this_week"}}selected{{end}}>This Week</option>
+          <option value="this_month" {{if eq .Filters.LastBooking "this_month"}}selected{{end}}>This Month</option>
+          <option value="older" {{if eq .Filters.LastBooking "older"}}selected{{end}}>Older</option>
+        </select>
+        <select
+          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          name="status"
+          id="status"
+        >
+          <option class="text-[#9B9B9B]" value="all" {{if or (eq .Filters.Status "") (eq .Filters.Status "all")}}selected{{end}}>
+            All Statuses
+          </option>
+          <option value="active" {{if eq .Filters.Status "active"}}selected{{end}}>Active</option>
+          <option value="inactive" {{if eq .Filters.Status "inactive"}}selected{{end}}>Inactive</option>
+        </select>
+      </div>
+    </form>
 
     <!-- table -->
     <div class="p-4">
       <div class="rounded-t-2xl overflow-hidden border border-gray-200">
-        <table class="w-full text-sm">
-          <thead class="bg-[#336891] text-white">
-            <tr>
-              <th class="px-2 py-3 text-center font-semibold">Name</th>
-              <th class="px-2 py-3 text-center font-semibold">Email Address</th>
-              <th class="px-2 py-3 text-center font-semibold">Phone Number</th>
-              <th class="px-2 py-3 text-center font-semibold">Status</th>
-              <th class="px-2 py-3 text-center font-semibold">Total Bookings</th>
-              <th class="px-2 py-3 text-center font-semibold">Last Booking</th>
-              <th class="px-2 py-3 text-center font-semibold">Created On</th>
-              <th class="px-2 py-3 text-center font-semibold">Actions</th>
-            </tr>
-          </thead>
-        </table>
         <div class="overflow-y-auto custom-scrollbar" style="max-height: 560px;">
           <table class="w-full text-sm">
+            <thead class="bg-[#336891] text-white sticky top-0 z-10">
+              <tr>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12.5%;">Name</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12.5%;">Email Address</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12.5%;">Phone Number</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12.5%;">Status</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12.5%;">Total Bookings</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12.5%;">Last Booking</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12.5%;">Created On</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12.5%;">Actions</th>
+              </tr>
+            </thead>
             <tbody class="bg-white text-gray-900">
               {{range .Users}}
               <tr class="border-b border-gray-200">
                 <td class="px-4 py-3 text-center" style="width: 12.5%;">
                   <span class="inline-flex items-center gap-3">
                     <span class="w-8 h-8 rounded-full bg-[#336891] text-white flex items-center justify-center text-sm font-semibold">
-                      {{if .Name}}{{index .Name 0}}{{else}}U{{end}}
+                      {{.Initials}}
                     </span>
                     <span class="font-semibold text-sm">{{.Name}}</span>
                   </span>
@@ -95,3 +133,97 @@
   </main>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  // Initialize Flatpickr calendar with custom buttons
+  function initDatePicker() {
+    const dateInput = document.getElementById('date');
+    if (dateInput && !dateInput._flatpickr) {
+      flatpickr(dateInput, {
+        dateFormat: "Y-m-d",
+        allowInput: false,
+        disableMobile: true,
+        onChange: function(selectedDates, dateStr, instance) {
+          // Trigger form change event
+          dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+        },
+        onReady: function(selectedDates, dateStr, instance) {
+          // Add custom buttons to calendar
+          const calendar = instance.calendarContainer;
+          const buttonsDiv = document.createElement('div');
+          buttonsDiv.className = 'calendar-buttons';
+          buttonsDiv.innerHTML = `
+            <button type="button" class="cancel-btn">Cancel</button>
+            <button type="button" class="clear-btn">Clear</button>
+          `;
+          calendar.appendChild(buttonsDiv);
+
+          // Cancel button handler
+          buttonsDiv.querySelector('.cancel-btn').addEventListener('click', function() {
+            instance.close();
+          });
+
+          // Clear button handler
+          buttonsDiv.querySelector('.clear-btn').addEventListener('click', function() {
+            instance.clear();
+            instance.close();
+            dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+          });
+        }
+      });
+    }
+  }
+
+  // Init on load and after HTMX swaps
+  document.addEventListener("DOMContentLoaded", function() {
+    initDatePicker();
+  });
+  
+  document.addEventListener("htmx:afterSwap", function() {
+    initDatePicker();
+  });
+
+  // Initialize immediately if DOM is already loaded
+  if (document.readyState !== 'loading') {
+    initDatePicker();
+  }
+</script>
+
+<style>
+  .calendar-buttons {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-top: 1px solid #e5e7eb;
+    gap: 8px;
+  }
+
+  .calendar-buttons button {
+    flex: 1;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+  }
+
+  .cancel-btn {
+    background-color: #f3f4f6;
+    color: #374151;
+  }
+
+  .cancel-btn:hover {
+    background-color: #e5e7eb;
+  }
+
+  .clear-btn {
+    background-color: #ef4444;
+    color: white;
+  }
+
+  .clear-btn:hover {
+    background-color: #dc2626;
+  }
+</style>
