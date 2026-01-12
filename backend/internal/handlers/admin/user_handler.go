@@ -37,6 +37,42 @@ type UserBookingRow struct {
 	CreatedAt   time.Time
 }
 
+// ManageUsers renders the user management page
+func (h *AdminHandler) ManageUsers(c *fiber.Ctx) error {
+	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "user.html")))
+	if err != nil {
+		return c.Status(500).SendString("Error loading template")
+	}
+
+	data := fiber.Map{
+		"Title": "Users",
+	}
+
+	c.Set("Content-Type", "text/html")
+	return tmpl.Execute(c, data)
+}
+
+// ViewUser renders the user detail page
+func (h *AdminHandler) ViewUser(c *fiber.Ctx) error {
+	userID := c.Query("id")
+	if strings.TrimSpace(userID) == "" {
+		return c.Status(400).SendString("User id is required")
+	}
+
+	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "view-user.html")))
+	if err != nil {
+		return c.Status(500).SendString("Error loading template")
+	}
+
+	data := fiber.Map{
+		"Title":  "View User",
+		"UserID": userID,
+	}
+
+	c.Set("Content-Type", "text/html")
+	return tmpl.Execute(c, data)
+}
+
 // GetUsersFragment serves the user management fragment for HTMX partial loads.
 func (h *AdminHandler) GetUsersFragment(c *fiber.Ctx) error {
 	ctx := c.Context()
@@ -324,4 +360,51 @@ func (h *AdminHandler) GetViewUserFragment(c *fiber.Ctx) error {
 
 	c.Set("Content-Type", "text/html")
 	return tmpl.Execute(c, data)
+}
+
+// UpdateUserEmail updates the email address for a user
+func (h *AdminHandler) UpdateUserEmail(c *fiber.Ctx) error {
+	ctx := c.Context()
+
+	type UpdateEmailRequest struct {
+		UserID string `json:"user_id"`
+		Email  string `json:"email"`
+	}
+
+	var req UpdateEmailRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"message": "Invalid request body",
+		})
+	}
+
+	if req.UserID == "" || req.Email == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"message": "User ID and email are required",
+		})
+	}
+
+	// Check if user exists
+	user, err := h.userRepo.FindByID(ctx, req.UserID)
+	if err != nil || user == nil {
+		return c.Status(404).JSON(fiber.Map{
+			"success": false,
+			"message": "User not found",
+		})
+	}
+
+	// Update email
+	if err := h.userRepo.UpdateEmail(ctx, req.UserID, req.Email); err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"message": "Failed to update email",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "Email updated successfully",
+	})
 }

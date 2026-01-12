@@ -60,7 +60,7 @@
       <!-- Admin Settings Section -->
       <div id="admin-section" class="settings-section">
         <!-- Title -->
-        <h1 class="text-3xl font-bold text-gray-800 mb-8">Welcome Back, Admin 313</h1>
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">Welcome Back, {{.Name}}</h1>
 
         <!-- Profile Section -->
         <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
@@ -68,7 +68,11 @@
             <!-- Profile Picture -->
             <div class="flex items-center gap-6">
               <div class="w-24 h-24 rounded-full bg-[#336891] flex items-center justify-center text-white text-3xl font-bold">
-                JD
+                {{if .Photo}}
+                  <img src="{{.Photo}}" alt="{{.Name}}" class="w-full h-full rounded-full object-cover" />
+                {{else}}
+                  {{index .Name 0}}{{if gt (len .Name) 1}}{{index .Name 1}}{{end}}
+                {{end}}
               </div>
               <div class="flex-1">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Profile Picture</h2>
@@ -91,11 +95,11 @@
               <div class="flex items-center gap-2">
                 <input
                   type="password"
-                  value="••••••••••••••"
+                  value="{{.Password}}"
                   class="flex-1 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
                   disabled
                 />
-                <button class="text-[#336891] font-semibold text-sm hover:text-[#254d6f]">Change</button>
+                <button onclick="openPasswordModal()" class="text-[#336891] font-semibold text-sm hover:text-[#254d6f]">Change</button>
               </div>
             </div>
 
@@ -104,11 +108,12 @@
               <div class="flex items-center gap-2">
                 <input
                   type="text"
-                  value="USD"
+                  id="currencyDisplay"
+                  value="{{.Currency}}"
                   class="flex-1 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
                   disabled
                 />
-                <button class="text-[#336891] font-semibold text-sm hover:text-[#254d6f]">Change</button>
+                <button onclick="openCurrencyModal()" class="text-[#336891] font-semibold text-sm hover:text-[#254d6f]">Change</button>
               </div>
             </div>
 
@@ -117,11 +122,12 @@
               <div class="flex items-center gap-2">
                 <input
                   type="text"
-                  value="English"
+                  id="languageDisplay"
+                  value="{{.Language}}"
                   class="flex-1 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
                   disabled
                 />
-                <button class="text-[#336891] font-semibold text-sm hover:text-[#254d6f]">Change</button>
+                <button onclick="openLanguageModal()" class="text-[#336891] font-semibold text-sm hover:text-[#254d6f]">Change</button>
               </div>
             </div>
           </div>
@@ -201,7 +207,7 @@
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-700">New Booking Notification</span>
                 <label class="relative inline-block w-12 h-6">
-                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <input type="checkbox" data-pref="new_booking" class="opacity-0 w-0 h-0 peer" />
                   <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
                   <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
                 </label>
@@ -209,7 +215,7 @@
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-700">Booking Cancelled</span>
                 <label class="relative inline-block w-12 h-6">
-                  <input type="checkbox" checked class="opacity-0 w-0 h-0 peer" />
+                  <input type="checkbox" data-pref="booking_cancelled" checked class="opacity-0 w-0 h-0 peer" />
                   <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
                   <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
                 </label>
@@ -217,7 +223,7 @@
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-700">Booking Confirmation</span>
                 <label class="relative inline-block w-12 h-6">
-                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <input type="checkbox" data-pref="booking_confirmation" class="opacity-0 w-0 h-0 peer" />
                   <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
                   <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
                 </label>
@@ -225,7 +231,7 @@
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-700">Booking Rescheduled</span>
                 <label class="relative inline-block w-12 h-6">
-                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <input type="checkbox" data-pref="booking_rescheduled" class="opacity-0 w-0 h-0 peer" />
                   <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
                   <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
                 </label>
@@ -233,7 +239,7 @@
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-700">Booking Reminder</span>
                 <label class="relative inline-block w-12 h-6">
-                  <input type="checkbox" checked class="opacity-0 w-0 h-0 peer" />
+                  <input type="checkbox" data-pref="booking_reminder" checked class="opacity-0 w-0 h-0 peer" />
                   <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
                   <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
                 </label>
@@ -241,7 +247,7 @@
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-700">Booking Updated</span>
                 <label class="relative inline-block w-12 h-6">
-                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <input type="checkbox" data-pref="booking_updated" class="opacity-0 w-0 h-0 peer" />
                   <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
                   <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
                 </label>
@@ -256,7 +262,7 @@
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-700">Payments Recieved</span>
                 <label class="relative inline-block w-12 h-6">
-                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <input type="checkbox" data-pref="payments_received" class="opacity-0 w-0 h-0 peer" />
                   <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
                   <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
                 </label>
@@ -264,7 +270,7 @@
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-700">Payments Confirmed</span>
                 <label class="relative inline-block w-12 h-6">
-                  <input type="checkbox" checked class="opacity-0 w-0 h-0 peer" />
+                  <input type="checkbox" data-pref="payments_confirmed" checked class="opacity-0 w-0 h-0 peer" />
                   <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
                   <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
                 </label>
@@ -272,7 +278,7 @@
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-700">Payment Received</span>
                 <label class="relative inline-block w-12 h-6">
-                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <input type="checkbox" data-pref="payment_received" class="opacity-0 w-0 h-0 peer" />
                   <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
                   <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
                 </label>
@@ -280,7 +286,7 @@
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-700">Booking Rescheduled</span>
                 <label class="relative inline-block w-12 h-6">
-                  <input type="checkbox" class="opacity-0 w-0 h-0 peer" />
+                  <input type="checkbox" data-pref="payment_rescheduled" class="opacity-0 w-0 h-0 peer" />
                   <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
                   <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
                 </label>
@@ -288,7 +294,7 @@
               <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-700">Payment Pending</span>
                 <label class="relative inline-block w-12 h-6">
-                  <input type="checkbox" checked class="opacity-0 w-0 h-0 peer" />
+                  <input type="checkbox" data-pref="payment_pending" checked class="opacity-0 w-0 h-0 peer" />
                   <span class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 peer-checked:bg-[#336891] rounded-full transition"></span>
                   <span class="absolute cursor-pointer top-0.5 left-0.5 bg-white w-5 h-5 rounded-full peer-checked:translate-x-6 transition"></span>
                 </label>
@@ -297,10 +303,10 @@
           </div>
 
           <div class="flex gap-3 pt-4">
-            <button class="px-6 py-3 bg-[#336891] text-white rounded-lg hover:bg-[#254d6f] transition font-semibold text-sm">
+            <button onclick="saveNotificationPreferences()" class="px-6 py-3 bg-[#336891] text-white rounded-lg hover:bg-[#254d6f] transition font-semibold text-sm">
               Save Changes
             </button>
-            <button class="px-6 py-3 border border-[#6FA4CD] text-gray-800 rounded-lg hover:bg-gray-50 transition font-semibold text-sm">
+            <button onclick="loadNotificationPreferences()" class="px-6 py-3 border border-[#6FA4CD] text-gray-800 rounded-lg hover:bg-gray-50 transition font-semibold text-sm">
               Cancel
             </button>
           </div>
@@ -309,6 +315,145 @@
     </div>
   </main>
 
+  <!-- Language Change Modal -->
+  <div id="languageModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">Change Language</h2>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-600 mb-4">Select your preferred language</label>
+          <div class="space-y-3">
+            <label class="flex items-center cursor-pointer p-3 border-2 border-gray-200 rounded-lg hover:border-[#336891] transition">
+              <input type="radio" name="language" value="English" class="w-4 h-4 text-[#336891]" />
+              <span class="ml-3 text-sm font-semibold text-gray-800">English</span>
+            </label>
+            <label class="flex items-center cursor-pointer p-3 border-2 border-gray-200 rounded-lg hover:border-[#336891] transition">
+              <input type="radio" name="language" value="Arabic" class="w-4 h-4 text-[#336891]" />
+              <span class="ml-3 text-sm font-semibold text-gray-800">العربية (Arabic)</span>
+            </label>
+            <label class="flex items-center cursor-pointer p-3 border-2 border-gray-200 rounded-lg hover:border-[#336891] transition">
+              <input type="radio" name="language" value="French" class="w-4 h-4 text-[#336891]" />
+              <span class="ml-3 text-sm font-semibold text-gray-800">Français (French)</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="flex gap-3 pt-4">
+          <button
+            onclick="saveLanguage()"
+            class="flex-1 px-6 py-3 bg-[#336891] text-white rounded-lg hover:bg-[#254d6f] transition font-semibold text-sm"
+          >
+            Save
+          </button>
+          <button
+            onclick="closeLanguageModal()"
+            class="flex-1 px-6 py-3 border border-[#6FA4CD] text-gray-800 rounded-lg hover:bg-gray-50 transition font-semibold text-sm"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Currency Change Modal -->
+  <div id="currencyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">Change Currency</h2>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-600 mb-4">Select your preferred currency</label>
+          <div class="space-y-3">
+            <label class="flex items-center cursor-pointer p-3 border-2 border-gray-200 rounded-lg hover:border-[#336891] transition">
+              <input type="radio" name="currency" value="USD" class="w-4 h-4 text-[#336891]" />
+              <span class="ml-3 text-sm font-semibold text-gray-800">USD ($)</span>
+            </label>
+            <label class="flex items-center cursor-pointer p-3 border-2 border-gray-200 rounded-lg hover:border-[#336891] transition">
+              <input type="radio" name="currency" value="LBP" class="w-4 h-4 text-[#336891]" />
+              <span class="ml-3 text-sm font-semibold text-gray-800">LBP (ل.ل)</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="flex gap-3 pt-4">
+          <button
+            onclick="saveCurrency()"
+            class="flex-1 px-6 py-3 bg-[#336891] text-white rounded-lg hover:bg-[#254d6f] transition font-semibold text-sm"
+          >
+            Save
+          </button>
+          <button
+            onclick="closeCurrencyModal()"
+            class="flex-1 px-6 py-3 border border-[#6FA4CD] text-gray-800 rounded-lg hover:bg-gray-50 transition font-semibold text-sm"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password Change Modal -->
+  <div id="passwordModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">Change Password</h2>
+      
+      <form id="passwordChangeForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-600 mb-2">Current Password</label>
+          <input
+            type="password"
+            id="currentPassword"
+            required
+            class="w-full h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          />
+        </div>
+        
+        <div>
+          <label class="block text-sm font-semibold text-gray-600 mb-2">New Password</label>
+          <input
+            type="password"
+            id="newPassword"
+            required
+            minlength="8"
+            class="w-full h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          />
+          <p class="text-xs text-gray-500 mt-1">Must be at least 8 characters</p>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-semibold text-gray-600 mb-2">Confirm New Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            required
+            minlength="8"
+            class="w-full h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          />
+        </div>
+        
+        <div class="flex gap-3 pt-4">
+          <button
+            type="submit"
+            class="flex-1 px-6 py-3 bg-[#336891] text-white rounded-lg hover:bg-[#254d6f] transition font-semibold text-sm"
+          >
+            Update Password
+          </button>
+          <button
+            type="button"
+            onclick="closePasswordModal()"
+            class="flex-1 px-6 py-3 border border-[#6FA4CD] text-gray-800 rounded-lg hover:bg-gray-50 transition font-semibold text-sm"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     function showSettingsSection(section) {
       // Hide all sections
@@ -328,6 +473,314 @@
       // Add active class to clicked button
       event.target.classList.remove('text-gray-600');
       event.target.classList.add('active-nav', 'text-[#336891]', 'border-b-2', 'border-[#336891]');
+      
+      // Load notification preferences when switching to notifications section
+      if (section === 'notifications') {
+        loadNotificationPreferences();
+      }
     }
+    
+    // Load notification preferences from API
+    function loadNotificationPreferences() {
+      fetch('/admin/notification-preferences')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.data) {
+            const prefs = data.data;
+            
+            // Set bookings checkboxes
+            document.querySelector('input[data-pref="new_booking"]').checked = prefs.bookings.new_booking || false;
+            document.querySelector('input[data-pref="booking_cancelled"]').checked = prefs.bookings.booking_cancelled || false;
+            document.querySelector('input[data-pref="booking_confirmation"]').checked = prefs.bookings.booking_confirmation || false;
+            document.querySelector('input[data-pref="booking_rescheduled"]').checked = prefs.bookings.booking_rescheduled || false;
+            document.querySelector('input[data-pref="booking_reminder"]').checked = prefs.bookings.booking_reminder || false;
+            document.querySelector('input[data-pref="booking_updated"]').checked = prefs.bookings.booking_updated || false;
+            
+            // Set payments checkboxes
+            document.querySelector('input[data-pref="payments_received"]').checked = prefs.payments.payments_received || false;
+            document.querySelector('input[data-pref="payments_confirmed"]').checked = prefs.payments.payments_confirmed || false;
+            document.querySelector('input[data-pref="payment_received"]').checked = prefs.payments.payment_received || false;
+            document.querySelector('input[data-pref="payment_rescheduled"]').checked = prefs.payments.booking_rescheduled || false;
+            document.querySelector('input[data-pref="payment_pending"]').checked = prefs.payments.payment_pending || false;
+          }
+        })
+        .catch(error => {
+          console.error('Error loading notification preferences:', error);
+        });
+    }
+    
+    // Save notification preferences
+    function saveNotificationPreferences() {
+      const bookings = {
+        new_booking: document.querySelector('input[data-pref="new_booking"]').checked,
+        booking_cancelled: document.querySelector('input[data-pref="booking_cancelled"]').checked,
+        booking_confirmation: document.querySelector('input[data-pref="booking_confirmation"]').checked,
+        booking_rescheduled: document.querySelector('input[data-pref="booking_rescheduled"]').checked,
+        booking_reminder: document.querySelector('input[data-pref="booking_reminder"]').checked,
+        booking_updated: document.querySelector('input[data-pref="booking_updated"]').checked
+      };
+      
+      const payments = {
+        payments_received: document.querySelector('input[data-pref="payments_received"]').checked,
+        payments_confirmed: document.querySelector('input[data-pref="payments_confirmed"]').checked,
+        payment_received: document.querySelector('input[data-pref="payment_received"]').checked,
+        booking_rescheduled: document.querySelector('input[data-pref="payment_rescheduled"]').checked,
+        payment_pending: document.querySelector('input[data-pref="payment_pending"]').checked
+      };
+      
+      fetch('/admin/notification-preferences', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookings: bookings,
+          payments: payments
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Notification preferences saved successfully!",
+            timer: 2000,
+            showConfirmButton: false
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to save notification preferences: " + (data.message || "Unknown error"),
+            confirmButtonColor: "#336891"
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error saving notification preferences:', error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to save notification preferences. Please try again.",
+          confirmButtonColor: "#336891"
+        });
+      });
+    }
+    
+    // Language modal functions
+    function openLanguageModal() {
+      const currentLanguage = document.getElementById('languageDisplay').value || 'English';
+      document.querySelector(`input[name="language"][value="${currentLanguage}"]`).checked = true;
+      document.getElementById('languageModal').classList.remove('hidden');
+    }
+    
+    function closeLanguageModal() {
+      document.getElementById('languageModal').classList.add('hidden');
+    }
+    
+    // Save language
+    function saveLanguage() {
+      const language = document.querySelector('input[name="language"]:checked')?.value;
+      
+      if (!language) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Please select a language!",
+          confirmButtonColor: "#336891"
+        });
+        return;
+      }
+      
+      fetch('/admin/change-language', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          language: language
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('languageDisplay').value = language;
+          closeLanguageModal();
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: `Language changed to ${language} successfully!`,
+            timer: 2000,
+            showConfirmButton: false
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: data.message || "Failed to change language",
+            confirmButtonColor: "#336891"
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error changing language:', error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to change language. Please try again.",
+          confirmButtonColor: "#336891"
+        });
+      });
+    }
+    
+    // Currency modal functions
+    function openCurrencyModal() {
+      const currentCurrency = document.getElementById('currencyDisplay').value || 'USD';
+      document.querySelector(`input[name="currency"][value="${currentCurrency}"]`).checked = true;
+      document.getElementById('currencyModal').classList.remove('hidden');
+    }
+    
+    function closeCurrencyModal() {
+      document.getElementById('currencyModal').classList.add('hidden');
+    }
+    
+    // Save currency
+    function saveCurrency() {
+      const currency = document.querySelector('input[name="currency"]:checked')?.value;
+      
+      if (!currency) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Please select a currency!",
+          confirmButtonColor: "#336891"
+        });
+        return;
+      }
+      
+      fetch('/admin/change-currency', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currency: currency
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('currencyDisplay').value = currency;
+          closeCurrencyModal();
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: `Currency changed to ${currency} successfully!`,
+            timer: 2000,
+            showConfirmButton: false
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: data.message || "Failed to change currency",
+            confirmButtonColor: "#336891"
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error changing currency:', error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to change currency. Please try again.",
+          confirmButtonColor: "#336891"
+        });
+      });
+    }
+    
+    // Password modal functions
+    function openPasswordModal() {
+      document.getElementById('passwordModal').classList.remove('hidden');
+      document.getElementById('passwordChangeForm').reset();
+    }
+    
+    function closePasswordModal() {
+      document.getElementById('passwordModal').classList.add('hidden');
+      document.getElementById('passwordChangeForm').reset();
+    }
+    
+    // Handle password change form submission
+    document.getElementById('passwordChangeForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      // Validate passwords match
+      if (newPassword !== confirmPassword) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "New passwords do not match!",
+          confirmButtonColor: "#336891"
+        });
+        return;
+      }
+      
+      // Validate password length
+      if (newPassword.length < 8) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Password must be at least 8 characters long!",
+          confirmButtonColor: "#336891"
+        });
+        return;
+      }
+      
+      // Send request to backend
+      fetch('/admin/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          current_password: currentPassword,
+          new_password: newPassword
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          closePasswordModal();
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Password changed successfully!",
+            timer: 2000,
+            showConfirmButton: false
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: data.message || "Failed to change password",
+            confirmButtonColor: "#336891"
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error changing password:', error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to change password. Please try again.",
+          confirmButtonColor: "#336891"
+        });
+      });
+    });
   </script>
 </div>

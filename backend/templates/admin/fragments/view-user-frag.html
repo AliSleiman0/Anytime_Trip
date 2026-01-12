@@ -131,10 +131,11 @@
           </div>
           <div>
             <p class="text-sm text-[#6A7282]">Email</p>
-            <p class="text-[#101828] flex items-center gap-2">
+            <p class="text-[#101828] flex items-center gap-2" id="emailDisplay">
               {{.Email}}
               <button
-                class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
+                onclick="openEmailModal()"
+                class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center hover:opacity-70"
               >
                 <svg
                   width="14"
@@ -247,3 +248,126 @@
     </div>
   </main>
 </div>
+
+<!-- Email Edit Modal -->
+<div id="emailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+  <div class="bg-white rounded-lg p-6 w-96">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Edit Email Address</h3>
+    <div class="mb-4">
+      <label class="block text-sm text-gray-600 mb-2">Email Address</label>
+      <input
+        type="email"
+        id="emailInput"
+        value="{{.Email}}"
+        class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#336891] focus:border-transparent"
+      />
+    </div>
+    <div class="flex gap-3 justify-end">
+      <button onclick="closeEmailModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
+        Cancel
+      </button>
+      <button onclick="saveEmail()" class="px-4 py-2 bg-[#336891] text-white rounded hover:bg-[#2a5573]">
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="hidden fixed top-6 right-6 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-[60] flex items-center gap-2 transition-all">
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM8 15L3 10L4.41 8.59L8 12.17L15.59 4.58L17 6L8 15Z" fill="white"/>
+  </svg>
+  <span id="toastMessage">Email updated successfully!</span>
+</div>
+
+<script>
+  function openEmailModal() {
+    document.getElementById('emailModal').classList.remove('hidden');
+  }
+
+  function closeEmailModal() {
+    document.getElementById('emailModal').classList.add('hidden');
+  }
+
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    
+    toastMessage.textContent = message;
+    
+    if (type === 'error') {
+      toast.classList.remove('bg-green-500');
+      toast.classList.add('bg-red-500');
+    } else {
+      toast.classList.remove('bg-red-500');
+      toast.classList.add('bg-green-500');
+    }
+    
+    toast.classList.remove('hidden');
+    
+    setTimeout(() => {
+      toast.classList.add('hidden');
+    }, 3000);
+  }
+
+  function saveEmail() {
+    const newEmail = document.getElementById('emailInput').value;
+    if (!newEmail || newEmail.trim() === '') {
+      showToast('Please enter a valid email address', 'error');
+      return;
+    }
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmail)) {
+      showToast('Please enter a valid email address', 'error');
+      return;
+    }
+    
+    // Get the user ID from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('id');
+    
+    if (!userId) {
+      showToast('User ID not found', 'error');
+      return;
+    }
+    
+    // Call API to update email
+    fetch('/admin/update-user-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        email: newEmail
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Update the display
+        const emailDisplay = document.getElementById('emailDisplay');
+        const emailText = emailDisplay.childNodes[0];
+        emailText.textContent = newEmail;
+        
+        closeEmailModal();
+        showToast('Email updated successfully!');
+      } else {
+        showToast(data.message || 'Failed to update email', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showToast('Failed to update email', 'error');
+    });
+  }
+
+  document.getElementById('emailModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeEmailModal();
+    }
+  });
+</script>

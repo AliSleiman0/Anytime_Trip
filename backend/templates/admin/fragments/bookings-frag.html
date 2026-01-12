@@ -363,7 +363,8 @@
                   <span class="{{.StatusClass}}">{{.Status}}</span>
                 </td>
                 <td class="px-4 py-3 text-center" style="width: 10%;">
-                <button
+                <a
+                  href="/admin/view-booking?id={{.RefID}}"
                   class="bg-[#336891] text-white w-6 h-6 rounded-lg inline-flex items-center justify-center hover:bg-blue-600"
                 >
                   <svg
@@ -384,7 +385,7 @@
                       fill="white"
                     />
                   </svg>
-                  </button>
+                </a>
                 </td>
               </tr>
               {{else}}
@@ -507,25 +508,14 @@
     });
   }
 
-  // Attach click handlers to action buttons in the table
-  function initBookingDetailButtons() {
-    const buttons = document.querySelectorAll(
-      "table tbody tr td:last-child button"
-    );
-    buttons.forEach((btn) => {
-      btn.onclick = showBookingDetail;
-      btn.type = "button";
-    });
-  }
+  // Booking detail buttons are now links - no initialization needed
 
   // Init on load and after HTMX swaps
   document.addEventListener("DOMContentLoaded", function() {
-    initBookingDetailButtons();
     initDatePicker();
   });
   
   document.addEventListener("htmx:afterSwap", function() {
-    initBookingDetailButtons();
     initDatePicker();
   });
 </script>

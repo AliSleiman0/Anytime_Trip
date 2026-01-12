@@ -1,0 +1,64 @@
+<div style="position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center;">
+  <!-- blurred background layer -->
+  <div style="position:absolute; inset:0; background-image:url('/static/admin/images/login-background.png'); background-size:cover; background-position:center; filter:blur(8px); -webkit-filter:blur(8px);"></div>
+
+  <!-- content above the blurred background -->
+  <div style="position:relative; z-index:1;" class="flex justify-center items-center">
+    <div class="bg-white rounded-2xl shadow-2xl overflow-hidden flex max-w-4xl w-full">
+      <!-- Left side: City Image -->
+      <div class="w-2/5">
+        <img src="/static/admin/images/city-image.png" alt="City View" class="h-full w-full object-cover" />
+      </div>
+      
+      <!-- Right side: Login Form -->
+      <div class="w-3/5 p-12 flex flex-col justify-center">
+        <div class="max-w-md mx-auto w-full">
+          <!-- Logo -->
+          <img src="/static/admin/images/logo2.png" alt="Anytime Logo" class="w-28 h-28 mx-auto mb-6" />
+          
+          <!-- Heading -->
+          <h2 class="text-3xl font-semibold text-center text-gray-800 mb-8">Forgot Password</h2>
+          
+          <!-- Forgot Password Form -->
+          <form action="/admin/forgot-password" method="POST" class="space-y-5">
+            <!-- Email Field with Verify Button -->
+            <div>
+              <label for="email" class="block text-sm text-gray-600 mb-2">Your email</label>
+              <div class="flex gap-2">
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email" 
+                  class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 focus:border-transparent" 
+                  style="--tw-ring-color: #336891;"
+                  placeholder=""
+                />
+                <button 
+                  type="button" 
+                  class="px-6 py-3 font-medium text-white rounded-lg transition duration-200 whitespace-nowrap"
+                  style="background-color: #336891;"
+                  onmouseover="this.style.backgroundColor='#264d6e';"
+                  onmouseout="this.style.backgroundColor='#336891';"
+                >
+                  Verify
+                </button>
+              </div>
+            </div>
+            
+            <!-- Next Button -->
+            <button 
+              type="submit" 
+              class="w-full text-white font-medium py-3 rounded-lg transition duration-200"
+              style="background-color: #336891;"
+              onmouseover="this.style.backgroundColor='#264d6e';"
+              onmouseout="this.style.backgroundColor='#336891';"
+            >
+              Next
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</div>

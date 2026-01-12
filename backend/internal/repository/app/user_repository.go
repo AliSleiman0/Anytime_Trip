@@ -113,3 +113,14 @@ func (r *UserRepository) FindAll(ctx context.Context, limit int64, skip int64) (
 
 	return users, nil
 }
+
+// UpdateEmail updates the email for a user
+func (r *UserRepository) UpdateEmail(ctx context.Context, id string, email string) error {
+	update := bson.M{
+		"$set": bson.M{
+			"email": email,
+		},
+	}
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	return err
+}

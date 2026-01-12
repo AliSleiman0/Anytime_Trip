@@ -91,7 +91,7 @@
             </thead>
             <tbody class="bg-white text-gray-900">
               {{range .Flights}}
-              <tr class="border-b border-gray-200" data-flight-id="{{.ID}}" data-flight-number="{{.FlightNumber}}" data-flight-code="{{.FlightID}}" data-status="{{.Status}}" data-cost="{{.Cost}}" data-profit-percent="{{.ProfitPercent}}">
+              <tr class="border-b border-gray-200" data-flight-id="{{.ID}}" data-flight-number="{{.FlightNumber}}" data-flight-code="{{.FlightID}}" data-status="{{.Status}}" data-cost="{{.Cost}}" data-profit-percent="{{.ProfitPercent}}" data-departure-time="{{formatDateTime .DepartureTime}}" data-arrival-time="{{formatDateTime .ArrivalTime}}" data-departure-location="{{.DepartureLocation}}" data-arrival-location="{{.ArrivalLocation}}">
                 <td class="px-4 py-3 text-center" style="width: 8%;">
                   <div class="text-sm font-semibold">{{.FlightNumber}}</div>
                   <div class="text-xs text-gray-500">{{.FlightID}}</div>
@@ -109,10 +109,10 @@
                   {{end}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 12%;">
-                  Beirut to Dubai<br/>8:00 PM - 12 AM
+                  {{.DepartureLocation}}<br/>{{formatTime .DepartureTime}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 12%;">
-                  Beirut to Dubai<br/>8:00 PM - 12 AM
+                  {{.ArrivalLocation}}<br/>{{formatTime .ArrivalTime}}
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-800" style="width: 8%;">
                   <div class="flex items-center justify-center gap-2">
@@ -207,7 +207,11 @@
             flightCode: row.dataset.flightCode,
             status: row.dataset.status,
             cost: parseFloat(row.dataset.cost) || 0,
-            profitPercent: parseFloat(row.dataset.profitPercent) || 0
+            profitPercent: parseFloat(row.dataset.profitPercent) || 0,
+            departureTime: row.dataset.departureTime || '',
+            arrivalTime: row.dataset.arrivalTime || '',
+            departureLocation: row.dataset.departureLocation || '',
+            arrivalLocation: row.dataset.arrivalLocation || ''
           };
         }
 
@@ -227,22 +231,33 @@
               <div class="grid grid-cols-2 gap-3">
                 <div class="flex flex-col gap-1">
                   <label class="text-xs font-semibold text-[#5b7282]">Departure Date</label>
-                  <input id="departure-date" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" placeholder="10 Jan, 2024" />
+                  <input id="departure-date" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="date" value="${currentFlightData?.departureTime ? currentFlightData.departureTime.split('T')[0] : ''}" />
                 </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-xs font-semibold text-[#5b7282]">Arrival Date</label>
-                  <input id="arrival-date" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" placeholder="10 Jan, 2024" />
+                  <input id="arrival-date" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="date" value="${currentFlightData?.arrivalTime ? currentFlightData.arrivalTime.split('T')[0] : ''}" />
                 </div>
               </div>
 
               <div class="grid grid-cols-2 gap-3">
                 <div class="flex flex-col gap-1">
                   <label class="text-xs font-semibold text-[#5b7282]">Departure Time</label>
-                  <input id="departure-time" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" placeholder="10:00 am" />
+                  <input id="departure-time" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="time" value="${currentFlightData?.departureTime ? currentFlightData.departureTime.split('T')[1] : ''}" />
                 </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-xs font-semibold text-[#5b7282]">Arrival Time</label>
-                  <input id="arrival-time" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" placeholder="3:00 pm" />
+                  <input id="arrival-time" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="time" value="${currentFlightData?.arrivalTime ? currentFlightData.arrivalTime.split('T')[1] : ''}" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Departure Location</label>
+                  <input id="departure-location" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" placeholder="e.g., Beirut" value="${currentFlightData?.departureLocation || ''}" />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Arrival Location</label>
+                  <input id="arrival-location" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" placeholder="e.g., Dubai" value="${currentFlightData?.arrivalLocation || ''}" />
                 </div>
               </div>
 
@@ -316,13 +331,24 @@
       }
 
       async function saveFlightData() {
+        const departureDate = document.getElementById('departure-date')?.value;
+        const departureTime = document.getElementById('departure-time')?.value;
+        const arrivalDate = document.getElementById('arrival-date')?.value;
+        const arrivalTime = document.getElementById('arrival-time')?.value;
+        const departureLocation = document.getElementById('departure-location')?.value;
+        const arrivalLocation = document.getElementById('arrival-location')?.value;
+        
         const data = {
           id: currentFlightData?.id,
           flight_number: currentFlightData?.flightNumber,
           flight_id: currentFlightData?.flightCode,
-          status: document.querySelector('input[name=\"status\"]:checked')?.value,
+          status: document.querySelector('input[name="status"]:checked')?.value,
           cost: parseFloat(currentFlightData?.cost) || 0,
           profit_percent: parseFloat(document.getElementById('commission-percent')?.value) || 0,
+          departure_time: departureDate && departureTime ? `${departureDate}T${departureTime}:00Z` : '',
+          arrival_time: arrivalDate && arrivalTime ? `${arrivalDate}T${arrivalTime}:00Z` : '',
+          departure_location: departureLocation || '',
+          arrival_location: arrivalLocation || '',
           refundable: document.getElementById('refundable')?.checked || false,
           allow_changes: document.getElementById('allow-changes')?.checked || false,
           allow_seat_choice: document.getElementById('allow-seat')?.checked || false,

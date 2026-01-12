@@ -92,12 +92,12 @@
             </thead>
             <tbody class="bg-white text-gray-900">
               {{range .Cars}}
-              <tr class="border-b border-gray-200">
+              <tr class="border-b border-gray-200" data-car-id="{{.ID}}" data-car-name="{{.CarName}}" data-car-type="{{.CarType}}" data-status="{{.Status}}" data-cost="{{.Cost}}" data-profit-percent="{{.ProfitPercent}}" data-passengers="{{.Passengers}}" data-mileage="{{.Mileage}}" data-pickup-location="{{.PickupLocation}}" data-pickup-time="{{formatDateTime .PickupTime}}" data-dropoff-location="{{.DropOffLocation}}" data-dropoff-time="{{formatDateTime .DropOffTime}}" data-unlimited-mileage="{{.UnlimitedMileage}}" data-shuttle="{{.ShuttleToCounter}}" data-transmission="{{.Transmission}}" data-extras="{{range .Extras}}{{.}},{{end}}">
                 <td class="px-4 py-3 text-center text-sm font-semibold" style="width: 10%;">
                   {{.CarName}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 8%;">
-                  Midsize SUV
+                  {{.CarType}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 8%;">
                   {{.ProviderName}}
@@ -112,22 +112,22 @@
                   {{end}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
-                  Sun, Oct 19, 1:30 AM
+                  {{.PickupLocation}}<br/>{{formatDate .PickupTime}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
-                  Sun, Oct 19, 1:30 AM
+                  {{.DropOffLocation}}<br/>{{formatDate .DropOffTime}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
                   {{.Location}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 8%;">
-                  4
+                  {{.Passengers}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 12%;">
-                  Automatic<br/>Unlimited mileage
+                  {{.Transmission}}<br/>{{if .UnlimitedMileage}}Unlimited mileage{{else}}{{.Mileage}}{{end}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
-                  Toddler Seat
+                  {{range .Extras}}{{.}}<br/>{{end}}
                 </td>
                 <td class="px-4 py-3 text-center" style="width: 6%;">
                   <div class="flex justify-center gap-2">
@@ -172,74 +172,122 @@
       }
     </style>
     <script>
+      let currentCarData = null;
+
       function openCarModal(event) {
         if (event) {
           event.stopPropagation();
           event.preventDefault();
         }
 
+        // Get the row data
+        const row = event.target.closest('tr');
+        if (row) {
+          const extras = row.dataset.extras ? row.dataset.extras.split(',').filter(e => e) : [];
+          currentCarData = {
+            id: row.dataset.carId,
+            carName: row.dataset.carName,
+            carType: row.dataset.carType,
+            status: row.dataset.status,
+            cost: parseFloat(row.dataset.cost) || 0,
+            profitPercent: parseFloat(row.dataset.profitPercent) || 0,
+            passengers: parseInt(row.dataset.passengers) || 0,
+            mileage: row.dataset.mileage || '',
+            pickupLocation: row.dataset.pickupLocation || '',
+            pickupTime: row.dataset.pickupTime || '',
+            dropoffLocation: row.dataset.dropoffLocation || '',
+            dropoffTime: row.dataset.dropoffTime || '',
+            unlimitedMileage: row.dataset.unlimitedMileage === 'true',
+            shuttle: row.dataset.shuttle === 'true',
+            transmission: row.dataset.transmission || 'Automatic',
+            extras: extras
+          };
+        }
+
         const modalHtml = `
            <div class="flex flex-col gap-4 text-[#1d1d1d] font-sans">
             <div class="text-center">
-              <div class="text-lg font-bold text-[#1f3242]">Midsize SUV</div>
-              <div class="text-xs text-[#5b7282] mt-1">1DLRT190/GMARSAN-SMITH</div>
+              <div class="text-lg font-bold text-[#1f3242]">${currentCarData?.carType || 'Car'}</div>
+              <div class="text-xs text-[#5b7282] mt-1">${currentCarData?.carName || ''}</div>
             </div>
 
             <div class="grid gap-3">
               <div class="grid grid-cols-2 gap-3">
                 <div class="flex flex-col gap-1">
                   <label class="text-xs font-semibold text-[#5b7282]">Name</label>
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="Toyota Rav4" />
+                  <input id="car-name" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="${currentCarData?.carName || ''}" />
                 </div>
                 <div class="flex flex-col gap-1">
-                  <label class="text-xs font-semibold text-[#5b7282]">Passengers</label>
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="5" />
+                  <label class="text-xs font-semibold text-[#5b7282]">Type</label>
+                  <input id="car-type" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="${currentCarData?.carType || ''}" />
                 </div>
               </div>
 
               <div class="grid grid-cols-2 gap-3">
                 <div class="flex flex-col gap-1">
-                  <label class="text-xs font-semibold text-[#5b7282]">Milage</label>
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="10km" />
+                  <label class="text-xs font-semibold text-[#5b7282]">Number of Passengers</label>
+                  <input id="car-passengers" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="number" value="${currentCarData?.passengers || 0}" />
                 </div>
                 <div class="flex flex-col gap-1">
-                  <label class="text-xs font-semibold text-[#5b7282]">Arrival Time</label>
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="3:00 pm" />
+                  <label class="text-xs font-semibold text-[#5b7282]">Mileage</label>
+                  <input id="car-mileage" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="${currentCarData?.mileage || ''}" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Pickup Location</label>
+                  <input id="car-pickup-location" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="${currentCarData?.pickupLocation || ''}" />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Pickup Time</label>
+                  <input id="car-pickup" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="datetime-local" value="${currentCarData?.pickupTime || ''}" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Drop Off Location</label>
+                  <input id="car-dropoff-location" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="${currentCarData?.dropoffLocation || ''}" />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Drop Off Time</label>
+                  <input id="car-dropoff" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="datetime-local" value="${currentCarData?.dropoffTime || ''}" />
                 </div>
               </div>
 
               <div class="flex flex-col gap-1">
                 <label class="text-xs font-semibold text-[#5b7282]">Total Commission</label>
                 <div class="grid grid-cols-[1fr_auto] gap-2">
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="10%" />
-                  <div class="h-10 px-3 rounded-md border border-[#8aaecd] bg-[#f7fafc] text-sm font-semibold flex items-center justify-center text-[#1d1d1d]">$ 321.32</div>
+                  <input id="car-commission" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="number" step="0.1" placeholder="10%" value="${currentCarData?.profitPercent || 0}" />
+                  <div class="h-10 px-3 rounded-md border border-[#8aaecd] bg-[#f7fafc] text-sm font-semibold flex items-center justify-center text-[#1d1d1d]">$ ${((currentCarData?.cost || 0) * (currentCarData?.profitPercent || 0) / 100).toFixed(2)}</div>
                 </div>
               </div>
 
               <div class="grid gap-2">
                 <div class="grid grid-cols-2 gap-3 text-sm font-medium text-[#1d1d1d]">
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Unlimited Milage</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" checked /> Shuttle to Counter and Car</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="unlimited-mileage" class="h-4 w-4" ${currentCarData?.unlimitedMileage ? 'checked' : ''} /> Unlimited Mileage</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="shuttle" class="h-4 w-4" ${currentCarData?.shuttle ? 'checked' : ''} /> Shuttle to Counter and Car</label>
                 </div>
               </div>
 
               <div class="grid gap-2 mt-5">
                 <div class="text-sm font-bold text-[#1f3242] text-start">Extras</div>
                 <div class="grid grid-cols-4 gap-3 text-sm font-medium text-[#1d1d1d]">
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" checked /> Booster Seat</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Infant Seat</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Gas Coupons</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Extra Seat</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Toddler Seat</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" checked /> Radio Station</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Snacks & Beverages</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> No Extra</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Booster Seat" ${currentCarData?.extras.includes('Booster Seat') ? 'checked' : ''} /> Booster Seat</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Infant Seat" ${currentCarData?.extras.includes('Infant Seat') ? 'checked' : ''} /> Infant Seat</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Gas Coupons" ${currentCarData?.extras.includes('Gas Coupons') ? 'checked' : ''} /> Gas Coupons</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Extra Seat" ${currentCarData?.extras.includes('Extra Seat') ? 'checked' : ''} /> Extra Seat</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Toddler Seat" ${currentCarData?.extras.includes('Toddler Seat') ? 'checked' : ''} /> Toddler Seat</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Radio Station" ${currentCarData?.extras.includes('Radio Station') ? 'checked' : ''} /> Radio Station</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Snacks & Beverages" ${currentCarData?.extras.includes('Snacks & Beverages') ? 'checked' : ''} /> Snacks & Beverages</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="No Extra" ${currentCarData?.extras.includes('No Extra') ? 'checked' : ''} /> No Extra</label>
                 </div>
               </div>
 
               <div class="flex justify-center gap-3 pt-1">
-                <button class="min-w-[96px] px-4 py-2.5 rounded-lg border border-[#1f3242] text-[#1f3242] font-bold text-sm" id="flight-modal-cancel">Cancel</button>
-                <button class="min-w-[96px] px-4 py-2.5 rounded-lg border border-[#336891] bg-[#336891] text-white font-bold text-sm" id="flight-modal-save">Save</button>
+                <button class="min-w-[96px] px-4 py-2.5 rounded-lg border border-[#1f3242] text-[#1f3242] font-bold text-sm" id="car-modal-cancel">Cancel</button>
+                <button class="min-w-[96px] px-4 py-2.5 rounded-lg border border-[#336891] bg-[#336891] text-white font-bold text-sm" id="car-modal-save">Save</button>
               </div>
             </div>
           </div>
@@ -259,8 +307,74 @@
           const cancelBtn = document.getElementById("car-modal-cancel");
           const saveBtn = document.getElementById("car-modal-save");
           if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
-          if (saveBtn) saveBtn.addEventListener("click", closeModal);
+          if (saveBtn) saveBtn.addEventListener("click", saveCarData);
+
+          // Add event listener to update commission calculation
+          const commissionInput = document.getElementById("car-commission");
+          if (commissionInput) {
+            commissionInput.addEventListener("input", () => {
+              const percent = parseFloat(commissionInput.value) || 0;
+              const calculated = ((currentCarData?.cost || 0) * percent / 100).toFixed(2);
+              document.querySelector('[id*="commission"]').closest('.grid').querySelector('div:last-child').textContent = `$ ${calculated}`;
+            });
+          }
         }, 0);
+      }
+
+      async function saveCarData() {
+        const extras = Array.from(document.querySelectorAll('.extra-checkbox:checked')).map(cb => cb.value);
+        
+        const data = {
+          id: currentCarData?.id,
+          car_name: document.getElementById('car-name')?.value || '',
+          car_type: document.getElementById('car-type')?.value || '',
+          passengers: parseInt(document.getElementById('car-passengers')?.value) || 0,
+          mileage: document.getElementById('car-mileage')?.value || '',
+          pickup_location: document.getElementById('car-pickup-location')?.value || '',
+          pickup_time: document.getElementById('car-pickup')?.value || '',
+          drop_off_location: document.getElementById('car-dropoff-location')?.value || '',
+          drop_off_time: document.getElementById('car-dropoff')?.value || '',
+          profit_percent: parseFloat(document.getElementById('car-commission')?.value) || 0,
+          unlimited_mileage: document.getElementById('unlimited-mileage')?.checked || false,
+          shuttle_to_counter: document.getElementById('shuttle')?.checked || false,
+          extras: extras
+        };
+
+        try {
+          const response = await fetch('/admin/cms/cars/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: 'Car updated successfully',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: result.error || 'Failed to update car'
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Network error occurred'
+          });
+        }
       }
 
       function showProviderActions(event) {

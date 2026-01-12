@@ -235,3 +235,203 @@ func (h *AdminHandler) GetBookingsFragment(c *fiber.Ctx) error {
 	c.Set("Content-Type", "text/html")
 	return tmpl.Execute(c, data)
 }
+
+// ViewBooking renders the booking details page
+func (h *AdminHandler) ViewBooking(c *fiber.Ctx) error {
+	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "view-booking.html")))
+	if err != nil {
+		return c.Status(500).SendString("Error loading template")
+	}
+
+	data := fiber.Map{
+		"Title":     "Booking Details",
+		"BookingID": c.Query("id"),
+	}
+
+	c.Set("Content-Type", "text/html")
+	return tmpl.Execute(c, data)
+}
+
+// GetViewBookingFragment serves the booking details fragment for HTMX partial loads
+func (h *AdminHandler) GetViewBookingFragment(c *fiber.Ctx) error {
+	ctx := c.Context()
+	bookingID := c.Query("id")
+
+	if bookingID == "" {
+		return c.Status(400).SendString("Missing booking ID")
+	}
+
+	funcMap := template.FuncMap{
+		"title": func(s string) string {
+			if s == "" {
+				return ""
+			}
+			return strings.ToUpper(s[:1]) + strings.ToLower(s[1:])
+		},
+		"printf": fmt.Sprintf,
+	}
+
+	// Try to find in flight bookings
+	flightBooking, err := h.flightBookingRepo.FindByID(ctx, bookingID)
+	if err == nil && flightBooking != nil {
+		tmpl, err := template.New("view-booking-frag.html").Funcs(funcMap).ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "view-booking-frag.html")))
+		if err != nil {
+			return c.Status(500).SendString("Error loading template: " + err.Error())
+		}
+
+		data := fiber.Map{
+			"BookingID":     flightBooking.BookingID,
+			"FlightName":    "Flight Details",
+			"Type":          "Flight",
+			"Details":       flightBooking.Details,
+			"Amount":        flightBooking.Amount,
+			"Currency":      flightBooking.Currency,
+			"PaymentStatus": string(flightBooking.PaymentStatus),
+			"Email":         flightBooking.Customer.Email,
+			"Phone":         "-",
+			"Seat":          "-",
+			"DepartureDate": flightBooking.BookingDate.Format("01/02/2006"),
+			"ArrivalDate":   flightBooking.BookingDate.Format("01/02/2006"),
+			"ReferenceID":   flightBooking.ID,
+			"RefundAmount":  0.0,
+		}
+
+		c.Set("Content-Type", "text/html")
+		return tmpl.Execute(c, data)
+	}
+
+	// Try to find in car bookings
+	carBooking, err := h.carBookingRepo.FindByID(ctx, bookingID)
+	if err == nil && carBooking != nil {
+		tmpl, err := template.New("view-booking-frag.html").Funcs(funcMap).ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "view-booking-frag.html")))
+		if err != nil {
+			return c.Status(500).SendString("Error loading template: " + err.Error())
+		}
+
+		data := fiber.Map{
+			"BookingID":     carBooking.BookingID,
+			"FlightName":    "Car Booking",
+			"Type":          "Car",
+			"Details":       carBooking.Details,
+			"Amount":        carBooking.Amount,
+			"Currency":      carBooking.Currency,
+			"PaymentStatus": string(carBooking.PaymentStatus),
+			"Email":         carBooking.Customer.Email,
+			"Phone":         "-",
+			"Seat":          "-",
+			"DepartureDate": carBooking.BookingDate.Format("01/02/2006"),
+			"ArrivalDate":   carBooking.BookingDate.Format("01/02/2006"),
+			"ReferenceID":   carBooking.ID,
+			"RefundAmount":  0.0,
+		}
+
+		c.Set("Content-Type", "text/html")
+		return tmpl.Execute(c, data)
+	}
+
+	// Try to find in hotel bookings
+	hotelBooking, err := h.hotelBookingRepo.FindByID(ctx, bookingID)
+	if err == nil && hotelBooking != nil {
+		tmpl, err := template.New("view-booking-frag.html").Funcs(funcMap).ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "view-booking-frag.html")))
+		if err != nil {
+			return c.Status(500).SendString("Error loading template: " + err.Error())
+		}
+
+		data := fiber.Map{
+			"BookingID":     hotelBooking.BookingID,
+			"FlightName":    "Hotel Booking",
+			"Type":          "Hotel",
+			"Details":       hotelBooking.Details,
+			"Amount":        hotelBooking.Amount,
+			"Currency":      hotelBooking.Currency,
+			"PaymentStatus": string(hotelBooking.PaymentStatus),
+			"Email":         hotelBooking.Customer.Email,
+			"Phone":         "-",
+			"Seat":          "-",
+			"DepartureDate": hotelBooking.BookingDate.Format("01/02/2006"),
+			"ArrivalDate":   hotelBooking.BookingDate.Format("01/02/2006"),
+			"ReferenceID":   hotelBooking.ID,
+			"RefundAmount":  0.0,
+		}
+
+		c.Set("Content-Type", "text/html")
+		return tmpl.Execute(c, data)
+	}
+
+	return c.Status(404).SendString("Booking not found")
+}
+
+// UpdateBookingEmail updates the email address for a booking
+func (h *AdminHandler) UpdateBookingEmail(c *fiber.Ctx) error {
+	ctx := c.Context()
+
+	type UpdateEmailRequest struct {
+		BookingID string `json:"booking_id"`
+		Email     string `json:"email"`
+	}
+
+	var req UpdateEmailRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"message": "Invalid request body",
+		})
+	}
+
+	if req.BookingID == "" || req.Email == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"message": "Booking ID and email are required",
+		})
+	}
+
+	// Try to update in flight bookings
+	flightBooking, err := h.flightBookingRepo.FindByID(ctx, req.BookingID)
+	if err == nil && flightBooking != nil {
+		if err := h.flightBookingRepo.UpdateCustomerEmail(ctx, req.BookingID, req.Email); err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"success": false,
+				"message": "Failed to update email",
+			})
+		}
+		return c.JSON(fiber.Map{
+			"success": true,
+			"message": "Email updated successfully",
+		})
+	}
+
+	// Try to update in car bookings
+	carBooking, err := h.carBookingRepo.FindByID(ctx, req.BookingID)
+	if err == nil && carBooking != nil {
+		if err := h.carBookingRepo.UpdateCustomerEmail(ctx, req.BookingID, req.Email); err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"success": false,
+				"message": "Failed to update email",
+			})
+		}
+		return c.JSON(fiber.Map{
+			"success": true,
+			"message": "Email updated successfully",
+		})
+	}
+
+	// Try to update in hotel bookings
+	hotelBooking, err := h.hotelBookingRepo.FindByID(ctx, req.BookingID)
+	if err == nil && hotelBooking != nil {
+		if err := h.hotelBookingRepo.UpdateCustomerEmail(ctx, req.BookingID, req.Email); err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"success": false,
+				"message": "Failed to update email",
+			})
+		}
+		return c.JSON(fiber.Map{
+			"success": true,
+			"message": "Email updated successfully",
+		})
+	}
+
+	return c.Status(404).JSON(fiber.Map{
+		"success": false,
+		"message": "Booking not found",
+	})
+}

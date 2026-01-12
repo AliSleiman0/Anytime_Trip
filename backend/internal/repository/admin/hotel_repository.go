@@ -135,6 +135,17 @@ func (r *HotelRepository) UpdateCost(ctx context.Context, id string, cost float6
 	return err
 }
 
+// UpdateProfitPercent updates the profit percent for a hotel provider
+func (r *HotelRepository) UpdateProfitPercent(ctx context.Context, id string, profitPercent float64) error {
+	update := bson.M{
+		"$set": bson.M{
+			"profit_percent": profitPercent,
+		},
+	}
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	return err
+}
+
 // Delete deletes a hotel
 func (r *HotelRepository) Delete(ctx context.Context, id string) error {
 	_, err := r.collection.DeleteOne(ctx, bson.M{"_id": id})
