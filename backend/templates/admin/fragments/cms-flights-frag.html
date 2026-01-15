@@ -285,12 +285,8 @@
                 <div class="grid grid-cols-4 gap-3 text-sm font-medium text-[#1d1d1d]">
                   <label class="flex items-center gap-2"><input type="radio" name="status" value="active" class="h-4 w-4" ${currentFlightData?.status === 'active' ? 'checked' : ''} /> Active</label>
                   <label class="flex items-center gap-2"><input type="radio" name="status" value="inactive" class="h-4 w-4" ${currentFlightData?.status === 'inactive' ? 'checked' : ''} /> Inactive</label>
-                  <label class="flex items-center gap-2"><input type="radio" name="status" value="refunded" class="h-4 w-4" /> Refunded</label>
-                  <label class="flex items-center gap-2"><input type="radio" name="status" value="failed" class="h-4 w-4" /> Failed</label>
-                  <label class="flex items-center gap-2"><input type="radio" name="status" value="pending" class="h-4 w-4" /> Pending</label>
-                  <label class="flex items-center gap-2"><input type="radio" name="status" value="confirmed" class="h-4 w-4" /> Confirmed</label>
                   <label class="flex items-center gap-2"><input type="radio" name="status" value="cancelled" class="h-4 w-4" ${currentFlightData?.status === 'cancelled' ? 'checked' : ''} /> Cancelled</label>
-                  <label class="flex items-center gap-2"><input type="radio" name="status" value="paid" class="h-4 w-4" /> Paid</label>
+                  <label class="flex items-center gap-2"><input type="radio" name="status" value="delayed" class="h-4 w-4" ${currentFlightData?.status === 'delayed' ? 'checked' : ''} /> Delayed</label>
                 </div>
               </div>
 
@@ -434,6 +430,21 @@
           if (confirmBtn) {
             confirmBtn.addEventListener("click", async () => {
               const newCost = parseFloat(document.getElementById('topup-value')?.value) || 0;
+
+              // Normalize values to satisfy backend validation
+              const allowedStatuses = ['active', 'inactive', 'cancelled', 'delayed'];
+              const statusValue = allowedStatuses.includes((row.dataset.status || '').toLowerCase())
+                ? row.dataset.status.toLowerCase()
+                : 'active';
+
+              const safeCost = Math.max(newCost, 0.01);
+              const profitValue = parseFloat(row.dataset.profitPercent);
+              const safeProfit = Math.min(Math.max(isNaN(profitValue) ? 0 : profitValue, 0), 100);
+
+              const departureLocation = row.dataset.departureLocation || 'Unknown';
+              const arrivalLocation = row.dataset.arrivalLocation || 'Unknown';
+              const flightNumber = row.dataset.flightNumber || 'Unknown';
+              const flightCode = row.dataset.flightCode || 'unknown';
               
               try {
                 const response = await fetch('/admin/cms/flights/update', {
@@ -443,11 +454,13 @@
                   },
                   body: JSON.stringify({
                     id: flightId,
-                    flight_number: row.dataset.flightNumber,
-                    flight_id: row.dataset.flightCode,
-                    status: row.dataset.status,
-                    cost: newCost,
-                    profit_percent: parseFloat(row.dataset.profitPercent) || 0
+                    flight_number: flightNumber,
+                    flight_id: flightCode,
+                    status: statusValue,
+                    cost: safeCost,
+                    profit_percent: safeProfit,
+                    departure_location: departureLocation,
+                    arrival_location: arrivalLocation
                   })
                 });
 

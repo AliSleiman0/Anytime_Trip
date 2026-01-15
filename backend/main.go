@@ -43,6 +43,8 @@ func main() {
 	carBookingRepository := apprepo.NewCarBookingRepository(dbConn.DB)
 	flightBookingRepository := apprepo.NewFlightBookingRepository(dbConn.DB)
 	hotelBookingRepository := apprepo.NewHotelBookingRepository(dbConn.DB)
+	// Support ticket repository
+	supportTicketRepository := apprepo.NewSupportTicketRepository(dbConn.DB)
 	flightRepository := adminrepo.NewFlightRepository(dbConn.DB)
 	carRepository := adminrepo.NewCarRepository(dbConn.DB)
 	hotelRepository := adminrepo.NewHotelRepository(dbConn.DB)
@@ -53,7 +55,7 @@ func main() {
 
 	// Initialize handlers
 	appHandler := apphandlers.NewAppHandler(appRepository)
-	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, flightRepository, carRepository, hotelRepository, cfg.JWTSecret)
+	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, supportTicketRepository, flightRepository, carRepository, hotelRepository, cfg.JWTSecret)
 	superAdminHandler := superadminhandlers.NewSuperAdminHandler(superAdminRepository)
 
 	// Initialize Fiber app

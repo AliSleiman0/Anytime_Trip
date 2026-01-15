@@ -88,6 +88,13 @@ func SetupRoutes(router fiber.Router, handler *admin.AdminHandler, jwtSecret str
 	protected.Get("/view-service-frag", handler.GetViewServiceFragment)
 	protected.Post("/update-service-profit", handler.UpdateServiceProviderProfitPercent)
 
+	// Support ticket routes
+	protected.Get("/support/tickets", handler.GetAllTickets)
+	protected.Get("/tickets/:id", handler.GetTicketDetail)
+	protected.Post("/support/tickets/:id/reply", handler.ReplyToTicket)
+	protected.Patch("/support/tickets/:id/status", handler.UpdateTicketStatus)
+	protected.Patch("/support/tickets/:id/priority", handler.UpdateTicketPriority)
+
 	// CMS mutations
 	protected.Post("/cms/flights/update", handler.UpdateFlight)
 	protected.Delete("/cms/flights/delete", handler.DeleteFlight)
