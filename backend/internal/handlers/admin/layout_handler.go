@@ -4,6 +4,8 @@ import (
 	"html/template"
 	"path/filepath"
 
+	"Anytime_Travel/backend/internal/middleware"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -15,7 +17,17 @@ func (h *AdminHandler) ServePage(c *fiber.Ctx) error {
 
 // GetSidebar serves the sidebar HTML fragment for HTMX partial loads
 func (h *AdminHandler) GetSidebar(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "sidebar.html")))
+	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "sidebar.html")))
+	if err != nil {
+		return c.Status(500).SendString("Error loading template")
+	}
+
+	data := fiber.Map{
+		"IsSuperAdmin": middleware.IsSuperAdmin(c),
+	}
+
+	c.Set("Content-Type", "text/html")
+	return tmpl.Execute(c, data)
 }
 
 // GetHeader serves the header HTML fragment for HTMX partial loads

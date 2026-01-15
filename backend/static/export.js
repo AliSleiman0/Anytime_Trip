@@ -169,7 +169,8 @@ function exportToPDF(tables) {
     }
 
     // Save PDF
-    doc.save(`export_${new Date().getTime()}.pdf`);
+    const pdfFilename = getExportFilename('pdf');
+    doc.save(pdfFilename);
     Swal.fire('Success', 'Data exported to PDF successfully!', 'success');
   } catch (error) {
     console.error('PDF export error:', error);
@@ -229,9 +230,10 @@ function exportToCSV(tables) {
 // Export to Excel
 function exportToExcel(tables) {
   // Placeholder for Excel export logic
-  Swal.fire('Success', 'Exporting to Excel...', 'success');
-  // You can use libraries like XLSX (SheetJS) here
-  console.log('Excel export initiated');
+  const xlsxFilename = getExportFilename('xlsx');
+  // TODO: implement actual Excel export (XLSX) here and save using xlsxFilename
+  Swal.fire('Success', `Exporting to Excel (${xlsxFilename})...`, 'success');
+  console.log('Excel export initiated, filename:', xlsxFilename);
 }
 
 // Download CSV file
@@ -240,7 +242,7 @@ function downloadCSV(csv) {
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `export_${new Date().getTime()}.csv`;
+  a.download = getExportFilename('csv');
   document.body.appendChild(a);
   a.click();
   window.URL.revokeObjectURL(url);
@@ -297,3 +299,27 @@ if (document.readyState === 'loading') {
 
 // Also check after a delay to ensure all scripts loaded
 setTimeout(checkLibraries, 2000);
+
+// Build an export filename using the current page/title and today's date
+function getExportFilename(format) {
+  // Try to get a meaningful title from the header or document
+  let base = 'export';
+  try{
+    const h1 = document.querySelector('header h1');
+    if(h1 && h1.textContent.trim()) base = h1.textContent.trim();
+    else if(document.title && document.title.trim()) base = document.title.trim();
+  }catch(e){/* ignore */}
+
+  // Format date as M-D-YYYY
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  const year = now.getFullYear();
+  const datePart = `${month}-${day}-${year}`;
+
+  // Build filename and sanitize characters not allowed in filenames
+  const raw = `${base} export ${datePart}`;
+  const safe = raw.replace(/[\\/:*?"<>|]/g, '-');
+  const ext = (format || 'csv').toLowerCase();
+  return `${safe}.${ext}`;
+}
