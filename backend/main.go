@@ -50,6 +50,9 @@ func main() {
 	flightRepository := adminrepo.NewFlightRepository(dbConn.DB)
 	carRepository := adminrepo.NewCarRepository(dbConn.DB)
 	hotelRepository := adminrepo.NewHotelRepository(dbConn.DB)
+	bannerRepository := adminrepo.NewBannerRepository(dbConn.DB)
+	travelRepository := adminrepo.NewTravelRepository(dbConn.DB)
+	popularRepository := adminrepo.NewPopularRepository(dbConn.DB)
 
 	if err := ensureDefaultAdmin(adminRepository); err != nil {
 		log.Printf("warning: unable to seed default admin user: %v", err)
@@ -57,7 +60,7 @@ func main() {
 
 	// Initialize handlers
 	appHandler := apphandlers.NewAppHandler(appRepository)
-	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, supportTicketRepository, paymentRepository, flightRepository, carRepository, hotelRepository, cfg.JWTSecret)
+	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, supportTicketRepository, paymentRepository, flightRepository, carRepository, hotelRepository, bannerRepository, travelRepository, popularRepository, cfg.JWTSecret)
 	superAdminHandler := superadminhandlers.NewSuperAdminHandler(superAdminRepository)
 
 	// Initialize Fiber app

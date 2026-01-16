@@ -71,8 +71,17 @@ func SetupRoutes(router fiber.Router, handler *admin.AdminHandler, jwtSecret str
 	protected.Get("/cms/hotels-frag", handler.GetCMSHotelsFragment)
 	protected.Get("/cms/homepage/travel", handler.CMSTravelExperience)
 	protected.Get("/cms/homepage/travel-frag", handler.GetCMSTravelExperienceFragment)
+	// CMS travel upload/save endpoints
+	protected.Post("/cms/homepage/travel/upload", handler.UploadTravelImage)
+	protected.Post("/cms/homepage/travel/save", handler.SaveHomePage)
 	protected.Get("/cms/homepage/banner", handler.CMSBanner)
 	protected.Get("/cms/homepage/banner-frag", handler.GetCMSBannerFragment)
+	// CMS banner upload/save endpoints
+	protected.Post("/cms/homepage/banner/upload", handler.UploadBannerImage)
+	protected.Post("/cms/homepage/banner/save", handler.SaveBannerImage)
+	// CMS popular upload/save endpoints
+	protected.Post("/cms/homepage/popular/upload", handler.UploadPopularImage)
+	protected.Post("/cms/homepage/popular/save", handler.SavePopular)
 	protected.Get("/cms/homepage/popular", handler.CMSPopularLocations)
 	protected.Get("/cms/homepage/popular-frag", handler.GetCMSPopularLocationsFragment)
 	protected.Get("/sidebar", handler.GetSidebar)
@@ -100,4 +109,5 @@ func SetupRoutes(router fiber.Router, handler *admin.AdminHandler, jwtSecret str
 	protected.Delete("/cms/flights/delete", handler.DeleteFlight)
 	protected.Post("/cms/cars/update", handler.UpdateCar)
 	protected.Delete("/cms/cars/delete", handler.DeleteCar)
+
 }

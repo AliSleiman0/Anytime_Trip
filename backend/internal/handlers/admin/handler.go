@@ -108,10 +108,13 @@ type AdminHandler struct {
 	flightRepo            *adminrepo.FlightRepository
 	carRepo               *adminrepo.CarRepository
 	hotelRepo             *adminrepo.HotelRepository
+	travelRepo            *adminrepo.TravelRepository
+	bannerRepo            *adminrepo.BannerRepository
+	popularRepo           *adminrepo.PopularRepository
 	jwtSecret             string
 }
 
-func NewAdminHandler(adminRepo *adminrepo.AdminRepository, notificationPrefsRepo *adminrepo.NotificationPreferencesRepository, userRepo *app.UserRepository, carBookingRepo *app.CarBookingRepository, flightBookingRepo *app.FlightBookingRepository, hotelBookingRepo *app.HotelBookingRepository, supportTicketRepo *app.SupportTicketRepository, paymentRepo *app.PaymentRepository, flightRepo *adminrepo.FlightRepository, carRepo *adminrepo.CarRepository, hotelRepo *adminrepo.HotelRepository, jwtSecret string) *AdminHandler {
+func NewAdminHandler(adminRepo *adminrepo.AdminRepository, notificationPrefsRepo *adminrepo.NotificationPreferencesRepository, userRepo *app.UserRepository, carBookingRepo *app.CarBookingRepository, flightBookingRepo *app.FlightBookingRepository, hotelBookingRepo *app.HotelBookingRepository, supportTicketRepo *app.SupportTicketRepository, paymentRepo *app.PaymentRepository, flightRepo *adminrepo.FlightRepository, carRepo *adminrepo.CarRepository, hotelRepo *adminrepo.HotelRepository, bannerRepo *adminrepo.BannerRepository, travelRepo *adminrepo.TravelRepository, popularRepo *adminrepo.PopularRepository, jwtSecret string) *AdminHandler {
 	return &AdminHandler{
 		adminRepo:             adminRepo,
 		notificationPrefsRepo: notificationPrefsRepo,
@@ -124,6 +127,9 @@ func NewAdminHandler(adminRepo *adminrepo.AdminRepository, notificationPrefsRepo
 		flightRepo:            flightRepo,
 		carRepo:               carRepo,
 		hotelRepo:             hotelRepo,
+		bannerRepo:            bannerRepo,
+		travelRepo:            travelRepo,
+		popularRepo:           popularRepo,
 		jwtSecret:             jwtSecret,
 	}
 }

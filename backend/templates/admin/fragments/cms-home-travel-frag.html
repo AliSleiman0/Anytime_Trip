@@ -1,3 +1,7 @@
+<!-- CMS Homepage Travel Experience Fragment -->
+<!-- This template manages the travel experience section of the homepage CMS -->
+<!-- It supports uploading and managing three separate images with titles -->
+<!-- Uses HTMX for dynamic uploads and saves, SweetAlert2 for notifications -->
 <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
   <main>
     <div
@@ -7,6 +11,9 @@
     ></div>
 
     <div class="px-4 pt-2 pb-6 bg-[#E6F0F9] min-h-screen">
+      <!-- Main form containing all travel experience data -->
+      <form id="travel-form">
+      <!-- Navigation tabs for different homepage sections -->
       <div class="flex justify-between">
         <div class="flex gap-8 text-sm font-semibold text-[#336891] mb-6">
           <a href="/admin/cms/homepage/travel" class="relative pb-2"
@@ -25,13 +32,21 @@
           >
         </div>
 
+        <!-- Action buttons: Save & Publish (with HTMX save handler) and Add Travel Section -->
         <div class="flex gap-2">
           <button
             class="bg-[#336891] w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
+            hx-post="/admin/cms/homepage/travel/save"
+            hx-encoding="multipart/form-data"
+            hx-include="#travel-form"
+            hx-swap="none"
+            hx-on="htmx:afterRequest: if (event.detail.xhr && event.detail.xhr.status === 200) { Swal.fire({icon: 'success', title: 'Saved & Published', timer: 1500, showConfirmButton: false}); setTimeout(function() { window.location.reload(); }, 1500); } else { Swal.fire({icon: 'error', title: 'Save failed'}) }"
           >
             Save & Publish
           </button>
           <button
+            id="add-travel-section-btn"
+            type="button"
             class="bg-[#336891] w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
           >
             <svg
@@ -50,13 +65,23 @@
           </button>
         </div>
       </div>
-
-      <div>
-        <div class="p-6">
+      <div id="travel-sections" data-next-index="{{.NextIndex}}">
+        {{range .Sections}}
+        <div class="p-6 relative" data-travel-index="{{.Index}}">
+          <button
+            type="button"
+            class="absolute top-4 right-4 text-[#1f3242] hover:text-red-600 transition"
+            data-delete-index="{{.Index}}"
+            aria-label="Delete section {{.Index}}"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
           <div
             class="flex items-center mb-4 text-sm font-semibold text-[#1f3242]"
           >
-            <span class="text-xl font-semibold mr-5">Image 1</span>
+            <span class="text-xl font-semibold mr-5">Image {{.Index}}</span>
             <svg
               width="21"
               height="15"
@@ -89,9 +114,16 @@
                 >
                 <input
                   type="file"
-                  name="travel_image_1"
+                  name="travel_image_{{.Index}}"
                   accept="image/*"
                   class="hidden"
+                  hx-post="/admin/cms/homepage/travel/upload"
+                  hx-encoding="multipart/form-data"
+                  hx-trigger="change"
+                  hx-target="#current-image-{{.Index}}"
+                  hx-swap="outerHTML"
+                  hx-headers='{"X-Image-Slot":"{{.Index}}"}'
+                  hx-on="htmx:afterSwap: Swal.fire({icon: 'success', title: 'Upload complete', timer: 1500, showConfirmButton: false})"
                 />
               </label>
             </div>
@@ -101,175 +133,161 @@
                 Current Image
               </p>
               <div
-                class="w-full h-48 rounded-xl overflow-hidden border border-[#CAD9EA] bg-[#e7eef6] flex items-center justify-center"
+                id="current-image-{{.Index}}"
+                class="w-full h-48 rounded-xl overflow-hidden border border-[#CAD9EA] bg-[#e7eef6] relative"
+                style="background-image:url('{{if .Item.ImagePath}}{{.Item.ImagePath}}{{else}}/static/admin/images/paris.webp{{end}}'); background-size:cover; background-position:center;"
               >
-                <img src="/static/admin/images/paris.webp" alt="" />
+              {{if .Item.ImagePath}}
+              <div class="absolute top-2 right-2 bg-green-500 rounded-full p-1.5">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              {{end}}
               </div>
             </div>
           </div>
 
+          <input type="hidden" name="travel_image_path_{{.Index}}" value="{{.Item.ImagePath}}" />
+
           <div class="mt-6">
             <label
               class="block text-xl font-semibold text-[#1f3242] mb-2"
-              for="travel_image_title_1"
-              >Image 1 Title</label
+              for="travel_image_title_{{.Index}}"
+              >Image {{.Index}} Title</label
             >
             <input
-              id="travel_image_title_1"
-              name="travel_image_title_1"
+              id="travel_image_title_{{.Index}}"
+              name="travel_image_title_{{.Index}}"
               type="text"
+              value="{{.Item.Title}}"
               placeholder="Enter Title"
               class="w-full h-11 bg-[#E6F0F9] border-[#336891] rounded-lg border bg-none px-3 text-sm text-[#1f3242] placeholder:text-[#8AA6BD] focus:outline-none focus:ring-2 focus:ring-[#336891]"
             />
           </div>
         </div>
+        {{end}}
       </div>
-      <div>
-        <div class="p-6">
-          <div
-            class="flex items-center mb-4 text-sm font-semibold text-[#1f3242]"
+      <!-- End of travel form -->
+      </form>
+
+      <template id="travel-section-template">
+        <div class="p-6 relative" data-travel-index="__INDEX__">
+          <button
+            type="button"
+            class="absolute top-4 right-4 text-[#1f3242] hover:text-red-600 transition"
+            data-delete-index="__INDEX__"
+            aria-label="Delete section __INDEX__"
           >
-            <span class="text-xl font-semibold mr-5">Image 1</span>
-            <svg
-              width="21"
-              height="15"
-              viewBox="0 0 21 15"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M4.8241 10.8535C3.39615 9.62663 2.37622 8.22431 1.89774 7.5C2.37622 6.77569 3.39615 5.37336 4.8241 4.14651C6.29837 2.87986 8.11873 1.875 10.1665 1.875C12.2143 1.875 14.0347 2.87986 15.5089 4.14651C16.9369 5.37336 17.9568 6.77569 18.4353 7.5C17.9568 8.22431 16.9369 9.62663 15.5089 10.8535C14.0347 12.1202 12.2143 13.125 10.1665 13.125C8.11873 13.125 6.29837 12.1202 4.8241 10.8535ZM10.1665 0C7.49229 0 5.25132 1.30746 3.60221 2.72433C1.94711 4.14634 0.79857 5.754 0.288851 6.53419C-0.0962836 7.12359 -0.0962836 7.87641 0.288851 8.46581C0.79857 9.246 1.94711 10.8536 3.60221 12.2757C5.25132 13.6926 7.49229 15 10.1665 15C12.8407 15 15.0817 13.6926 16.7308 12.2757C18.3859 10.8536 19.5344 9.246 20.0442 8.46581C20.4293 7.87641 20.4293 7.12359 20.0442 6.53419C19.5344 5.754 18.3859 4.14634 16.7308 2.72433C15.0817 1.30746 12.8407 0 10.1665 0ZM8.29147 7.5C8.29147 6.46444 9.131 5.625 10.1665 5.625C11.202 5.625 12.0415 6.46444 12.0415 7.5C12.0415 8.53556 11.202 9.375 10.1665 9.375C9.131 9.375 8.29147 8.53556 8.29147 7.5ZM10.1665 3.75C8.09544 3.75 6.41651 5.42893 6.41651 7.5C6.41651 9.57103 8.09544 11.25 10.1665 11.25C12.2376 11.25 13.9165 9.57103 13.9165 7.5C13.9165 5.42893 12.2376 3.75 10.1665 3.75Z"
-                fill="#336891"
-              />
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div class="flex items-center mb-4 text-sm font-semibold text-[#1f3242]">
+            <span class="text-xl font-semibold mr-5">Image __INDEX__</span>
+            <svg width="21" height="15" viewBox="0 0 21 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M4.8241 10.8535C3.39615 9.62663 2.37622 8.22431 1.89774 7.5C2.37622 6.77569 3.39615 5.37336 4.8241 4.14651C6.29837 2.87986 8.11873 1.875 10.1665 1.875C12.2143 1.875 14.0347 2.87986 15.5089 4.14651C16.9369 5.37336 17.9568 6.77569 18.4353 7.5C17.9568 8.22431 16.9369 9.62663 15.5089 10.8535C14.0347 12.1202 12.2143 13.125 10.1665 13.125C8.11873 13.125 6.29837 12.1202 4.8241 10.8535ZM10.1665 0C7.49229 0 5.25132 1.30746 3.60221 2.72433C1.94711 4.14634 0.79857 5.754 0.288851 6.53419C-0.0962836 7.12359 -0.0962836 7.87641 0.288851 8.46581C0.79857 9.246 1.94711 10.8536 3.60221 12.2757C5.25132 13.6926 7.49229 15 10.1665 15C12.8407 15 15.0817 13.6926 16.7308 12.2757C18.3859 10.8536 19.5344 9.246 20.0442 8.46581C20.4293 7.87641 20.4293 7.12359 20.0442 6.53419C19.5344 5.754 18.3859 4.14634 16.7308 2.72433C15.0817 1.30746 12.8407 0 10.1665 0ZM8.29147 7.5C8.29147 6.46444 9.131 5.625 10.1665 5.625C11.202 5.625 12.0415 6.46444 12.0415 7.5C12.0415 8.53556 11.202 9.375 10.1665 9.375C9.131 9.375 8.29147 8.53556 8.29147 7.5ZM10.1665 3.75C8.09544 3.75 6.41651 5.42893 6.41651 7.5C6.41651 9.57103 8.09544 11.25 10.1665 11.25C12.2376 11.25 13.9165 9.57103 13.9165 7.5C13.9165 5.42893 12.2376 3.75 10.1665 3.75Z" fill="#336891"/>
             </svg>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <p class="text-xs font-semibold text-[#1f3242] mb-2">
-                Upload Image
-              </p>
-              <label
-                class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#8DB2D9] bg-[#F5FAFF] text-[#5A7A96] h-48 cursor-pointer transition hover:border-[#336891]"
-              >
+              <p class="text-xs font-semibold text-[#1f3242] mb-2">Upload Image</p>
+              <label class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#8DB2D9] bg-[#F5FAFF] text-[#5A7A96] h-48 cursor-pointer transition hover:border-[#336891]">
                 <span class="text-sm font-semibold">Drag &amp; Drop</span>
                 <span class="text-xs">Or</span>
-                <span
-                  class="px-4 py-1.5 bg-[#336891] text-white text-xs rounded-full"
-                  >Upload</span
-                >
+                <span class="px-4 py-1.5 bg-[#336891] text-white text-xs rounded-full">Upload</span>
                 <input
                   type="file"
-                  name="travel_image_1"
+                  name="travel_image___INDEX__"
                   accept="image/*"
                   class="hidden"
+                  hx-post="/admin/cms/homepage/travel/upload"
+                  hx-encoding="multipart/form-data"
+                  hx-trigger="change"
+                  hx-target="#current-image-__INDEX__"
+                  hx-swap="outerHTML"
+                  hx-headers='{"X-Image-Slot":"__INDEX__"}'
+                  hx-on="htmx:afterSwap: Swal.fire({icon: 'success', title: 'Upload complete', timer: 1500, showConfirmButton: false})"
                 />
               </label>
             </div>
 
             <div>
-              <p class="text-xs font-semibold text-[#1f3242] mb-2">
-                Current Image
-              </p>
+              <p class="text-xs font-semibold text-[#1f3242] mb-2">Current Image</p>
               <div
-                class="w-full h-48 rounded-xl overflow-hidden border border-[#CAD9EA] bg-[#e7eef6] flex items-center justify-center"
-              >
-                <img src="/static/admin/images/paris.webp" alt="" />
-              </div>
+                id="current-image-__INDEX__"
+                class="w-full h-48 rounded-xl overflow-hidden border border-[#CAD9EA] bg-[#e7eef6] relative"
+                style="background-image:url('/static/admin/images/paris.webp'); background-size:cover; background-position:center;"
+              ></div>
             </div>
           </div>
 
+          <input type="hidden" name="travel_image_path___INDEX__" value="" />
+
           <div class="mt-6">
-            <label
-              class="block text-xl font-semibold text-[#1f3242] mb-2"
-              for="travel_image_title_1"
-              >Image 1 Title</label
-            >
+            <label class="block text-xl font-semibold text-[#1f3242] mb-2" for="travel_image_title___INDEX__">Image __INDEX__ Title</label>
             <input
-              id="travel_image_title_1"
-              name="travel_image_title_1"
+              id="travel_image_title___INDEX__"
+              name="travel_image_title___INDEX__"
               type="text"
+              value=""
               placeholder="Enter Title"
               class="w-full h-11 bg-[#E6F0F9] border-[#336891] rounded-lg border bg-none px-3 text-sm text-[#1f3242] placeholder:text-[#8AA6BD] focus:outline-none focus:ring-2 focus:ring-[#336891]"
             />
           </div>
         </div>
-      </div>
-      <div>
-        <div class="p-6">
-          <div
-            class="flex items-center mb-4 text-sm font-semibold text-[#1f3242]"
-          >
-            <span class="text-xl font-semibold mr-5">Image 1</span>
-            <svg
-              width="21"
-              height="15"
-              viewBox="0 0 21 15"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M4.8241 10.8535C3.39615 9.62663 2.37622 8.22431 1.89774 7.5C2.37622 6.77569 3.39615 5.37336 4.8241 4.14651C6.29837 2.87986 8.11873 1.875 10.1665 1.875C12.2143 1.875 14.0347 2.87986 15.5089 4.14651C16.9369 5.37336 17.9568 6.77569 18.4353 7.5C17.9568 8.22431 16.9369 9.62663 15.5089 10.8535C14.0347 12.1202 12.2143 13.125 10.1665 13.125C8.11873 13.125 6.29837 12.1202 4.8241 10.8535ZM10.1665 0C7.49229 0 5.25132 1.30746 3.60221 2.72433C1.94711 4.14634 0.79857 5.754 0.288851 6.53419C-0.0962836 7.12359 -0.0962836 7.87641 0.288851 8.46581C0.79857 9.246 1.94711 10.8536 3.60221 12.2757C5.25132 13.6926 7.49229 15 10.1665 15C12.8407 15 15.0817 13.6926 16.7308 12.2757C18.3859 10.8536 19.5344 9.246 20.0442 8.46581C20.4293 7.87641 20.4293 7.12359 20.0442 6.53419C19.5344 5.754 18.3859 4.14634 16.7308 2.72433C15.0817 1.30746 12.8407 0 10.1665 0ZM8.29147 7.5C8.29147 6.46444 9.131 5.625 10.1665 5.625C11.202 5.625 12.0415 6.46444 12.0415 7.5C12.0415 8.53556 11.202 9.375 10.1665 9.375C9.131 9.375 8.29147 8.53556 8.29147 7.5ZM10.1665 3.75C8.09544 3.75 6.41651 5.42893 6.41651 7.5C6.41651 9.57103 8.09544 11.25 10.1665 11.25C12.2376 11.25 13.9165 9.57103 13.9165 7.5C13.9165 5.42893 12.2376 3.75 10.1665 3.75Z"
-                fill="#336891"
-              />
-            </svg>
-          </div>
+      </template>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <p class="text-xs font-semibold text-[#1f3242] mb-2">
-                Upload Image
-              </p>
-              <label
-                class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#8DB2D9] bg-[#F5FAFF] text-[#5A7A96] h-48 cursor-pointer transition hover:border-[#336891]"
-              >
-                <span class="text-sm font-semibold">Drag &amp; Drop</span>
-                <span class="text-xs">Or</span>
-                <span
-                  class="px-4 py-1.5 bg-[#336891] text-white text-xs rounded-full"
-                  >Upload</span
-                >
-                <input
-                  type="file"
-                  name="travel_image_1"
-                  accept="image/*"
-                  class="hidden"
-                />
-              </label>
-            </div>
+      <script>
+        (function() {
+          var addBtn = document.getElementById('add-travel-section-btn');
+          var container = document.getElementById('travel-sections');
+          var tpl = document.getElementById('travel-section-template');
+          var form = document.getElementById('travel-form');
+          if (!addBtn || !container || !tpl) return;
 
-            <div>
-              <p class="text-xs font-semibold text-[#1f3242] mb-2">
-                Current Image
-              </p>
-              <div
-                class="w-full h-48 rounded-xl overflow-hidden border border-[#CAD9EA] bg-[#e7eef6] flex items-center justify-center"
-              >
-                <img src="/static/admin/images/paris.webp" alt="" />
-              </div>
-            </div>
-          </div>
+          var nextIndex = parseInt(container.getAttribute('data-next-index') || '4', 10);
 
-          <div class="mt-6">
-            <label
-              class="block text-xl font-semibold text-[#1f3242] mb-2"
-              for="travel_image_title_1"
-              >Image 1 Title</label
-            >
-            <input
-              id="travel_image_title_1"
-              name="travel_image_title_1"
-              type="text"
-              placeholder="Enter Title"
-              class="w-full h-11 bg-[#E6F0F9] border-[#336891] rounded-lg border bg-none px-3 text-sm text-[#1f3242] placeholder:text-[#8AA6BD] focus:outline-none focus:ring-2 focus:ring-[#336891]"
-            />
-          </div>
-        </div>
-      </div>
+          function bindDeleteButtons(scope) {
+            var buttons = (scope || document).querySelectorAll('[data-delete-index]');
+            buttons.forEach(function(btn) {
+              btn.onclick = function() {
+                var idx = btn.getAttribute('data-delete-index');
+                var section = btn.closest('[data-travel-index="' + idx + '"]');
+                if (section && section.parentNode) {
+                  section.parentNode.removeChild(section);
+                }
+                if (form && idx) {
+                  var existing = form.querySelector('input[name="travel_image_delete_' + idx + '"]');
+                  if (!existing) {
+                    var hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = 'travel_image_delete_' + idx;
+                    hidden.value = '1';
+                    form.appendChild(hidden);
+                  }
+                }
+              };
+            });
+          }
+
+          bindDeleteButtons(container);
+
+          addBtn.addEventListener('click', function() {
+            var html = tpl.innerHTML.replace(/__INDEX__/g, nextIndex);
+            var wrapper = document.createElement('div');
+            wrapper.innerHTML = html.trim();
+            var section = wrapper.firstElementChild;
+            if (section) {
+              container.appendChild(section);
+              bindDeleteButtons(section);
+              nextIndex += 1;
+              container.setAttribute('data-next-index', String(nextIndex));
+            }
+          });
+        })();
+      </script>
     </div>
   </main>
 </div>

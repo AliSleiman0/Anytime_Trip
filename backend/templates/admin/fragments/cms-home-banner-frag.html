@@ -7,101 +7,154 @@
     ></div>
 
     <div class="px-4 pt-2 pb-6 bg-[#E6F0F9] min-h-screen">
-        <div class="flex justify-between">
-      <div class="flex gap-8 text-sm font-semibold text-[#336891] mb-6">
-        <a href="/admin/cms/homepage/travel" class="pb-2 hover:text-[#1f3242]">Travel Experience Section</a>
-        <a href="/admin/cms/homepage/banner" class="relative pb-2">Banner
-          <span class="absolute left-0 right-0 -bottom-0.5 h-0.5 bg-[#336891]"></span>
-        </a>
-        <a href="/admin/cms/homepage/popular" class="pb-2 hover:text-[#1f3242]">Popular Locations</a>
-      </div>
-
-      <div class="flex gap-2">
-          <button
-            class="bg-[#336891] w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
-          >
-            Save & Publish
-          </button>
-          <button
-            class="bg-[#336891] w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M18 12.998H13V17.998C13 18.2633 12.8946 18.5176 12.7071 18.7052C12.5196 18.8927 12.2652 18.998 12 18.998C11.7348 18.998 11.4804 18.8927 11.2929 18.7052C11.1054 18.5176 11 18.2633 11 17.998V12.998H6C5.73478 12.998 5.48043 12.8927 5.29289 12.7052C5.10536 12.5176 5 12.2633 5 11.998C5 11.7328 5.10536 11.4785 5.29289 11.2909C5.48043 11.1034 5.73478 10.998 6 10.998H11V5.99805C11 5.73283 11.1054 5.47848 11.2929 5.29094C11.4804 5.1034 11.7348 4.99805 12 4.99805C12.2652 4.99805 12.5196 5.1034 12.7071 5.29094C12.8946 5.47848 13 5.73283 13 5.99805V10.998H18C18.2652 10.998 18.5196 11.1034 18.7071 11.2909C18.8946 11.4785 19 11.7328 19 11.998C19 12.2633 18.8946 12.5176 18.7071 12.7052C18.5196 12.8927 18.2652 12.998 18 12.998Z"
-                fill="white"
-              />
-            </svg>
-            Add Banner
-          </button>
-        </div></div>
-
-        <div class="p-6">
+      <!-- CMS Homepage Banner Fragment -->
+      <!-- Server-rendered template: iterates saved banners and supports HTMX uploads/saves -->
+      <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+        <main>
           <div
-            class="flex items-center mb-4 text-sm font-semibold text-[#1f3242]"
-          >
-            <span class="text-xl font-semibold mr-5">Image 1</span>
-            <svg
-              width="21"
-              height="15"
-              viewBox="0 0 21 15"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M4.8241 10.8535C3.39615 9.62663 2.37622 8.22431 1.89774 7.5C2.37622 6.77569 3.39615 5.37336 4.8241 4.14651C6.29837 2.87986 8.11873 1.875 10.1665 1.875C12.2143 1.875 14.0347 2.87986 15.5089 4.14651C16.9369 5.37336 17.9568 6.77569 18.4353 7.5C17.9568 8.22431 16.9369 9.62663 15.5089 10.8535C14.0347 12.1202 12.2143 13.125 10.1665 13.125C8.11873 13.125 6.29837 12.1202 4.8241 10.8535ZM10.1665 0C7.49229 0 5.25132 1.30746 3.60221 2.72433C1.94711 4.14634 0.79857 5.754 0.288851 6.53419C-0.0962836 7.12359 -0.0962836 7.87641 0.288851 8.46581C0.79857 9.246 1.94711 10.8536 3.60221 12.2757C5.25132 13.6926 7.49229 15 10.1665 15C12.8407 15 15.0817 13.6926 16.7308 12.2757C18.3859 10.8536 19.5344 9.246 20.0442 8.46581C20.4293 7.87641 20.4293 7.12359 20.0442 6.53419C19.5344 5.754 18.3859 4.14634 16.7308 2.72433C15.0817 1.30746 12.8407 0 10.1665 0ZM8.29147 7.5C8.29147 6.46444 9.131 5.625 10.1665 5.625C11.202 5.625 12.0415 6.46444 12.0415 7.5C12.0415 8.53556 11.202 9.375 10.1665 9.375C9.131 9.375 8.29147 8.53556 8.29147 7.5ZM10.1665 3.75C8.09544 3.75 6.41651 5.42893 6.41651 7.5C6.41651 9.57103 8.09544 11.25 10.1665 11.25C12.2376 11.25 13.9165 9.57103 13.9165 7.5C13.9165 5.42893 12.2376 3.75 10.1665 3.75Z"
-                fill="#336891"
-              />
-            </svg>
-          </div>
+            hx-get="/admin/header?title=Homepage Management&subtitle=Manage homepage content"
+            hx-trigger="load"
+            hx-swap="innerHTML"
+          ></div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <p class="text-xs font-semibold text-[#1f3242] mb-2">
-                Upload Image
-              </p>
-              <label
-                class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#8DB2D9] bg-[#F5FAFF] text-[#5A7A96] h-48 cursor-pointer transition hover:border-[#336891]"
-              >
-                <span class="text-sm font-semibold">Drag &amp; Drop</span>
-                <span class="text-xs">Or</span>
-                <span
-                  class="px-4 py-1.5 bg-[#336891] text-white text-xs rounded-full"
-                  >Upload</span
+          <div class="px-4 pt-2 pb-6 bg-[#E6F0F9] min-h-screen">
+            <form id="banner-form">
+            <div class="flex justify-between">
+              <div class="flex gap-8 text-sm font-semibold text-[#336891] mb-6">
+                <a href="/admin/cms/homepage/travel" class="pb-2 hover:text-[#1f3242]">Travel Experience Section</a>
+                <a href="/admin/cms/homepage/banner" class="relative pb-2">Banner
+                  <span class="absolute left-0 right-0 -bottom-0.5 h-0.5 bg-[#336891]"></span>
+                </a>
+                <a href="/admin/cms/homepage/popular" class="pb-2 hover:text-[#1f3242]">Popular Locations</a>
+              </div>
+
+              <div class="flex gap-2">
+                <button
+                  class="bg-[#336891] w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
+                  hx-post="/admin/cms/homepage/banner/save"
+                  hx-encoding="multipart/form-data"
+                  hx-include="#banner-form"
+                  hx-swap="none"
+                  hx-on="htmx:afterRequest: if (event.detail.xhr && event.detail.xhr.status === 200) { Swal.fire({icon: 'success', title: 'Saved & Published', timer: 1500, showConfirmButton: false}); setTimeout(function() { window.location.reload(); }, 1500); } else { Swal.fire({icon: 'error', title: 'Save failed'}) }"
                 >
-                <input
-                  type="file"
-                  name="travel_image_1"
-                  accept="image/*"
-                  class="hidden"
-                />
-              </label>
-            </div>
-
-            <div>
-              <p class="text-xs font-semibold text-[#1f3242] mb-2">
-                Current Image
-              </p>
-              <div
-                class="w-full h-48 rounded-xl overflow-hidden border border-[#CAD9EA] bg-[#e7eef6] flex items-center justify-center"
-              >
-                <img src="/static/admin/images/paris.webp" alt="" />
+                  Save & Publish
+                </button>
+                <button
+                  id="add-banner-section-btn"
+                  type="button"
+                  class="bg-[#336891] w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 12.998H13V17.998C13 18.2633 12.8946 18.5176 12.7071 18.7052C12.5196 18.8927 12.2652 18.998 12 18.998C11.7348 18.998 11.4804 18.8927 11.2929 18.7052C11.1054 18.5176 11 18.2633 11 17.998V12.998H6C5.73478 12.998 5.48043 12.8927 5.29289 12.7052C5.10536 12.5176 5 12.2633 5 11.998C5 11.7328 5.10536 11.4785 5.29289 11.2909C5.48043 11.1034 5.73478 10.998 6 10.998H11V5.99805C11 5.73283 11.1054 5.47848 11.2929 5.29094C11.4804 5.1034 11.7348 4.99805 12 4.99805C12.2652 4.99805 12.5196 5.1034 12.7071 5.29094C12.8946 5.47848 13 5.73283 13 5.99805V10.998H18C18.2652 10.998 18.5196 11.1034 18.7071 11.2909C18.8946 11.4785 19 11.7328 19 11.998C19 12.2633 18.8946 12.5176 18.7071 12.7052C18.5196 12.8927 18.2652 12.998 18 12.998Z" fill="white"/></svg>
+                  Add Banner
+                </button>
               </div>
             </div>
+
+            <div id="banner-sections" data-next-index="{{.NextIndex}}">
+              {{range .Sections}}
+              <div class="p-6 relative" data-banner-index="{{.Index}}">
+                <button type="button" class="absolute top-4 right-4 text-[#1f3242] hover:text-red-600 transition" data-delete-index="{{.Index}}" aria-label="Delete banner {{.Index}}">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+
+                <div class="flex items-center mb-4 text-sm font-semibold text-[#1f3242]"><span class="text-xl font-semibold mr-5">Image {{.Index}}</span>
+                  <svg width="21" height="15" viewBox="0 0 21 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.8241 10.8535C3.39615 9.62663 2.37622 8.22431 1.89774 7.5C2.37622 6.77569 3.39615 5.37336 4.8241 4.14651C6.29837 2.87986 8.11873 1.875 10.1665 1.875C12.2143 1.875 14.0347 2.87986 15.5089 4.14651C16.9369 5.37336 17.9568 6.77569 18.4353 7.5C17.9568 8.22431 16.9369 9.62663 15.5089 10.8535C14.0347 12.1202 12.2143 13.125 10.1665 13.125C8.11873 13.125 6.29837 12.1202 4.8241 10.8535ZM10.1665 0C7.49229 0 5.25132 1.30746 3.60221 2.72433C1.94711 4.14634 0.79857 5.754 0.288851 6.53419C-0.0962836 7.12359 -0.0962836 7.87641 0.288851 8.46581C0.79857 9.246 1.94711 10.8536 3.60221 12.2757C5.25132 13.6926 7.49229 15 10.1665 15C12.8407 15 15.0817 13.6926 16.7308 12.2757C18.3859 10.8536 19.5344 9.246 20.0442 8.46581C20.4293 7.87641 20.4293 7.12359 20.0442 6.53419C19.5344 5.754 18.3859 4.14634 16.7308 2.72433C15.0817 1.30746 12.8407 0 10.1665 0ZM8.29147 7.5C8.29147 6.46444 9.131 5.625 10.1665 5.625C11.202 5.625 12.0415 6.46444 12.0415 7.5C12.0415 8.53556 11.202 9.375 10.1665 9.375C9.131 9.375 8.29147 8.53556 8.29147 7.5ZM10.1665 3.75C8.09544 3.75 6.41651 5.42893 6.41651 7.5C6.41651 9.57103 8.09544 11.25 10.1665 11.25C12.2376 11.25 13.9165 9.57103 13.9165 7.5C13.9165 5.42893 12.2376 3.75 10.1665 3.75Z" fill="#336891"/></svg>
+                </div>
+
+                <div class="mb-4">
+                  <label class="text-xs font-semibold text-[#1f3242]">Title</label>
+                  <input type="text" name="banner_title_{{.Index}}" value="{{.Item.Title}}" class="w-full mt-2 p-2 rounded border" placeholder="Banner title" />
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <p class="text-xs font-semibold text-[#1f3242] mb-2">Upload Image</p>
+                    <label class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#8DB2D9] bg-[#F5FAFF] text-[#5A7A96] h-48 cursor-pointer transition hover:border-[#336891]">
+                      <span class="text-sm font-semibold">Drag &amp; Drop</span>
+                      <span class="text-xs">Or</span>
+                      <span class="px-4 py-1.5 bg-[#336891] text-white text-xs rounded-full">Upload</span>
+                      <input type="file" name="banner_image_{{.Index}}" accept="image/*" class="hidden" hx-post="/admin/cms/homepage/banner/upload" hx-encoding="multipart/form-data" hx-trigger="change" hx-target="#current-banner-{{.Index}}" hx-swap="outerHTML" hx-headers='{"X-Banner-Slot":"{{.Index}}"}' hx-on="htmx:afterSwap: Swal.fire({icon: 'success', title: 'Upload complete', timer: 1500, showConfirmButton: false})" />
+                    </label>
+                  </div>
+
+                  <div>
+                    <p class="text-xs font-semibold text-[#1f3242] mb-2">Current Image</p>
+                    <div id="current-banner-{{.Index}}" class="w-full h-48 rounded-xl overflow-hidden border border-[#CAD9EA] bg-[#e7eef6] relative" style="background-image:url('{{if .Item.ImagePath}}{{.Item.ImagePath}}{{else}}/static/admin/images/paris.webp{{end}}'); background-size:cover; background-position:center;">
+                      {{if .Item.ImagePath}}
+                      <div class="absolute top-2 right-2 bg-green-500 rounded-full p-1.5"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>
+                      {{end}}
+                    </div>
+                  </div>
+                </div>
+
+                <input type="hidden" name="banner_image_path_{{.Index}}" value="{{.Item.ImagePath}}" />
+              </div>
+              {{end}}
+            </div>
+            </form>
+
+            <template id="banner-section-template">
+              <!-- client-side template for new banner sections -->
+              <div class="p-6 relative" data-banner-index="__INDEX__">
+                <button type="button" class="absolute top-4 right-4 text-[#1f3242] hover:text-red-600 transition" data-delete-index="__INDEX__" aria-label="Delete banner __INDEX__"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                <div class="flex items-center mb-4 text-sm font-semibold text-[#1f3242]"><span class="text-xl font-semibold mr-5">Image __INDEX__</span></div>
+                <div class="mb-4"><label class="text-xs font-semibold text-[#1f3242]">Title</label><input type="text" name="banner_title___INDEX__" class="w-full mt-2 p-2 rounded border" placeholder="Banner title" /></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><p class="text-xs font-semibold text-[#1f3242] mb-2">Upload Image</p><label class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#8DB2D9] bg-[#F5FAFF] text-[#5A7A96] h-48 cursor-pointer transition hover:border-[#336891]"><span class="text-sm font-semibold">Drag &amp; Drop</span><span class="text-xs">Or</span><span class="px-4 py-1.5 bg-[#336891] text-white text-xs rounded-full">Upload</span><input type="file" name="banner_image___INDEX__" accept="image/*" class="hidden" hx-post="/admin/cms/homepage/banner/upload" hx-encoding="multipart/form-data" hx-trigger="change" hx-target="#current-banner-__INDEX__" hx-swap="outerHTML" hx-headers='{"X-Banner-Slot":"__INDEX__"}' hx-on="htmx:afterSwap: Swal.fire({icon: 'success', title: 'Upload complete', timer: 1500, showConfirmButton: false})"/></label></div><div><p class="text-xs font-semibold text-[#1f3242] mb-2">Current Image</p><div id="current-banner-__INDEX__" class="w-full h-48 rounded-xl overflow-hidden border border-[#CAD9EA] bg-[#e7eef6] flex items-center justify-center" style="background-image:url('/static/admin/images/paris.webp'); background-size:cover; background-position:center;"></div></div></div>
+                <input type="hidden" name="banner_image_path___INDEX__" value="" />
+              </div>
+            </template>
+
+            <script>
+              (function() {
+                var addBtn = document.getElementById('add-banner-section-btn');
+                var container = document.getElementById('banner-sections');
+                var tpl = document.getElementById('banner-section-template');
+                var form = document.getElementById('banner-form');
+                if (!addBtn || !container || !tpl) return;
+
+                var nextIndex = parseInt(container.getAttribute('data-next-index') || '2', 10);
+
+                function bindDelete(scope) {
+                  var buttons = (scope || document).querySelectorAll('[data-delete-index]');
+                  buttons.forEach(function(btn) {
+                    btn.onclick = function() {
+                      var idx = btn.getAttribute('data-delete-index');
+                      var section = btn.closest('[data-banner-index="' + idx + '"]');
+                      if (section && section.parentNode) {
+                        section.parentNode.removeChild(section);
+                      }
+                      if (form && idx) {
+                        var existing = form.querySelector('input[name="banner_image_delete_' + idx + '"]');
+                        if (!existing) {
+                          var hidden = document.createElement('input');
+                          hidden.type = 'hidden';
+                          hidden.name = 'banner_image_delete_' + idx;
+                          hidden.value = '1';
+                          form.appendChild(hidden);
+                        }
+                      }
+                    };
+                  });
+                }
+
+                bindDelete(container);
+
+                addBtn.addEventListener('click', function() {
+                  var html = tpl.innerHTML.replace(/__INDEX__/g, nextIndex).replace(/___INDEX__/g, nextIndex);
+                  var wrapper = document.createElement('div');
+                  wrapper.innerHTML = html.trim();
+                  var section = wrapper.firstElementChild;
+                  if (section) {
+                    container.appendChild(section);
+                    bindDelete(section);
+                    nextIndex += 1;
+                    container.setAttribute('data-next-index', String(nextIndex));
+                  }
+                });
+              })();
+            </script>
+
           </div>
-
-          
-        </div>
+        </main>
       </div>
-
-      
-    </div>
-  </main>
-</div>
+              <p class="text-xs font-semibold text-[#1f3242] mb-2">Upload Image</p>
