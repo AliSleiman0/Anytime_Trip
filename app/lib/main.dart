@@ -3,5 +3,6 @@ import 'package:get/get.dart';
 import 'app/app.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }

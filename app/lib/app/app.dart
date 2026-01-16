@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'routes/app_pages.dart';
 import 'routes/app_routes.dart';
 import 'theme/app_theme.dart';
+import '../core/localization/app_translations.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -14,9 +15,13 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      initialRoute: AppRoutes.SPLASH,
+      initialRoute: AppRoutes.SPLASH_SCREEN,
       getPages: AppPages.pages,
       debugShowCheckedModeBanner: false,
+      // Localization setup
+      translations: AppTranslations(),
+      locale: const Locale('en', 'US'),
+      fallbackLocale: const Locale('en', 'US'),
     );
   }
 }
