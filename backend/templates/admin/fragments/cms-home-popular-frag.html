@@ -7,8 +7,8 @@
     ></div>
 
     <div class="px-4 pt-2 pb-6 bg-[#E6F0F9] min-h-screen">
-      <div class="flex justify-between">
-        <div class="flex gap-8 text-sm font-semibold text-[#336891] mb-6">
+        <div class="flex justify-between">
+          <div class="flex gap-8 text-sm font-semibold text-[#336891] mb-6">
           <a href="/admin/cms/homepage/travel" class="pb-2 hover:text-[#1f3242]"
             >Travel Experience Section</a
           >
@@ -22,14 +22,23 @@
             ></span>
           </a>
         </div>
-
+        
         <div class="flex gap-2">
           <button
+            id="save-popular-btn"
+            hx-post="/admin/cms/homepage/popular/save"
+            hx-trigger="click"
+            hx-encoding="multipart/form-data"
+            hx-include="#popular-sections"
+            hx-swap="none"
+            hx-on="htmx:afterRequest: if (event.detail.xhr && event.detail.xhr.status === 200) { if (typeof Swal !== 'undefined') { Swal.fire({icon: 'success', title: 'Saved & Published', timer: 1500, showConfirmButton: false}); setTimeout(function() { window.location.reload(); }, 1500); } else { window.location.reload(); } } else { if (typeof Swal !== 'undefined') { Swal.fire({icon: 'error', title: 'Save failed'}); } else { alert('Save failed'); } }"
             class="bg-[#336891] w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
           >
             Save & Publish
           </button>
           <button
+            id="add-popular-section-btn"
+            type="button"
             class="bg-[#336891] w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
           >
             <svg
@@ -44,85 +53,144 @@
                 fill="white"
               />
             </svg>
-            Add Banner
+            Add Popular Location Section
           </button>
         </div>
       </div>
 
       <div class="p-6">
-        <div class="flex gap-6">
-          <div class="w-1/2">
-            <h3 class="font-semibold mb-2 text-xl">Image Title</h3>
-            <input
-              type="text"
-              class="w-full h-11 bg-[#E6F0F9] border-[#336891] rounded-lg border bg-none px-3 text-sm text-[#1f3242] placeholder:text-[#8AA6BD] focus:outline-none focus:ring-2 focus:ring-[#336891]"
-              placeholder="Enter image title"
-            />
-          </div>
-          <div class="w-1/2">
-            <h3 class="font-semibold mb-2 text-xl">Location</h3>
-            <input
-              type="text"
-              class="w-full h-11 bg-[#E6F0F9] border-[#336891] rounded-lg border bg-none px-3 text-sm text-[#1f3242] placeholder:text-[#8AA6BD] focus:outline-none focus:ring-2 focus:ring-[#336891]"
-              placeholder="Enter location"
-            />
-          </div>
-        </div>
+        <div id="popular-sections" data-next-index="{{.NextIndex}}">
+          {{range .Sections}}
+          <div class="popular-section" data-index="{{.Index}}">
+            <div class="flex gap-6">
+              <div class="w-1/2">
+                <h3 class="font-semibold mb-2 text-xl">Image Title</h3>
+                <input
+                  type="text"
+                  name="popular_title_{{.Index}}"
+                  value="{{.Item.Title}}"
+                  class="w-full h-11 bg-[#E6F0F9] border-[#336891] rounded-lg border bg-none px-3 text-sm text-[#1f3242] placeholder:text-[#8AA6BD] focus:outline-none focus:ring-2 focus:ring-[#336891]"
+                  placeholder="Enter image title"
+                />
+              </div>
+              <div class="w-1/2">
+                <h3 class="font-semibold mb-2 text-xl">Location</h3>
+                <input
+                  type="text"
+                  name="popular_location_{{.Index}}"
+                  value="{{.Item.Location}}"
+                  class="w-full h-11 bg-[#E6F0F9] border-[#336891] rounded-lg border bg-none px-3 text-sm text-[#1f3242] placeholder:text-[#8AA6BD] focus:outline-none focus:ring-2 focus:ring-[#336891]"
+                  placeholder="Enter location"
+                />
+              </div>
+            </div>
 
-        <div
-          class="flex items-center my-4 text-sm font-semibold text-[#1f3242]"
-        >
-          <span class="text-xl font-semibold mr-5">Image 1</span>
-          <svg
-            width="21"
-            height="15"
-            viewBox="0 0 21 15"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M4.8241 10.8535C3.39615 9.62663 2.37622 8.22431 1.89774 7.5C2.37622 6.77569 3.39615 5.37336 4.8241 4.14651C6.29837 2.87986 8.11873 1.875 10.1665 1.875C12.2143 1.875 14.0347 2.87986 15.5089 4.14651C16.9369 5.37336 17.9568 6.77569 18.4353 7.5C17.9568 8.22431 16.9369 9.62663 15.5089 10.8535C14.0347 12.1202 12.2143 13.125 10.1665 13.125C8.11873 13.125 6.29837 12.1202 4.8241 10.8535ZM10.1665 0C7.49229 0 5.25132 1.30746 3.60221 2.72433C1.94711 4.14634 0.79857 5.754 0.288851 6.53419C-0.0962836 7.12359 -0.0962836 7.87641 0.288851 8.46581C0.79857 9.246 1.94711 10.8536 3.60221 12.2757C5.25132 13.6926 7.49229 15 10.1665 15C12.8407 15 15.0817 13.6926 16.7308 12.2757C18.3859 10.8536 19.5344 9.246 20.0442 8.46581C20.4293 7.87641 20.4293 7.12359 20.0442 6.53419C19.5344 5.754 18.3859 4.14634 16.7308 2.72433C15.0817 1.30746 12.8407 0 10.1665 0ZM8.29147 7.5C8.29147 6.46444 9.131 5.625 10.1665 5.625C11.202 5.625 12.0415 6.46444 12.0415 7.5C12.0415 8.53556 11.202 9.375 10.1665 9.375C9.131 9.375 8.29147 8.53556 8.29147 7.5ZM10.1665 3.75C8.09544 3.75 6.41651 5.42893 6.41651 7.5C6.41651 9.57103 8.09544 11.25 10.1665 11.25C12.2376 11.25 13.9165 9.57103 13.9165 7.5C13.9165 5.42893 12.2376 3.75 10.1665 3.75Z"
-              fill="#336891"
-            />
-          </svg>
-        </div>
+            <div class="flex items-center my-4 text-sm font-semibold text-[#1f3242]">
+              <span class="text-xl font-semibold mr-5">Image {{.Index}}</span>
+              <button type="button" class="ml-auto text-red-600 remove-popular-btn">Remove</button>
+            </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <p class="text-xs font-semibold text-[#1f3242] mb-2">
-              Upload Image
-            </p>
-            <label
-              class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#8DB2D9] bg-[#F5FAFF] text-[#5A7A96] h-48 cursor-pointer transition hover:border-[#336891]"
-            >
-              <span class="text-sm font-semibold">Drag &amp; Drop</span>
-              <span class="text-xs">Or</span>
-              <span
-                class="px-4 py-1.5 bg-[#336891] text-white text-xs rounded-full"
-                >Upload</span
-              >
-              <input
-                type="file"
-                name="travel_image_1"
-                accept="image/*"
-                class="hidden"
-              />
-            </label>
-          </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <p class="text-xs font-semibold text-[#1f3242] mb-2">Upload Image</p>
+                <label
+                  class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#8DB2D9] bg-[#F5FAFF] text-[#5A7A96] h-48 cursor-pointer transition hover:border-[#336891]"
+                >
+                  <span class="text-sm font-semibold">Drag &amp; Drop</span>
+                  <span class="text-xs">Or</span>
+                  <span class="px-4 py-1.5 bg-[#336891] text-white text-xs rounded-full">Upload</span>
+                  <input
+                    type="file"
+                    name="popular_image_{{.Index}}"
+                    accept="image/*"
+                    class="hidden popular-file-input"
+                    hx-post="/admin/cms/homepage/popular/upload"
+                    hx-encoding="multipart/form-data"
+                    hx-vals='{"popular-slot":"{{.Index}}"}'
+                    hx-target="#current-popular-{{.Index}}"
+                    hx-swap="outerHTML"
+                  />
+                </label>
+              </div>
 
-          <div>
-            <p class="text-xs font-semibold text-[#1f3242] mb-2">
-              Current Image
-            </p>
-            <div
-              class="w-full h-48 rounded-xl overflow-hidden border border-[#CAD9EA] bg-[#e7eef6] flex items-center justify-center"
-            >
-              <img src="/static/admin/images/paris.webp" alt="" />
+              <div>
+                <p class="text-xs font-semibold text-[#1f3242] mb-2">Current Image</p>
+                <div id="current-popular-{{.Index}}" class="w-full h-48 rounded-xl overflow-hidden border border-[#CAD9EA] bg-[#e7eef6] relative" style="background-image:url('{{if .Item.ImagePath}}{{.Item.ImagePath}}{{else}}/static/admin/images/paris.webp{{end}}'); background-size:cover; background-position:center;">
+                  {{if .Item.ImagePath}}
+                    <div class="absolute top-2 right-2 bg-green-500 rounded-full p-1.5"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg></div>
+                    <input type="hidden" name="popular_image_path_{{.Index}}" value="{{.Item.ImagePath}}" />
+                  {{else}}
+                    <input type="hidden" name="popular_image_path_{{.Index}}" value="" />
+                  {{end}}
+                </div>
+              </div>
             </div>
           </div>
+          {{end}}
         </div>
+
+        <template id="popular-section-template">
+          <div class="popular-section" data-index="%%INDEX%%">
+            <div class="flex gap-6">
+              <div class="w-1/2">
+                <h3 class="font-semibold mb-2 text-xl">Image Title</h3>
+                <input type="text" name="popular_title_%%INDEX%%" class="w-full h-11 bg-[#E6F0F9] border-[#336891] rounded-lg border bg-none px-3 text-sm text-[#1f3242]" placeholder="Enter image title" />
+              </div>
+              <div class="w-1/2">
+                <h3 class="font-semibold mb-2 text-xl">Location</h3>
+                <input type="text" name="popular_location_%%INDEX%%" class="w-full h-11 bg-[#E6F0F9] border-[#336891] rounded-lg border bg-none px-3 text-sm text-[#1f3242]" placeholder="Enter location" />
+              </div>
+            </div>
+            <div class="flex items-center my-4 text-sm font-semibold text-[#1f3242]"><span class="text-xl font-semibold mr-5">Image %%INDEX%%</span><button type="button" class="ml-auto text-red-600 remove-popular-btn">Remove</button></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <p class="text-xs font-semibold text-[#1f3242] mb-2">Upload Image</p>
+                <label class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#8DB2D9] bg-[#F5FAFF] text-[#5A7A96] h-48 cursor-pointer transition hover:border-[#336891]">
+                  <span class="text-sm font-semibold">Drag &amp; Drop</span>
+                  <span class="text-xs">Or</span>
+                  <span class="px-4 py-1.5 bg-[#336891] text-white text-xs rounded-full">Upload</span>
+                  <input type="file" name="popular_image_%%INDEX%%" accept="image/*" class="hidden popular-file-input" hx-post="/admin/cms/homepage/popular/upload" hx-encoding="multipart/form-data" hx-vals='{"popular-slot":"%%INDEX%%"}' hx-target="#current-popular-%%INDEX%%" hx-swap="outerHTML" />
+                </label>
+              </div>
+              <div>
+                <p class="text-xs font-semibold text-[#1f3242] mb-2">Current Image</p>
+                <div id="current-popular-%%INDEX%%" class="w-full h-48 rounded-xl overflow-hidden border border-[#CAD9EA] bg-[#e7eef6] relative" style="background-image:url('/static/admin/images/paris.webp'); background-size:cover; background-position:center;">
+                  <input type="hidden" name="popular_image_path_%%INDEX%%" value="" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <script>
+          (function(){
+            const container = document.getElementById('popular-sections');
+            const tpl = document.getElementById('popular-section-template').innerHTML;
+            // read initial next index from DOM data attribute to avoid raw template tokens inside JS
+            let nextIndex = parseInt(container.getAttribute('data-next-index')) || 2;
+
+            const addBtn = document.getElementById('add-popular-section-btn');
+            if (addBtn) {
+              addBtn.addEventListener('click', function(){
+                const html = tpl.replace(/%%INDEX%%/g, nextIndex);
+                const tmp = document.createElement('div'); tmp.innerHTML = html;
+                container.appendChild(tmp.firstElementChild);
+                nextIndex++;
+              });
+            }
+
+            document.addEventListener('click', function(e){
+              if(e.target && e.target.classList.contains('remove-popular-btn')){
+                const sec = e.target.closest('.popular-section');
+                if(!sec) return;
+                const idx = sec.getAttribute('data-index');
+                const del = document.createElement('input'); del.type='hidden'; del.name = 'popular_image_delete_'+idx; del.value='on';
+                sec.appendChild(del);
+                sec.remove();
+              }
+            });
+          })();
+        </script>
       </div>
     </div>
   </main>

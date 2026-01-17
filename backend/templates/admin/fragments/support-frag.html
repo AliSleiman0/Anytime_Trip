@@ -27,22 +27,35 @@
           Filter:
         </p>
         <select
+          id="filter-category"
           class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
-          name="status"
-          id="status"
+          name="category"
         >
-          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
-            Flights
-          </option>
+          <option class="text-[#9B9B9B]" value="">All Categories</option>
+          <option value="Flight">Flights</option>
+          <option value="Hotel">Hotels</option>
+          <option value="Car">Cars</option>
+          <option value="Other">Other</option>
         </select>
         <select
+          id="filter-status"
           class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           name="status"
-          id="status"
         >
-          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
-            All Statuses
-          </option>
+          <option class="text-[#9B9B9B]" value="">All Statuses</option>
+          <option value="Open">Open</option>
+          <option value="Pending">Pending</option>
+          <option value="Closed">Closed</option>
+        </select>
+        <select
+          id="filter-priority"
+          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          name="priority"
+        >
+          <option class="text-[#9B9B9B]" value="">All Priorities</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
         </select>
       </div>
     </div>
@@ -50,7 +63,8 @@
     <div class="p-4">
       <div class="grid grid-cols-3 gap-6 mb-6">
         <!-- Support Ticket Detail Card -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 max-w-2xl">
+         {{range .Tickets}}
+        <div onclick="showModal('ticket-modal-{{.ID.Hex}}')" role="button" tabindex="0" class="ticket-card bg-white rounded-2xl shadow-xl p-6 max-w-2xl cursor-pointer hover:shadow-2xl transition" data-category="{{.Category}}" data-status="{{.Status}}" data-priority="{{.Priority}}">
           <!-- Customer Info -->
           <div
             class="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200"
@@ -65,8 +79,8 @@
               />
             </div>
             <div class="flex-1">
-              <h3 class="text-lg font-bold text-gray-800">JohnMichaelDoe</h3>
-              <p class="text-sm text-gray-600">JohnMichael@email.com</p>
+              <h3 class="text-lg font-bold text-gray-800">{{.CustomerName}}</h3>
+              <p class="text-sm text-gray-600">{{.CustomerEmail}}</p>
             </div>
           </div>
 
@@ -75,23 +89,73 @@
             <div class="flex items-center gap-2">
               <span class="text-sm font-semibold text-gray-600">Type:</span>
               <span
-                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
-                >Complaint</span
+                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ticket-category"
+                >{{.Category}}</span
+              >
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold text-gray-600">Status:</span>
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ticket-status"
+                >{{.Status}}</span
               >
             </div>
             <div class="flex items-center gap-2">
               <span class="text-sm font-semibold text-gray-600"
                 >Ticket ID:</span
               >
-              <span class="text-sm font-semibold text-gray-800">12345</span>
+                <span class="text-sm font-semibold text-gray-800">{{if .TicketID}}{{.TicketID}}{{else}}{{printf "%.6s" .ID.Hex}}{{end}}</span>
             </div>
           </div>
 
           <!-- Message Content -->
           <div class="mb-6 p-4 bg-[#D9D9D9] rounded-lg">
             <p class="text-sm text-[#1D1D1D] leading-relaxed">
-              Room not cleaned properly...
+              {{.Subject}}
             </p>
+          </div>
+
+          <!-- Modal (hidden) -->
+          <div id="ticket-modal-{{.ID.Hex}}" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center bg-black/40 cursor-default">
+            <div onclick="event.stopPropagation()" class="modal-content bg-white w-11/12 md:w-2/3 lg:w-1/2 rounded-xl shadow-lg overflow-hidden cursor-default">
+              <div class="p-4 border-b flex items-center justify-between">
+                <div>
+                  <h3 class="text-lg font-bold">{{.CustomerName}} — {{if .TicketID}}{{.TicketID}}{{else}}{{printf "%.6s" .ID.Hex}}{{end}}</h3>
+                  <p class="text-sm text-gray-500">{{.CustomerEmail}}</p>
+                </div>
+                <button onclick="event.stopPropagation(); hideModal('ticket-modal-{{.ID.Hex}}')" class="text-gray-600">Close</button>
+              </div>
+              <div class="p-4 max-h-[60vh] overflow-y-auto">
+                <div class="mb-4">
+                  <h4 class="font-semibold">Subject</h4>
+                  <p class="text-sm text-gray-800">{{.Subject}}</p>
+                </div>
+                <div class="mb-4">
+                  <h4 class="font-semibold">Description</h4>
+                  <div class="p-3 bg-gray-100 rounded">{{.Description}}</div>
+                </div>
+
+                <div class="mb-4">
+                  <h4 class="font-semibold">Conversation</h4>
+                  <div class="space-y-3 replies">
+                    {{range .Replies}}
+                      <div class="p-3 rounded-lg max-w-[80%] {{if .IsAdmin}}ml-auto bg-blue-50 text-right{{else}}bg-gray-50 text-left{{end}}">
+                        <div class="text-xs text-gray-500 mb-1">{{if .IsAdmin}}{{.AdminName}} (Admin){{else}}Customer{{end}} — {{.CreatedAt.Format "Jan 02, 2006 15:04"}}</div>
+                        <div class="text-sm">{{.Message}}</div>
+                      </div>
+                    {{else}}
+                      <div class="text-sm text-gray-500">No replies yet.</div>
+                    {{end}}
+                  </div>
+                </div>
+              </div>
+              <div class="p-4 border-t bg-gray-50">
+                <form onsubmit="event.preventDefault(); event.stopPropagation(); submitReply(this, 'ticket-modal-{{.ID.Hex}}');" action="/admin/support/tickets/{{if .TicketID}}{{.TicketID}}{{else}}{{.ID.Hex}}{{end}}/reply" method="post" class="flex gap-2">
+                  <input name="message" required placeholder="Write a reply..." class="flex-1 px-3 py-2 rounded border" />
+                  <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Send</button>
+                </form>
+              </div>
+            </div>
           </div>
 
           <!-- Reply Input -->
@@ -119,357 +183,150 @@
             </button>
           </div>
         </div>
-        <!-- Support Ticket Detail Card -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 max-w-2xl">
-          <!-- Customer Info -->
-          <div
-            class="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200"
-          >
-            <div
-              class="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
-            >
-              <img
-                src="/static/admin/images/pp1.jpg"
-                alt=""
-                class="rounded-full"
-              />
-            </div>
-            <div class="flex-1">
-              <h3 class="text-lg font-bold text-gray-800">JohnMichaelDoe</h3>
-              <p class="text-sm text-gray-600">JohnMichael@email.com</p>
-            </div>
-          </div>
-
-          <!-- Ticket Info -->
-          <div class="flex items-center justify-between gap-4 mb-6">
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold text-gray-600">Type:</span>
-              <span
-                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
-                >Complaint</span
-              >
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold text-gray-600"
-                >Ticket ID:</span
-              >
-              <span class="text-sm font-semibold text-gray-800">12345</span>
-            </div>
-          </div>
-
-          <!-- Message Content -->
-          <div class="mb-6 p-4 bg-[#D9D9D9] rounded-lg">
-            <p class="text-sm text-[#1D1D1D] leading-relaxed">
-              Room not cleaned properly...
-            </p>
-          </div>
-
-          <!-- Reply Input -->
-          <div class="flex items-end gap-3 bg-[#D9D9D9] rounded-xl">
-            <input
-              type="text"
-              placeholder="Send reply..."
-              class="flex-1 h-12 bg-[#D9D9D9] rounded-lg px-4 text-sm text-[#1D1D1D] placeholder:text-[#1D1D1D]"
-            />
-            <button
-              class="py-3 rounded-lg hover:bg-[#1D1D1D]/20 transition font-semibold text-sm"
-            >
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 22 22"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4.03333 17.8063C3.72778 17.9286 3.4375 17.9017 3.1625 17.7257C2.8875 17.5497 2.75 17.2939 2.75 16.9584V12.8334L10.0833 11.0001L2.75 9.16675V5.04175C2.75 4.70564 2.8875 4.44989 3.1625 4.2745C3.4375 4.09911 3.72778 4.07222 4.03333 4.19383L18.15 10.1522C18.5319 10.3202 18.7229 10.6029 18.7229 11.0001C18.7229 11.3973 18.5319 11.6799 18.15 11.848L4.03333 17.8063Z"
-                  fill="#1D1D1D"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-        <!-- Support Ticket Detail Card -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 max-w-2xl">
-          <!-- Customer Info -->
-          <div
-            class="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200"
-          >
-            <div
-              class="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
-            >
-              <img
-                src="/static/admin/images/pp1.jpg"
-                alt=""
-                class="rounded-full"
-              />
-            </div>
-            <div class="flex-1">
-              <h3 class="text-lg font-bold text-gray-800">JohnMichaelDoe</h3>
-              <p class="text-sm text-gray-600">JohnMichael@email.com</p>
-            </div>
-          </div>
-
-          <!-- Ticket Info -->
-          <div class="flex items-center justify-between gap-4 mb-6">
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold text-gray-600">Type:</span>
-              <span
-                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
-                >Complaint</span
-              >
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold text-gray-600"
-                >Ticket ID:</span
-              >
-              <span class="text-sm font-semibold text-gray-800">12345</span>
-            </div>
-          </div>
-
-          <!-- Message Content -->
-          <div class="mb-6 p-4 bg-[#D9D9D9] rounded-lg">
-            <p class="text-sm text-[#1D1D1D] leading-relaxed">
-              Room not cleaned properly...
-            </p>
-          </div>
-
-          <!-- Reply Input -->
-          <div class="flex items-end gap-3 bg-[#D9D9D9] rounded-xl">
-            <input
-              type="text"
-              placeholder="Send reply..."
-              class="flex-1 h-12 bg-[#D9D9D9] rounded-lg px-4 text-sm text-[#1D1D1D] placeholder:text-[#1D1D1D]"
-            />
-            <button
-              class="py-3 rounded-lg hover:bg-[#1D1D1D]/20 transition font-semibold text-sm"
-            >
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 22 22"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4.03333 17.8063C3.72778 17.9286 3.4375 17.9017 3.1625 17.7257C2.8875 17.5497 2.75 17.2939 2.75 16.9584V12.8334L10.0833 11.0001L2.75 9.16675V5.04175C2.75 4.70564 2.8875 4.44989 3.1625 4.2745C3.4375 4.09911 3.72778 4.07222 4.03333 4.19383L18.15 10.1522C18.5319 10.3202 18.7229 10.6029 18.7229 11.0001C18.7229 11.3973 18.5319 11.6799 18.15 11.848L4.03333 17.8063Z"
-                  fill="#1D1D1D"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-        <!-- Support Ticket Detail Card -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 max-w-2xl">
-          <!-- Customer Info -->
-          <div
-            class="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200"
-          >
-            <div
-              class="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
-            >
-              <img
-                src="/static/admin/images/pp1.jpg"
-                alt=""
-                class="rounded-full"
-              />
-            </div>
-            <div class="flex-1">
-              <h3 class="text-lg font-bold text-gray-800">JohnMichaelDoe</h3>
-              <p class="text-sm text-gray-600">JohnMichael@email.com</p>
-            </div>
-          </div>
-
-          <!-- Ticket Info -->
-          <div class="flex items-center justify-between gap-4 mb-6">
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold text-gray-600">Type:</span>
-              <span
-                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
-                >Complaint</span
-              >
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold text-gray-600"
-                >Ticket ID:</span
-              >
-              <span class="text-sm font-semibold text-gray-800">12345</span>
-            </div>
-          </div>
-
-          <!-- Message Content -->
-          <div class="mb-6 p-4 bg-[#D9D9D9] rounded-lg">
-            <p class="text-sm text-[#1D1D1D] leading-relaxed">
-              Room not cleaned properly...
-            </p>
-          </div>
-
-          <!-- Reply Input -->
-          <div class="flex items-end gap-3 bg-[#D9D9D9] rounded-xl">
-            <input
-              type="text"
-              placeholder="Send reply..."
-              class="flex-1 h-12 bg-[#D9D9D9] rounded-lg px-4 text-sm text-[#1D1D1D] placeholder:text-[#1D1D1D]"
-            />
-            <button
-              class="py-3 rounded-lg hover:bg-[#1D1D1D]/20 transition font-semibold text-sm"
-            >
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 22 22"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4.03333 17.8063C3.72778 17.9286 3.4375 17.9017 3.1625 17.7257C2.8875 17.5497 2.75 17.2939 2.75 16.9584V12.8334L10.0833 11.0001L2.75 9.16675V5.04175C2.75 4.70564 2.8875 4.44989 3.1625 4.2745C3.4375 4.09911 3.72778 4.07222 4.03333 4.19383L18.15 10.1522C18.5319 10.3202 18.7229 10.6029 18.7229 11.0001C18.7229 11.3973 18.5319 11.6799 18.15 11.848L4.03333 17.8063Z"
-                  fill="#1D1D1D"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-        <!-- Support Ticket Detail Card -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 max-w-2xl">
-          <!-- Customer Info -->
-          <div
-            class="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200"
-          >
-            <div
-              class="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
-            >
-              <img
-                src="/static/admin/images/pp1.jpg"
-                alt=""
-                class="rounded-full"
-              />
-            </div>
-            <div class="flex-1">
-              <h3 class="text-lg font-bold text-gray-800">JohnMichaelDoe</h3>
-              <p class="text-sm text-gray-600">JohnMichael@email.com</p>
-            </div>
-          </div>
-
-          <!-- Ticket Info -->
-          <div class="flex items-center justify-between gap-4 mb-6">
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold text-gray-600">Type:</span>
-              <span
-                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
-                >Complaint</span
-              >
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold text-gray-600"
-                >Ticket ID:</span
-              >
-              <span class="text-sm font-semibold text-gray-800">12345</span>
-            </div>
-          </div>
-
-          <!-- Message Content -->
-          <div class="mb-6 p-4 bg-[#D9D9D9] rounded-lg">
-            <p class="text-sm text-[#1D1D1D] leading-relaxed">
-              Room not cleaned properly...
-            </p>
-          </div>
-
-          <!-- Reply Input -->
-          <div class="flex items-end gap-3 bg-[#D9D9D9] rounded-xl">
-            <input
-              type="text"
-              placeholder="Send reply..."
-              class="flex-1 h-12 bg-[#D9D9D9] rounded-lg px-4 text-sm text-[#1D1D1D] placeholder:text-[#1D1D1D]"
-            />
-            <button
-              class="py-3 rounded-lg hover:bg-[#1D1D1D]/20 transition font-semibold text-sm"
-            >
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 22 22"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4.03333 17.8063C3.72778 17.9286 3.4375 17.9017 3.1625 17.7257C2.8875 17.5497 2.75 17.2939 2.75 16.9584V12.8334L10.0833 11.0001L2.75 9.16675V5.04175C2.75 4.70564 2.8875 4.44989 3.1625 4.2745C3.4375 4.09911 3.72778 4.07222 4.03333 4.19383L18.15 10.1522C18.5319 10.3202 18.7229 10.6029 18.7229 11.0001C18.7229 11.3973 18.5319 11.6799 18.15 11.848L4.03333 17.8063Z"
-                  fill="#1D1D1D"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-        <!-- Support Ticket Detail Card -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 max-w-2xl">
-          <!-- Customer Info -->
-          <div
-            class="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200"
-          >
-            <div
-              class="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg"
-            >
-              <img
-                src="/static/admin/images/pp1.jpg"
-                alt=""
-                class="rounded-full"
-              />
-            </div>
-            <div class="flex-1">
-              <h3 class="text-lg font-bold text-gray-800">JohnMichaelDoe</h3>
-              <p class="text-sm text-gray-600">JohnMichael@email.com</p>
-            </div>
-          </div>
-
-          <!-- Ticket Info -->
-          <div class="flex items-center justify-between gap-4 mb-6">
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold text-gray-600">Type:</span>
-              <span
-                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"
-                >Complaint</span
-              >
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold text-gray-600"
-                >Ticket ID:</span
-              >
-              <span class="text-sm font-semibold text-gray-800">12345</span>
-            </div>
-          </div>
-
-          <!-- Message Content -->
-          <div class="mb-6 p-4 bg-[#D9D9D9] rounded-lg">
-            <p class="text-sm text-[#1D1D1D] leading-relaxed">
-              Room not cleaned properly...
-            </p>
-          </div>
-
-          <!-- Reply Input -->
-          <div class="flex items-end gap-3 bg-[#D9D9D9] rounded-xl">
-            <input
-              type="text"
-              placeholder="Send reply..."
-              class="flex-1 h-12 bg-[#D9D9D9] rounded-lg px-4 text-sm text-[#1D1D1D] placeholder:text-[#1D1D1D]"
-            />
-            <button
-              class="py-3 rounded-lg hover:bg-[#1D1D1D]/20 transition font-semibold text-sm"
-            >
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 22 22"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4.03333 17.8063C3.72778 17.9286 3.4375 17.9017 3.1625 17.7257C2.8875 17.5497 2.75 17.2939 2.75 16.9584V12.8334L10.0833 11.0001L2.75 9.16675V5.04175C2.75 4.70564 2.8875 4.44989 3.1625 4.2745C3.4375 4.09911 3.72778 4.07222 4.03333 4.19383L18.15 10.1522C18.5319 10.3202 18.7229 10.6029 18.7229 11.0001C18.7229 11.3973 18.5319 11.6799 18.15 11.848L4.03333 17.8063Z"
-                  fill="#1D1D1D"
-                />
-              </svg>
-            </button>
-          </div>
+        {{else}}
+        <p class="text-center text-gray-500">No support tickets found.</p>
+        {{end}}
+        
         </div>
       </div>
     </div>
   </main>
 </div>
+
+    <script>
+    function showModal(id){
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.classList.remove('hidden');
+      el.style.display = 'flex';
+    }
+    function hideModal(id){
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.classList.add('hidden');
+      el.style.display = 'none';
+    }
+    async function submitReply(form, modalId){
+      const action = form.action;
+      const data = new FormData(form);
+      try{
+        const resp = await fetch(action, {method: 'POST', body: data, credentials: 'same-origin'});
+        const j = await resp.json();
+        if(resp.ok && j.success){
+          // append reply to conversation without closing modal
+          const modal = document.getElementById(modalId);
+          if(modal){
+            const replies = modal.querySelector('.replies');
+            if(replies){
+              const message = data.get('message');
+              const now = new Date();
+              const wrapper = document.createElement('div');
+              wrapper.className = 'p-3 rounded-lg max-w-[80%] ml-auto bg-blue-50 text-right';
+              wrapper.innerHTML = `<div class="text-xs text-gray-500 mb-1">Admin — ${now.toLocaleString()}</div><div class="text-sm"></div>`;
+              wrapper.querySelector('div:last-child').textContent = message;
+              replies.appendChild(wrapper);
+              // scroll replies to bottom
+              replies.scrollTop = replies.scrollHeight;
+            }
+          }
+          // clear input
+          const input = form.querySelector('input[name="message"]');
+          if(input) input.value = '';
+          return true;
+        }
+        alert(j.error || 'Failed to send reply');
+      }catch(e){
+        alert('Network error');
+      }
+      return false;
+    }
+
+    // Close modal when clicking overlay (more reliable than inline handlers)
+    document.addEventListener('click', function(e){
+      try{
+        if(e.target && e.target.classList && e.target.classList.contains('modal-overlay')){
+          hideModal(e.target.id);
+        }
+      }catch(err){/* ignore */}
+    });
+
+    // Close open modals on Escape
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape'){
+        document.querySelectorAll('.modal-overlay').forEach(function(el){
+          if(el && !el.classList.contains('hidden')){
+            hideModal(el.id);
+          }
+        });
+      }
+    });
+
+    // Ticket filtering
+    function applyFilters(){
+      const cat = (document.getElementById('filter-category')?.value || '').toLowerCase();
+      const status = (document.getElementById('filter-status')?.value || '').toLowerCase();
+      const prio = (document.getElementById('filter-priority')?.value || '').toLowerCase();
+      document.querySelectorAll('.ticket-card').forEach(function(card){
+        try{
+          const c = (card.dataset.category || '').toLowerCase();
+          const s = (card.dataset.status || '').toLowerCase();
+          const p = (card.dataset.priority || '').toLowerCase();
+          const matchCategory = !cat || c === cat;
+          const matchStatus = !status || s === status;
+          const matchPriority = !prio || p === prio;
+          if(matchCategory && matchStatus && matchPriority){
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        }catch(e){ /* ignore */ }
+      });
+    }
+
+    ['filter-category','filter-status','filter-priority'].forEach(function(id){
+      const el = document.getElementById(id);
+      if(el) el.addEventListener('change', applyFilters);
+    });
+
+    // Run initial filter pass
+    applyFilters();
+
+    // Apply colors to category badges based on category
+    function applyCategoryColors(){
+      document.querySelectorAll('.ticket-card').forEach(function(card){
+        try{
+          const cat = (card.dataset.category || '').toLowerCase();
+          const span = card.querySelector('.ticket-category');
+          if(!span) return;
+          const base = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ticket-category';
+          let extra = ' bg-gray-100 text-gray-800';
+          if(cat === 'flight' || cat === 'flights') extra = ' bg-blue-100 text-blue-800';
+          else if(cat === 'hotel' || cat === 'hotels') extra = ' bg-green-100 text-green-800';
+          else if(cat === 'car' || cat === 'cars') extra = ' bg-yellow-100 text-yellow-800';
+          else if(cat === 'other') extra = ' bg-gray-100 text-gray-800';
+          span.className = base + extra;
+        }catch(e){/* ignore */}
+      });
+    }
+
+    applyCategoryColors();
+
+    // Apply colors to status badges based on status
+    function applyStatusColors(){
+      document.querySelectorAll('.ticket-card').forEach(function(card){
+        try{
+          const s = (card.dataset.status || '').toLowerCase();
+          const span = card.querySelector('.ticket-status');
+          if(!span) return;
+          const base = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ticket-status';
+          let extra = ' bg-gray-100 text-gray-800';
+          if(s === 'open') extra = ' bg-green-100 text-green-800';
+          else if(s === 'pending') extra = ' bg-yellow-100 text-yellow-800';
+          else if(s === 'closed') extra = ' bg-red-100 text-red-800';
+          span.className = base + extra;
+        }catch(e){/* ignore */}
+      });
+    }
+
+    applyStatusColors();
+    </script>

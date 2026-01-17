@@ -1,355 +1,135 @@
-package admin
+﻿package admin
 
 import (
-	"Anytime_Travel/backend/internal/repository/admin"
-	"html/template"
-	"path/filepath"
+	"fmt"
+	"math"
+	"strings"
 
-	"github.com/gofiber/fiber/v2"
+	adminrepo "Anytime_Travel/backend/internal/repository/admin"
+	"Anytime_Travel/backend/internal/repository/app"
 )
+
+// ServiceProviderView is a flattened view model for the table
+type ServiceProviderView struct {
+	ID            string
+	Name          string
+	Type          string
+	Status        string
+	Location      string
+	ContactEmail  string
+	Rating        float64
+	TotalBookings int64
+	Revenue       float64
+	ProviderType  string // flight | car | hotel for filtering
+}
+
+// ProviderDetailView is a simplified view model for the detail screen
+type ProviderDetailView struct {
+	ID                     string
+	Name                   string
+	Email                  string
+	Status                 string
+	StatusClass            string
+	Type                   string
+	Location               string
+	CreatedAt              string
+	Rating                 string
+	TotalBookings          int64
+	Revenue                string
+	ProviderType           string
+	ProfitShareDisplay     string
+	PhoneNumberDisplay     string
+	RevenueThisMonth       string
+	TotalBookingsThisMonth string
+}
+
+func statusBadgeClass(status string) string {
+	switch strings.ToLower(status) {
+	case "active":
+		return "bg-[#DCFCE7] text-[#008236]"
+	case "inactive":
+		return "bg-[#FFE4E6] text-[#DC2626]"
+	default:
+		return "bg-gray-200 text-gray-700"
+	}
+}
+
+// formatCurrency formats a float64 amount into a currency string with thousand separators.
+func formatCurrency(currency string, amount float64) string {
+	if currency == "" {
+		currency = "$"
+	}
+
+	value := int64(math.Round(amount))
+	s := fmt.Sprintf("%d", value)
+	n := len(s)
+	if n <= 3 {
+		return fmt.Sprintf("%s %s", currency, s)
+	}
+
+	var b strings.Builder
+	rem := n % 3
+	if rem == 0 {
+		rem = 3
+	}
+	b.WriteString(s[:rem])
+	for i := rem; i < n; i += 3 {
+		b.WriteString(",")
+		b.WriteString(s[i : i+3])
+	}
+
+	return fmt.Sprintf("%s %s", currency, b.String())
+}
+
+// formatProfitPercent prefers an explicit percent; if missing, derives from profit/revenue.
+func formatProfitPercent(percent float64, profit float64, revenue float64) string {
+	if percent > 0 {
+		return fmt.Sprintf("%.1f%%", percent)
+	}
+
+	if revenue > 0 && profit > 0 {
+		derived := (profit / revenue) * 100
+		return fmt.Sprintf("%.1f%%", derived)
+	}
+
+	return "--"
+}
 
 // AdminHandler handles admin-level requests
 type AdminHandler struct {
-	adminRepo *admin.AdminRepository
+	adminRepo             *adminrepo.AdminRepository
+	notificationPrefsRepo *adminrepo.NotificationPreferencesRepository
+	userRepo              *app.UserRepository
+	carBookingRepo        *app.CarBookingRepository
+	flightBookingRepo     *app.FlightBookingRepository
+	hotelBookingRepo      *app.HotelBookingRepository
+	supportTicketRepo     *app.SupportTicketRepository
+	paymentRepo           *app.PaymentRepository
+	flightRepo            *adminrepo.FlightRepository
+	carRepo               *adminrepo.CarRepository
+	hotelRepo             *adminrepo.HotelRepository
+	travelRepo            *adminrepo.TravelRepository
+	bannerRepo            *adminrepo.BannerRepository
+	popularRepo           *adminrepo.PopularRepository
+	jwtSecret             string
 }
 
-func NewAdminHandler(adminRepo *admin.AdminRepository) *AdminHandler {
+func NewAdminHandler(adminRepo *adminrepo.AdminRepository, notificationPrefsRepo *adminrepo.NotificationPreferencesRepository, userRepo *app.UserRepository, carBookingRepo *app.CarBookingRepository, flightBookingRepo *app.FlightBookingRepository, hotelBookingRepo *app.HotelBookingRepository, supportTicketRepo *app.SupportTicketRepository, paymentRepo *app.PaymentRepository, flightRepo *adminrepo.FlightRepository, carRepo *adminrepo.CarRepository, hotelRepo *adminrepo.HotelRepository, bannerRepo *adminrepo.BannerRepository, travelRepo *adminrepo.TravelRepository, popularRepo *adminrepo.PopularRepository, jwtSecret string) *AdminHandler {
 	return &AdminHandler{
-		adminRepo: adminRepo,
+		adminRepo:             adminRepo,
+		notificationPrefsRepo: notificationPrefsRepo,
+		userRepo:              userRepo,
+		carBookingRepo:        carBookingRepo,
+		flightBookingRepo:     flightBookingRepo,
+		hotelBookingRepo:      hotelBookingRepo,
+		supportTicketRepo:     supportTicketRepo,
+		paymentRepo:           paymentRepo,
+		flightRepo:            flightRepo,
+		carRepo:               carRepo,
+		hotelRepo:             hotelRepo,
+		bannerRepo:            bannerRepo,
+		travelRepo:            travelRepo,
+		popularRepo:           popularRepo,
+		jwtSecret:             jwtSecret,
 	}
-}
-
-func (h *AdminHandler) GetDashboard(c *fiber.Ctx) error {
-	// Parse and render dashboard template with data
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "dashboard.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Dashboard",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetDashboardFragment serves the dashboard fragment for HTMX partial loads
-func (h *AdminHandler) GetDashboardFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "dashboard-frag.html")))
-}
-
-// GetSidebar serves the sidebar HTML fragment for HTMX partial loads
-func (h *AdminHandler) GetSidebar(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "sidebar.html")))
-}
-
-// GetHeader serves the header HTML fragment for HTMX partial loads
-func (h *AdminHandler) GetHeader(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "header.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	title := c.Query("title", "Dashboard")
-	subtitle := c.Query("subtitle", "Here's what's happening today!")
-
-	data := fiber.Map{
-		"Title":    title,
-		"Subtitle": subtitle,
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-func (h *AdminHandler) GetBookings(c *fiber.Ctx) error {
-	// Parse and render bookings template with data
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "bookings.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Bookings",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-func (h *AdminHandler) GetPayments(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "payments.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Payments and Transactions",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetPaymentsFragment serves the payments fragment for HTMX partial loads
-func (h *AdminHandler) GetPaymentsFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "payments-frag.html")))
-}
-
-func (h *AdminHandler) GetReports(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "reports.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Reports and Analytics",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetReportsFragment serves the reports fragment for HTMX partial loads
-func (h *AdminHandler) GetReportsFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "reports-frag.html")))
-}
-
-// GetBookingsFragment serves the bookings fragment for HTMX partial loads
-func (h *AdminHandler) GetBookingsFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "bookings-frag.html")))
-}
-
-func (h *AdminHandler) ManageUsers(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "user.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Users",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetUsersFragment serves the user management fragment for HTMX partial loads
-func (h *AdminHandler) GetUsersFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "user-frag.html")))
-}
-
-func (h *AdminHandler) ViewUser(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "view-user.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "View User",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetViewUserFragment serves the view user fragment for HTMX partial loads
-func (h *AdminHandler) GetViewUserFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "view-user-frag.html")))
-}
-
-func (h *AdminHandler) ManageServiceProviders(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "service-provider.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Service Providers",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetServiceProvidersFragment serves the service provider management fragment for HTMX partial loads
-func (h *AdminHandler) GetServiceProvidersFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "service-provider-frag.html")))
-}
-
-func (h *AdminHandler) ViewService(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "view-service.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "View Service Provider",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetViewServiceFragment serves the view service provider fragment for HTMX partial loads
-func (h *AdminHandler) GetViewServiceFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "view-service-frag.html")))
-}
-
-func (h *AdminHandler) CMSFlights(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "cms-flights.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Flights Management",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetCMSFlightsFragment serves the flights management fragment for HTMX partial loads
-func (h *AdminHandler) GetCMSFlightsFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "cms-flights-frag.html")))
-}
-
-func (h *AdminHandler) CMSCars(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "cms-cars.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Cars Management",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetCMSCarsFragment serves the cars management fragment for HTMX partial loads
-func (h *AdminHandler) GetCMSCarsFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "cms-cars-frag.html")))
-}
-
-func (h *AdminHandler) CMSHotels(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "cms-hotels.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Hotels Management",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetCMSHotelsFragment serves the hotels management fragment for HTMX partial loads
-func (h *AdminHandler) GetCMSHotelsFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "cms-hotels-frag.html")))
-}
-
-func (h *AdminHandler) CMSTravelExperience(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "cms-home-travel.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Homepage - Travel Experience",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetCMSTravelExperienceFragment serves the travel experience fragment for HTMX partial loads
-func (h *AdminHandler) GetCMSTravelExperienceFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "cms-home-travel-frag.html")))
-}
-
-func (h *AdminHandler) CMSBanner(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "cms-home-banner.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Homepage - Banner",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetCMSBannerFragment serves the banner fragment for HTMX partial loads
-func (h *AdminHandler) GetCMSBannerFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "cms-home-banner-frag.html")))
-}
-
-func (h *AdminHandler) CMSPopularLocations(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "cms-home-popular.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Homepage - Popular Locations",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetCMSPopularLocationsFragment serves the popular locations fragment for HTMX partial loads
-func (h *AdminHandler) GetCMSPopularLocationsFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "cms-home-popular-frag.html")))
-}
-
-func (h *AdminHandler) GetSupport(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "support.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Customer Support",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetSupportFragment serves the support fragment for HTMX partial loads
-func (h *AdminHandler) GetSupportFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "support-frag.html")))
-}
-
-func (h *AdminHandler) GetSettings(c *fiber.Ctx) error {
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "full-page", "settings.html")))
-	if err != nil {
-		return c.Status(500).SendString("Error loading template")
-	}
-
-	data := fiber.Map{
-		"Title": "Settings",
-	}
-
-	c.Set("Content-Type", "text/html")
-	return tmpl.Execute(c, data)
-}
-
-// GetSettingsFragment serves the settings fragment for HTMX partial loads
-func (h *AdminHandler) GetSettingsFragment(c *fiber.Ctx) error {
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "admin", "fragments", "settings-frag.html")))
-}
-
-// ServePage returns the admin landing page HTML
-func (h *AdminHandler) ServePage(c *fiber.Ctx) error {
-	// Serve the shared admin HTML template located under backend/templates
-	return c.SendFile(filepath.Clean(filepath.Join("templates", "index.html")))
 }

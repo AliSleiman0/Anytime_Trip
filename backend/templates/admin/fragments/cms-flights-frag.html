@@ -1,3 +1,20 @@
+<style>
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #336891;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2a5573;
+  }
+</style>
+
 <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
   <main class="">
     <!-- header -->
@@ -55,380 +72,99 @@
 
     <!-- Flights management Table -->
     <div class="px-4">
-      <div class="rounded-t-2xl overflow-hidden">
-        <table class="w-full text-sm">
-          <thead class="bg-[#336891] text-white">
-            <tr>
-              <th class="px-2 py-3 text-center font-semibold">Number</th>
-              <th class="px-2 py-3 text-center font-semibold">Airline</th>
-              <th class="px-2 py-3 text-center font-semibold">Status</th>
-              <th class="px-2 py-3 text-center font-semibold">Departure</th>
-              <th class="px-2 py-3 text-center font-semibold">Arrival</th>
-              <th class="px-2 py-3 text-center font-semibold">Top up</th>
-              <th class="px-2 py-3 text-center font-semibold">Cabin</th>
-              <th class="px-2 py-3 text-center font-semibold">Baggage</th>
-              <th class="px-2 py-3 text-center font-semibold">Seat Number</th>
-              <th class="px-2 py-3 text-center font-semibold">Action</th>
-            </tr>
-          </thead>
-
-          <tbody class="bg-white text-gray-900">
-            <tr
-              class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-            >
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                ME-223
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                MEA AIR
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold"
-                  >Active</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                <div class="font-semibold">Beirut to Dubai</div>
-                <div class="text-gray-500">8:00 PM - 12 AM</div>
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                <div class="font-semibold">Beirut to Dubai</div>
-                <div class="text-gray-500">8:00 PM - 12 AM</div>
-              </td>
-              <td
-                class="px-4 py-3 text-sm font-semibold flex items-center justify-center gap-2"
-              >
-                1,000$
-                <button
-                  class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
-                      fill="white"
-                    />
-                  </svg>
-                </button>
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-500">
-                Economy
-              </td>
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                TPC - 23 KG
-              </td>
-              <td class="px-4 py-3 text-center text-sm font-semibold">28A</td>
-              <td class="px-4 py-3 text-center">
-                <div class="flex justify-center gap-2">
-                  <!-- delete button -->
-                  <button
-                    class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="21"
-                      height="21"
-                      viewBox="0 0 21 21"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
+      <div class="rounded-t-2xl overflow-hidden border border-gray-200">
+        <div class="overflow-y-auto custom-scrollbar" style="max-height: 560px;">
+          <table class="w-full text-sm">
+            <thead class="bg-[#336891] text-white sticky top-0 z-10">
+              <tr>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Number</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Airline</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Status</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Departure</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Arrival</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Top up</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Cabin</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Baggage</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Seat Number</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 6%;">Action</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white text-gray-900">
+              {{range .Flights}}
+              <tr class="border-b border-gray-200" data-flight-id="{{.ID}}" data-flight-number="{{.FlightNumber}}" data-flight-code="{{.FlightID}}" data-status="{{.Status}}" data-cost="{{.Cost}}" data-profit-percent="{{.ProfitPercent}}" data-departure-time="{{formatDateTime .DepartureTime}}" data-arrival-time="{{formatDateTime .ArrivalTime}}" data-departure-location="{{.DepartureLocation}}" data-arrival-location="{{.ArrivalLocation}}">
+                <td class="px-4 py-3 text-center" style="width: 8%;">
+                  <div class="text-sm font-semibold">{{.FlightNumber}}</div>
+                  <div class="text-xs text-gray-500">{{.FlightID}}</div>
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 8%;">
+                  {{.ProviderName}}
+                </td>
+                <td class="px-4 py-3 text-center" style="width: 8%;">
+                  {{if eq .Status "active"}}
+                  <span class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold">Active</span>
+                  {{else if eq .Status "inactive"}}
+                  <span class="bg-[#FFE4E6] text-[#DC2626] px-3 py-1 rounded-full text-xs font-semibold">Inactive</span>
+                  {{else}}
+                  <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold">{{.Status}}</span>
+                  {{end}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 12%;">
+                  {{.DepartureLocation}}<br/>{{formatTime .DepartureTime}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 12%;">
+                  {{.ArrivalLocation}}<br/>{{formatTime .ArrivalTime}}
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-800" style="width: 8%;">
+                  <div class="flex items-center justify-center gap-2">
+                    <span>{{printf "%.0f" .Cost}}$</span>
+                    <button
+                      class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center topup-btn"
+                      onclick="openTopUpModal(event)"
                     >
-                      <path
-                        d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                  <!-- edit button -->
-                  <button
-                    class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-            >
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                ME-223
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                MEA AIR
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold"
-                  >Active</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                <div class="font-semibold">Beirut to Dubai</div>
-                <div class="text-gray-500">8:00 PM - 12 AM</div>
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                <div class="font-semibold">Beirut to Dubai</div>
-                <div class="text-gray-500">8:00 PM - 12 AM</div>
-              </td>
-              <td
-                class="px-4 py-3 text-sm font-semibold flex items-center justify-center gap-2"
-              >
-                1,000$
-                <button
-                  class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
-                      fill="white"
-                    />
-                  </svg>
-                </button>
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-500">
-                Economy
-              </td>
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                TPC - 23 KG
-              </td>
-              <td class="px-4 py-3 text-center text-sm font-semibold">28A</td>
-              <td class="px-4 py-3 text-center">
-                <div class="flex justify-center gap-2">
-                  <button
-                    class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="21"
-                      height="21"
-                      viewBox="0 0 21 21"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-            >
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                ME-223
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                MEA AIR
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold"
-                  >Active</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                <div class="font-semibold">Beirut to Dubai</div>
-                <div class="text-gray-500">8:00 PM - 12 AM</div>
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                <div class="font-semibold">Beirut to Dubai</div>
-                <div class="text-gray-500">8:00 PM - 12 AM</div>
-              </td>
-              <td
-                class="px-4 py-3 text-sm font-semibold flex items-center justify-center gap-2"
-              >
-                1,000$
-                <button
-                  class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
-                      fill="white"
-                    />
-                  </svg>
-                </button>
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-500">
-                Economy
-              </td>
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                TPC - 23 KG
-              </td>
-              <td class="px-4 py-3 text-center text-sm font-semibold">28A</td>
-              <td class="px-4 py-3 text-center">
-                <div class="flex justify-center gap-2">
-                  <button
-                    class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="21"
-                      height="21"
-                      viewBox="0 0 21 21"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr
-              class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-            >
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                ME-223
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                MEA AIR
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold"
-                  >Active</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                <div class="font-semibold">Beirut to Dubai</div>
-                <div class="text-gray-500">8:00 PM - 12 AM</div>
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                <div class="font-semibold">Beirut to Dubai</div>
-                <div class="text-gray-500">8:00 PM - 12 AM</div>
-              </td>
-              <td
-                class="px-4 py-3 text-sm font-semibold flex items-center justify-center gap-2"
-              >
-                1,000$
-                <button
-                  class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
-                      fill="white"
-                    />
-                  </svg>
-                </button>
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-500">
-                Economy
-              </td>
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                TPC - 23 KG
-              </td>
-              <td class="px-4 py-3 text-center text-sm font-semibold">28A</td>
-              <td class="px-4 py-3 text-center">
-                <div class="flex justify-center gap-2">
-                  <button
-                    class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="21"
-                      height="21"
-                      viewBox="0 0 21 21"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
+                          fill="white"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 8%;">
+                  Economy
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
+                  1PC - 25 KG
+                </td>
+                <td class="px-4 py-3 text-center text-sm font-semibold" style="width: 8%;">
+                  28A
+                </td>
+                <td class="px-4 py-3 text-center" style="width: 6%;">
+                  <div class="flex justify-center gap-2">
+                    <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
+                      <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
+                      </svg>
+                    </button>
+                    <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {{end}}
+                
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -440,96 +176,117 @@
         background-color: transparent !important;
       }
 
-      /* Let the Top up cell stay hoverable while ensuring the inner button always receives clicks */
-      tbody tr td:nth-child(6) {
+      /* Ensure action buttons receive clicks even if the row is clickable */
+      tbody tr td:last-child {
         position: relative;
-        pointer-events: none;
-      }
-
-      tbody tr td:nth-child(6) button {
-        position: relative;
-        z-index: 10;
         pointer-events: auto;
       }
 
-      tbody tr td:nth-child(10) {
-        position: relative;
-        pointer-events: none;
-      }
-
-      tbody tr td:nth-child(10) button {
+      tbody tr td:last-child button {
         position: relative;
         z-index: 10;
         pointer-events: auto;
       }
     </style>
     <script>
+      // Store current flight data for editing
+      let currentFlightData = null;
+
       function openFlightModal(event) {
         if (event) {
           event.stopPropagation();
           event.preventDefault();
         }
 
+        // Get the row data
+        const row = event.target.closest('tr');
+        if (row) {
+          currentFlightData = {
+            id: row.dataset.flightId,
+            flightNumber: row.dataset.flightNumber,
+            flightCode: row.dataset.flightCode,
+            status: row.dataset.status,
+            cost: parseFloat(row.dataset.cost) || 0,
+            profitPercent: parseFloat(row.dataset.profitPercent) || 0,
+            departureTime: row.dataset.departureTime || '',
+            arrivalTime: row.dataset.arrivalTime || '',
+            departureLocation: row.dataset.departureLocation || '',
+            arrivalLocation: row.dataset.arrivalLocation || ''
+          };
+        }
+
         const modalHtml = `
           <div class="flex flex-col gap-4 text-[#1d1d1d] font-sans">
             <div class="text-center">
-              <div class="text-lg font-bold text-[#1f3242]">ME 2245</div>
-              <div class="text-xs text-[#5b7282] mt-1">1DLRT190/GMARSAN-SMITH</div>
+              <div class="text-lg font-bold text-[#1f3242]">${currentFlightData?.flightNumber || 'Flight'}</div>
+              <div class="text-xs text-[#5b7282] mt-1 flex items-center justify-center gap-1">
+                ${currentFlightData?.flightCode || ''}
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="#336891"/>
+                </svg>
+              </div>
             </div>
 
             <div class="grid gap-3">
               <div class="grid grid-cols-2 gap-3">
                 <div class="flex flex-col gap-1">
                   <label class="text-xs font-semibold text-[#5b7282]">Departure Date</label>
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="10 Jan, 2024" />
+                  <input id="departure-date" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="date" value="${currentFlightData?.departureTime ? currentFlightData.departureTime.split('T')[0] : ''}" />
                 </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-xs font-semibold text-[#5b7282]">Arrival Date</label>
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="10 Jan, 2024" />
+                  <input id="arrival-date" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="date" value="${currentFlightData?.arrivalTime ? currentFlightData.arrivalTime.split('T')[0] : ''}" />
                 </div>
               </div>
 
               <div class="grid grid-cols-2 gap-3">
                 <div class="flex flex-col gap-1">
                   <label class="text-xs font-semibold text-[#5b7282]">Departure Time</label>
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="10:00 am" />
+                  <input id="departure-time" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="time" value="${currentFlightData?.departureTime ? currentFlightData.departureTime.split('T')[1] : ''}" />
                 </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-xs font-semibold text-[#5b7282]">Arrival Time</label>
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="3:00 pm" />
+                  <input id="arrival-time" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="time" value="${currentFlightData?.arrivalTime ? currentFlightData.arrivalTime.split('T')[1] : ''}" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Departure Location</label>
+                  <input id="departure-location" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" placeholder="e.g., Beirut" value="${currentFlightData?.departureLocation || ''}" />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Arrival Location</label>
+                  <input id="arrival-location" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" placeholder="e.g., Dubai" value="${currentFlightData?.arrivalLocation || ''}" />
                 </div>
               </div>
 
               <div class="flex flex-col gap-1">
                 <label class="text-xs font-semibold text-[#5b7282]">Total Commission</label>
                 <div class="grid grid-cols-[1fr_auto] gap-2">
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="10%" />
-                  <div class="h-10 px-3 rounded-md border border-[#8aaecd] bg-[#f7fafc] text-sm font-semibold flex items-center justify-center text-[#1d1d1d]">$ 321.32</div>
+                  <input id="commission-percent" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="number" step="0.1" placeholder="10%" value="${currentFlightData?.profitPercent || 0}" />
+                  <div class="h-10 px-3 rounded-md border border-[#8aaecd] bg-[#f7fafc] text-sm font-semibold flex items-center justify-center text-[#1d1d1d]">~ $ ${((currentFlightData?.cost || 0) * (currentFlightData?.profitPercent || 0) / 100).toFixed(2)}</div>
                 </div>
               </div>
 
               <div class="grid gap-2">
                 <div class="grid grid-cols-2 gap-3 text-sm font-medium text-[#1d1d1d]">
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Refundable</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" checked /> Allow Changes</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="refundable" class="h-4 w-4" /> Refundable</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="allow-changes" class="h-4 w-4" checked /> Allow Changes</label>
                 </div>
                 <div class="grid grid-cols-2 gap-3 text-sm font-medium text-[#1d1d1d]">
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" checked /> Allow Seat Choice</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Allow Carry-on Bag</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="allow-seat" class="h-4 w-4" checked /> Allow Seat Choice</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="allow-carryon" class="h-4 w-4" /> Allow Carry-on Bag</label>
                 </div>
               </div>
 
               <div class="grid gap-2">
                 <div class="text-sm font-bold text-[#1f3242]">Change Status</div>
                 <div class="grid grid-cols-4 gap-3 text-sm font-medium text-[#1d1d1d]">
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" checked /> Active</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Inactive</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Refunded</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Failed</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Pending</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" checked /> Confirmed</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Cancelled</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Paid</label>
+                  <label class="flex items-center gap-2"><input type="radio" name="status" value="active" class="h-4 w-4" ${currentFlightData?.status === 'active' ? 'checked' : ''} /> Active</label>
+                  <label class="flex items-center gap-2"><input type="radio" name="status" value="inactive" class="h-4 w-4" ${currentFlightData?.status === 'inactive' ? 'checked' : ''} /> Inactive</label>
+                  <label class="flex items-center gap-2"><input type="radio" name="status" value="cancelled" class="h-4 w-4" ${currentFlightData?.status === 'cancelled' ? 'checked' : ''} /> Cancelled</label>
+                  <label class="flex items-center gap-2"><input type="radio" name="status" value="delayed" class="h-4 w-4" ${currentFlightData?.status === 'delayed' ? 'checked' : ''} /> Delayed</label>
                 </div>
               </div>
 
@@ -555,8 +312,80 @@
           const cancelBtn = document.getElementById("flight-modal-cancel");
           const saveBtn = document.getElementById("flight-modal-save");
           if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
-          if (saveBtn) saveBtn.addEventListener("click", closeModal);
+          if (saveBtn) saveBtn.addEventListener("click", saveFlightData);
+
+          // Add event listener to update commission calculation
+          const commissionInput = document.getElementById("commission-percent");
+          if (commissionInput) {
+            commissionInput.addEventListener("input", () => {
+              const percent = parseFloat(commissionInput.value) || 0;
+              const calculated = ((currentFlightData?.cost || 0) * percent / 100).toFixed(2);
+              document.querySelector('[id*="commission"]').closest('.grid').querySelector('div:last-child').textContent = `~ $ ${calculated}`;
+            });
+          }
         }, 0);
+      }
+
+      async function saveFlightData() {
+        const departureDate = document.getElementById('departure-date')?.value;
+        const departureTime = document.getElementById('departure-time')?.value;
+        const arrivalDate = document.getElementById('arrival-date')?.value;
+        const arrivalTime = document.getElementById('arrival-time')?.value;
+        const departureLocation = document.getElementById('departure-location')?.value;
+        const arrivalLocation = document.getElementById('arrival-location')?.value;
+        
+        const data = {
+          id: currentFlightData?.id,
+          flight_number: currentFlightData?.flightNumber,
+          flight_id: currentFlightData?.flightCode,
+          status: document.querySelector('input[name="status"]:checked')?.value,
+          cost: parseFloat(currentFlightData?.cost) || 0,
+          profit_percent: parseFloat(document.getElementById('commission-percent')?.value) || 0,
+          departure_time: departureDate && departureTime ? `${departureDate}T${departureTime}:00Z` : '',
+          arrival_time: arrivalDate && arrivalTime ? `${arrivalDate}T${arrivalTime}:00Z` : '',
+          departure_location: departureLocation || '',
+          arrival_location: arrivalLocation || '',
+          refundable: document.getElementById('refundable')?.checked || false,
+          allow_changes: document.getElementById('allow-changes')?.checked || false,
+          allow_seat_choice: document.getElementById('allow-seat')?.checked || false,
+          allow_carry_on: document.getElementById('allow-carryon')?.checked || false
+        };
+
+        try {
+          const response = await fetch('/admin/cms/flights/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: 'Flight updated successfully',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: result.error || 'Failed to update flight'
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Network error occurred'
+          });
+        }
       }
 
       function openTopUpModal(event) {
@@ -565,11 +394,16 @@
           event.preventDefault();
         }
 
+        // Get the row data
+        const row = event.target.closest('tr');
+        const flightId = row?.dataset.flightId;
+        const currentCost = parseFloat(row?.dataset.cost) || 0;
+
         const modalHtml = `
           <div class="flex flex-col gap-3 text-[#1d1d1d] font-sans">
             <div class="text-center text-sm font-semibold text-[#1f3242]">Top Up</div>
             <div class="relative">
-              <input type="text" value="1,000" class="w-full h-11 rounded border border-[#9bb6c9] px-3 pr-10 text-sm text-[#1d1d1d] placeholder-[#9bb6c9] focus:outline-none focus:ring-2 focus:ring-[#336891]" />
+              <input type="number" id="topup-value" value="${currentCost}" step="0.01" class="w-full h-11 rounded border border-[#9bb6c9] px-3 pr-10 text-sm text-[#1d1d1d] placeholder-[#9bb6c9] focus:outline-none focus:ring-2 focus:ring-[#336891]" />
               <div class="absolute inset-y-0 right-3 flex items-center text-[#1f3242] font-semibold">$</div>
             </div>
             <div class="flex gap-2 justify-start">
@@ -593,7 +427,71 @@
           const cancelBtn = document.getElementById("topup-cancel");
           const confirmBtn = document.getElementById("topup-confirm");
           if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
-          if (confirmBtn) confirmBtn.addEventListener("click", closeModal);
+          if (confirmBtn) {
+            confirmBtn.addEventListener("click", async () => {
+              const newCost = parseFloat(document.getElementById('topup-value')?.value) || 0;
+
+              // Normalize values to satisfy backend validation
+              const allowedStatuses = ['active', 'inactive', 'cancelled', 'delayed'];
+              const statusValue = allowedStatuses.includes((row.dataset.status || '').toLowerCase())
+                ? row.dataset.status.toLowerCase()
+                : 'active';
+
+              const safeCost = Math.max(newCost, 0.01);
+              const profitValue = parseFloat(row.dataset.profitPercent);
+              const safeProfit = Math.min(Math.max(isNaN(profitValue) ? 0 : profitValue, 0), 100);
+
+              const departureLocation = row.dataset.departureLocation || 'Unknown';
+              const arrivalLocation = row.dataset.arrivalLocation || 'Unknown';
+              const flightNumber = row.dataset.flightNumber || 'Unknown';
+              const flightCode = row.dataset.flightCode || 'unknown';
+              
+              try {
+                const response = await fetch('/admin/cms/flights/update', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    id: flightId,
+                    flight_number: flightNumber,
+                    flight_id: flightCode,
+                    status: statusValue,
+                    cost: safeCost,
+                    profit_percent: safeProfit,
+                    departure_location: departureLocation,
+                    arrival_location: arrivalLocation
+                  })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Top-up updated successfully',
+                    timer: 2000,
+                    showConfirmButton: false
+                  }).then(() => {
+                    window.location.reload();
+                  });
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.error || 'Failed to update top-up'
+                  });
+                }
+              } catch (error) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Network error occurred'
+                });
+              }
+            });
+          }
         }, 0);
       }
 
@@ -674,6 +572,11 @@
           event.preventDefault();
         }
 
+        // Get the row data
+        const row = event.target.closest('tr');
+        const flightId = row?.dataset.flightId;
+        const flightNumber = row?.dataset.flightNumber;
+
         const modalHtml = `
           <div class="flex flex-col items-center gap-4 text-[#1d1d1d] font-sans">
             <div class="w-12 h-12 rounded-full bg-[#fdeeed] flex items-center justify-center shadow-[0_8px_32px_0_#fbd3ce]">
@@ -684,13 +587,13 @@
               </svg>
             </div>
             <div class="text-center flex flex-col gap-1">
-              <div class="text-lg font-bold text-[#1f3242]">Delete Content</div>
-              <div class="text-sm text-[#1d1d1d]">Are you sure you want to delete Content25's service?<br/>This change cannot be undone</div>
+              <div class="text-lg font-bold text-[#1f3242]">Delete Flight</div>
+              <div class="text-sm text-[#1d1d1d]">Are you sure you want to delete flight ${flightNumber}?<br/>This change cannot be undone</div>
             </div>
 
             <div class="flex gap-3">
               <button class="min-w-[120px] px-4 py-2.5 rounded-lg border border-[#1f3242] text-[#1f3242] font-semibold text-sm bg-white" id="flight-delete-cancel">Cancel</button>
-              <button class="min-w-[120px] px-4 py-2.5 rounded-lg border border-[#d24124] bg-[#d24124] text-white font-semibold text-sm" id="flight-delete-confirm">Delete content</button>
+              <button class="min-w-[120px] px-4 py-2.5 rounded-lg border border-[#d24124] bg-[#d24124] text-white font-semibold text-sm" id="flight-delete-confirm">Delete flight</button>
             </div>
           </div>
         `;
@@ -709,7 +612,41 @@
           const confirmBtn = document.getElementById("flight-delete-confirm");
           const closeModal = () => Swal.close();
           if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
-          if (confirmBtn) confirmBtn.addEventListener("click", closeModal);
+          if (confirmBtn) {
+            confirmBtn.addEventListener("click", async () => {
+              try {
+                const response = await fetch(`/admin/cms/flights/delete?id=${flightId}`, {
+                  method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted!',
+                    text: 'Flight deleted successfully',
+                    timer: 2000,
+                    showConfirmButton: false
+                  }).then(() => {
+                    window.location.reload();
+                  });
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.error || 'Failed to delete flight'
+                  });
+                }
+              } catch (error) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Network error occurred'
+                });
+              }
+            });
+          }
         }, 0);
       }
 
@@ -721,19 +658,14 @@
         const row = cell.parentElement;
         if (!row) return;
         const cellIndex = Array.from(row.children).indexOf(cell);
-        if (cellIndex === 5) {
-          openTopUpModal(event);
-          return;
+        if (cellIndex !== 9) return; // action column is now at index 9 (0-indexed)
+        const buttons = Array.from(cell.querySelectorAll("button"));
+        const btnIndex = buttons.indexOf(btn);
+        if (btnIndex === 0) {
+          openDeleteModal(event);
         }
-        if (cellIndex === 9) {
-          const buttons = Array.from(cell.querySelectorAll("button"));
-          const btnIndex = buttons.indexOf(btn);
-          if (btnIndex === 0) {
-            openDeleteModal(event);
-          }
-          if (btnIndex === 1) {
-            openFlightModal(event);
-          }
+        if (btnIndex === 1) {
+          openFlightModal(event);
         }
       });
     </script>

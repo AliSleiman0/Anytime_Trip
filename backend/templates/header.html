@@ -44,8 +44,12 @@
         />
       </svg>
     </button>
+    <!-- Small icon button: settings/profile -->
     <button
       class="bg-[#336891] p-2 rounded w-10 h-10 flex items-center justify-center"
+      onclick="window.location.href='/admin/settings'"
+      style="cursor: pointer;"
+      title="Settings"
     >
       <svg
         width="20"
@@ -70,6 +74,7 @@
     </button>
     <button
       class="bg-[#336891] text-white px-4 py-2 h-10 rounded flex items-center justify-center gap-2 text-sm font-medium"
+      onclick="showExportOptions()"
     >
       <svg
         width="22"

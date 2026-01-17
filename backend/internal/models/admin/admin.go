@@ -10,5 +10,7 @@ type AdminUser struct {
 	Email       string    `json:"email"`
 	Role        string    `json:"role"`
 	Permissions []string  `json:"permissions"`
+	Currency    string    `json:"currency"`
+	Language    string    `json:"language"`
 	CreatedAt   time.Time `json:"created_at"`
 }

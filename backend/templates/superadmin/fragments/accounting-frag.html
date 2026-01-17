@@ -1,3 +1,20 @@
+<style>
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #336891;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2a5573;
+  }
+</style>
+
 <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
   <main>
     <div
@@ -102,47 +119,54 @@
       </div>
 
       <div class="rounded-2xl overflow-hidden bg-white border border-[#CAD9EA] shadow-sm">
+        <!-- Fixed Header Table -->
         <table class="w-full text-sm">
           <thead class="bg-[#336891] text-white">
             <tr>
-              <th class="px-3 py-3 text-left font-semibold">Date</th>
-              <th class="px-3 py-3 text-left font-semibold">Description</th>
-              <th class="px-3 py-3 text-left font-semibold">Type</th>
-              <th class="px-3 py-3 text-left font-semibold">Amount</th>
-              <th class="px-3 py-3 text-left font-semibold">Status</th>
+              <th class="px-3 py-3 text-left font-semibold" style="width: 15%;">Date</th>
+              <th class="px-3 py-3 text-left font-semibold" style="width: 35%;">Description</th>
+              <th class="px-3 py-3 text-left font-semibold" style="width: 15%;">Type</th>
+              <th class="px-3 py-3 text-left font-semibold" style="width: 18%;">Amount</th>
+              <th class="px-3 py-3 text-left font-semibold" style="width: 17%;">Status</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[#E4ECF4] text-gray-800">
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">Jan 03, 2025</td>
-              <td class="px-3 py-3">Monthly server costs</td>
-              <td class="px-3 py-3">Expense</td>
-              <td class="px-3 py-3">$5,200</td>
-              <td class="px-3 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Paid</span></td>
-            </tr>
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">Jan 02, 2025</td>
-              <td class="px-3 py-3">Booking commissions</td>
-              <td class="px-3 py-3">Income</td>
-              <td class="px-3 py-3">$45,300</td>
-              <td class="px-3 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Paid</span></td>
-            </tr>
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">Jan 01, 2025</td>
-              <td class="px-3 py-3">Staff salaries</td>
-              <td class="px-3 py-3">Expense</td>
-              <td class="px-3 py-3">$125,000</td>
-              <td class="px-3 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Paid</span></td>
-            </tr>
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">Dec 31, 2024</td>
-              <td class="px-3 py-3">Marketing campaign</td>
-              <td class="px-3 py-3">Expense</td>
-              <td class="px-3 py-3">$28,500</td>
-              <td class="px-3 py-3"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#FFF0E633] text-[#FF9800]">Pending</span></td>
-            </tr>
-          </tbody>
         </table>
+        
+        <!-- Scrollable Body -->
+        <div class="overflow-y-auto custom-scrollbar" style="max-height: 560px;">
+          <table class="w-full text-sm">
+            <tbody class="divide-y divide-[#E4ECF4] text-gray-800">
+              <tr>
+                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 15%;">Jan 03, 2025</td>
+                <td class="px-3 py-3" style="width: 35%;">Monthly server costs</td>
+                <td class="px-3 py-3" style="width: 15%;">Expense</td>
+                <td class="px-3 py-3" style="width: 18%;">$5,200</td>
+                <td class="px-3 py-3" style="width: 17%;"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Paid</span></td>
+              </tr>
+              <tr>
+                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 15%;">Jan 02, 2025</td>
+                <td class="px-3 py-3" style="width: 35%;">Booking commissions</td>
+                <td class="px-3 py-3" style="width: 15%;">Income</td>
+                <td class="px-3 py-3" style="width: 18%;">$45,300</td>
+                <td class="px-3 py-3" style="width: 17%;"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Paid</span></td>
+              </tr>
+              <tr>
+                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 15%;">Jan 01, 2025</td>
+                <td class="px-3 py-3" style="width: 35%;">Staff salaries</td>
+                <td class="px-3 py-3" style="width: 15%;">Expense</td>
+                <td class="px-3 py-3" style="width: 18%;">$125,000</td>
+                <td class="px-3 py-3" style="width: 17%;"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Paid</span></td>
+              </tr>
+              <tr>
+                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 15%;">Dec 31, 2024</td>
+                <td class="px-3 py-3" style="width: 35%;">Marketing campaign</td>
+                <td class="px-3 py-3" style="width: 15%;">Expense</td>
+                <td class="px-3 py-3" style="width: 18%;">$28,500</td>
+                <td class="px-3 py-3" style="width: 17%;"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#FFF0E633] text-[#FF9800]">Pending</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>

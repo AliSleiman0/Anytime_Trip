@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}} - Seven Hives Admin</title>
+    <title>{{.Title}} - Anytime Trip Admin</title>
     <!-- Include HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <!-- Include Tailwind CSS or your CSS -->
@@ -17,7 +17,7 @@
     <div hx-get="/admin/sidebar" hx-trigger="load" hx-swap="innerHTML"></div>
     
     <!-- Main Content Area - Admin Dashboard Fragment -->
-    <div id="main-content" hx-get="/admin/view-service-frag" hx-trigger="load" hx-swap="innerHTML"></div>
+    <div id="main-content" hx-get="/admin/view-service-frag?id={{.ProviderID}}&type={{.ProviderType}}" hx-trigger="load" hx-swap="innerHTML"></div>
     
         
 </body>

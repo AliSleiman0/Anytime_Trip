@@ -1,3 +1,20 @@
+<style>
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #336891;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2a5573;
+  }
+</style>
+
 <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
   <main class="">
     <!-- header -->
@@ -55,322 +72,82 @@
 
     <!-- Cars management Table -->
     <div class="px-4">
-      <div class="rounded-t-2xl overflow-hidden">
-        <table class="w-full text-sm">
-          <thead class="bg-[#336891] text-white">
-            <tr>
-              <th class="px-2 py-3 text-center font-semibold">Name</th>
-              <th class="px-2 py-3 text-center font-semibold">Type</th>
-              <th class="px-2 py-3 text-center font-semibold">Car Rental</th>
-              <th class="px-2 py-3 text-center font-semibold">Status</th>
-              <th class="px-2 py-3 text-center font-semibold">Pickup</th>
-              <th class="px-2 py-3 text-center font-semibold">Drop off</th>
-              <th class="px-2 py-3 text-center font-semibold">Location</th>
-              <th class="px-2 py-3 text-center font-semibold">Passengers</th>
-              <th class="px-2 py-3 text-center font-semibold">Details</th>
-              <th class="px-2 py-3 text-center font-semibold">Extras</th>
-              <th class="px-2 py-3 text-center font-semibold">Action</th>
-            </tr>
-          </thead>
-
-          <tbody class="bg-white text-gray-900">
-            <tr
-              class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-            >
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                Toyota RAV4
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Midsize SUV
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                LocAuto
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold"
-                  >Active</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Sun, Oct 19, 1:30 AM
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Sun, Oct 19, 1:30 AM
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                BEY Airport
-              </td>
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                4
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Automatic<br>Unlimited mileage
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Toddler Seat
-              </td>
-              <td class="px-4 py-3 text-center">
-                <div class="flex justify-center gap-2">
-                  <button
-                    class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="21"
-                      height="21"
-                      viewBox="0 0 21 21"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-
-            <tr
-              class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-            >
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                Toyota RAV4
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Midsize SUV
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                LocAuto
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold"
-                  >Active</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Sun, Oct 19, 1:30 AM
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Sun, Oct 19, 1:30 AM
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                BEY Airport
-              </td>
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                4
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Automatic<br>Unlimited mileage
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Toddler Seat
-              </td>
-              <td class="px-4 py-3 text-center">
-                <div class="flex justify-center gap-2">
-                  <button
-                    class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="21"
-                      height="21"
-                      viewBox="0 0 21 21"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-
-            <tr
-              class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-            >
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                Toyota RAV4
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Midsize SUV
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                LocAuto
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold"
-                  >Active</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Sun, Oct 19, 1:30 AM
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Sun, Oct 19, 1:30 AM
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                BEY Airport
-              </td>
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                4
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Automatic<br>Unlimited mileage
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Toddler Seat
-              </td>
-              <td class="px-4 py-3 text-center">
-                <div class="flex justify-center gap-2">
-                  <button
-                    class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="21"
-                      height="21"
-                      viewBox="0 0 21 21"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-
-            <tr
-              class="border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-            >
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                Toyota RAV4
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Midsize SUV
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                LocAuto
-              </td>
-              <td class="px-4 py-3 text-center">
-                <span
-                  class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold"
-                  >Active</span
-                >
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Sun, Oct 19, 1:30 AM
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Sun, Oct 19, 1:30 AM
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                BEY Airport
-              </td>
-              <td class="px-4 py-3 text-center text-sm font-semibold">
-                4
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Automatic<br>Unlimited mileage
-              </td>
-              <td class="px-4 py-3 text-center text-sm text-gray-800">
-                Toddler Seat
-              </td>
-              <td class="px-4 py-3 text-center">
-                <div class="flex justify-center gap-2">
-                  <button
-                    class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="21"
-                      height="21"
-                      viewBox="0 0 21 21"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
-                        fill="white"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="rounded-t-2xl overflow-hidden border border-gray-200">
+        <div class="overflow-y-auto custom-scrollbar" style="max-height: 560px;">
+          <table class="w-full text-sm">
+            <thead class="bg-[#336891] text-white sticky top-0 z-10">
+              <tr>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Name</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Type</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Car Rental</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Status</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Pickup</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Drop off</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Location</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Passengers</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Details</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Extras</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 6%;">Action</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white text-gray-900">
+              {{range .Cars}}
+              <tr class="border-b border-gray-200" data-car-id="{{.ID}}" data-car-name="{{.CarName}}" data-car-type="{{.CarType}}" data-status="{{.Status}}" data-cost="{{.Cost}}" data-profit-percent="{{.ProfitPercent}}" data-passengers="{{.Passengers}}" data-mileage="{{.Mileage}}" data-pickup-location="{{.PickupLocation}}" data-pickup-time="{{formatDateTime .PickupTime}}" data-dropoff-location="{{.DropOffLocation}}" data-dropoff-time="{{formatDateTime .DropOffTime}}" data-unlimited-mileage="{{.UnlimitedMileage}}" data-shuttle="{{.ShuttleToCounter}}" data-transmission="{{.Transmission}}" data-extras="{{range .Extras}}{{.}},{{end}}">
+                <td class="px-4 py-3 text-center text-sm font-semibold" style="width: 10%;">
+                  {{.CarName}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 8%;">
+                  {{.CarType}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 8%;">
+                  {{.ProviderName}}
+                </td>
+                <td class="px-4 py-3 text-center" style="width: 8%;">
+                  {{if eq .Status "active"}}
+                  <span class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold">Active</span>
+                  {{else if eq .Status "inactive"}}
+                  <span class="bg-[#FFE4E6] text-[#DC2626] px-3 py-1 rounded-full text-xs font-semibold">Inactive</span>
+                  {{else}}
+                  <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold">{{.Status}}</span>
+                  {{end}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
+                  {{.PickupLocation}}<br/>{{formatDate .PickupTime}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
+                  {{.DropOffLocation}}<br/>{{formatDate .DropOffTime}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
+                  {{.Location}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 8%;">
+                  {{.Passengers}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 12%;">
+                  {{.Transmission}}<br/>{{if .UnlimitedMileage}}Unlimited mileage{{else}}{{.Mileage}}{{end}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
+                  {{range .Extras}}{{.}}<br/>{{end}}
+                </td>
+                <td class="px-4 py-3 text-center" style="width: 6%;">
+                  <div class="flex justify-center gap-2">
+                    <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
+                      <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
+                      </svg>
+                    </button>
+                    <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {{end}}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -383,86 +160,134 @@
       }
 
       /* Ensure action buttons receive clicks even if the row is clickable */
-      tbody tr td:nth-child(11) {
+      tbody tr td:last-child {
         position: relative;
-        pointer-events: none;
+        pointer-events: auto;
       }
 
-      tbody tr td:nth-child(11) button {
+      tbody tr td:last-child button {
         position: relative;
         z-index: 10;
         pointer-events: auto;
       }
     </style>
     <script>
+      let currentCarData = null;
+
       function openCarModal(event) {
         if (event) {
           event.stopPropagation();
           event.preventDefault();
         }
 
+        // Get the row data
+        const row = event.target.closest('tr');
+        if (row) {
+          const extras = row.dataset.extras ? row.dataset.extras.split(',').filter(e => e) : [];
+          currentCarData = {
+            id: row.dataset.carId,
+            carName: row.dataset.carName,
+            carType: row.dataset.carType,
+            status: row.dataset.status,
+            cost: parseFloat(row.dataset.cost) || 0,
+            profitPercent: parseFloat(row.dataset.profitPercent) || 0,
+            passengers: parseInt(row.dataset.passengers) || 0,
+            mileage: row.dataset.mileage || '',
+            pickupLocation: row.dataset.pickupLocation || '',
+            pickupTime: row.dataset.pickupTime || '',
+            dropoffLocation: row.dataset.dropoffLocation || '',
+            dropoffTime: row.dataset.dropoffTime || '',
+            unlimitedMileage: row.dataset.unlimitedMileage === 'true',
+            shuttle: row.dataset.shuttle === 'true',
+            transmission: row.dataset.transmission || 'Automatic',
+            extras: extras
+          };
+        }
+
         const modalHtml = `
            <div class="flex flex-col gap-4 text-[#1d1d1d] font-sans">
             <div class="text-center">
-              <div class="text-lg font-bold text-[#1f3242]">Midsize SUV</div>
-              <div class="text-xs text-[#5b7282] mt-1">1DLRT190/GMARSAN-SMITH</div>
+              <div class="text-lg font-bold text-[#1f3242]">${currentCarData?.carType || 'Car'}</div>
+              <div class="text-xs text-[#5b7282] mt-1">${currentCarData?.carName || ''}</div>
             </div>
 
             <div class="grid gap-3">
               <div class="grid grid-cols-2 gap-3">
                 <div class="flex flex-col gap-1">
                   <label class="text-xs font-semibold text-[#5b7282]">Name</label>
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="Toyota Rav4" />
+                  <input id="car-name" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="${currentCarData?.carName || ''}" />
                 </div>
                 <div class="flex flex-col gap-1">
-                  <label class="text-xs font-semibold text-[#5b7282]">Passengers</label>
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="5" />
+                  <label class="text-xs font-semibold text-[#5b7282]">Type</label>
+                  <input id="car-type" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="${currentCarData?.carType || ''}" />
                 </div>
               </div>
 
               <div class="grid grid-cols-2 gap-3">
                 <div class="flex flex-col gap-1">
-                  <label class="text-xs font-semibold text-[#5b7282]">Milage</label>
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="10km" />
+                  <label class="text-xs font-semibold text-[#5b7282]">Number of Passengers</label>
+                  <input id="car-passengers" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="number" value="${currentCarData?.passengers || 0}" />
                 </div>
                 <div class="flex flex-col gap-1">
-                  <label class="text-xs font-semibold text-[#5b7282]">Arrival Time</label>
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="3:00 pm" />
+                  <label class="text-xs font-semibold text-[#5b7282]">Mileage</label>
+                  <input id="car-mileage" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="${currentCarData?.mileage || ''}" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Pickup Location</label>
+                  <input id="car-pickup-location" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="${currentCarData?.pickupLocation || ''}" />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Pickup Time</label>
+                  <input id="car-pickup" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="datetime-local" value="${currentCarData?.pickupTime || ''}" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Drop Off Location</label>
+                  <input id="car-dropoff-location" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="${currentCarData?.dropoffLocation || ''}" />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Drop Off Time</label>
+                  <input id="car-dropoff" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="datetime-local" value="${currentCarData?.dropoffTime || ''}" />
                 </div>
               </div>
 
               <div class="flex flex-col gap-1">
                 <label class="text-xs font-semibold text-[#5b7282]">Total Commission</label>
                 <div class="grid grid-cols-[1fr_auto] gap-2">
-                  <input class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="10%" />
-                  <div class="h-10 px-3 rounded-md border border-[#8aaecd] bg-[#f7fafc] text-sm font-semibold flex items-center justify-center text-[#1d1d1d]">$ 321.32</div>
+                  <input id="car-commission" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="number" step="0.1" placeholder="10%" value="${currentCarData?.profitPercent || 0}" />
+                  <div class="h-10 px-3 rounded-md border border-[#8aaecd] bg-[#f7fafc] text-sm font-semibold flex items-center justify-center text-[#1d1d1d]">$ ${((currentCarData?.cost || 0) * (currentCarData?.profitPercent || 0) / 100).toFixed(2)}</div>
                 </div>
               </div>
 
               <div class="grid gap-2">
                 <div class="grid grid-cols-2 gap-3 text-sm font-medium text-[#1d1d1d]">
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Unlimited Milage</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" checked /> Shuttle to Counter and Car</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="unlimited-mileage" class="h-4 w-4" ${currentCarData?.unlimitedMileage ? 'checked' : ''} /> Unlimited Mileage</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="shuttle" class="h-4 w-4" ${currentCarData?.shuttle ? 'checked' : ''} /> Shuttle to Counter and Car</label>
                 </div>
               </div>
 
               <div class="grid gap-2 mt-5">
                 <div class="text-sm font-bold text-[#1f3242] text-start">Extras</div>
                 <div class="grid grid-cols-4 gap-3 text-sm font-medium text-[#1d1d1d]">
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" checked /> Booster Seat</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Infant Seat</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Gas Coupons</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Extra Seat</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Toddler Seat</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" checked /> Radio Station</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> Snacks & Beverages</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4" /> No Extra</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Booster Seat" ${currentCarData?.extras.includes('Booster Seat') ? 'checked' : ''} /> Booster Seat</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Infant Seat" ${currentCarData?.extras.includes('Infant Seat') ? 'checked' : ''} /> Infant Seat</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Gas Coupons" ${currentCarData?.extras.includes('Gas Coupons') ? 'checked' : ''} /> Gas Coupons</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Extra Seat" ${currentCarData?.extras.includes('Extra Seat') ? 'checked' : ''} /> Extra Seat</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Toddler Seat" ${currentCarData?.extras.includes('Toddler Seat') ? 'checked' : ''} /> Toddler Seat</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Radio Station" ${currentCarData?.extras.includes('Radio Station') ? 'checked' : ''} /> Radio Station</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="Snacks & Beverages" ${currentCarData?.extras.includes('Snacks & Beverages') ? 'checked' : ''} /> Snacks & Beverages</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" class="h-4 w-4 extra-checkbox" value="No Extra" ${currentCarData?.extras.includes('No Extra') ? 'checked' : ''} /> No Extra</label>
                 </div>
               </div>
 
               <div class="flex justify-center gap-3 pt-1">
-                <button class="min-w-[96px] px-4 py-2.5 rounded-lg border border-[#1f3242] text-[#1f3242] font-bold text-sm" id="flight-modal-cancel">Cancel</button>
-                <button class="min-w-[96px] px-4 py-2.5 rounded-lg border border-[#336891] bg-[#336891] text-white font-bold text-sm" id="flight-modal-save">Save</button>
+                <button class="min-w-[96px] px-4 py-2.5 rounded-lg border border-[#1f3242] text-[#1f3242] font-bold text-sm" id="car-modal-cancel">Cancel</button>
+                <button class="min-w-[96px] px-4 py-2.5 rounded-lg border border-[#336891] bg-[#336891] text-white font-bold text-sm" id="car-modal-save">Save</button>
               </div>
             </div>
           </div>
@@ -482,8 +307,74 @@
           const cancelBtn = document.getElementById("car-modal-cancel");
           const saveBtn = document.getElementById("car-modal-save");
           if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
-          if (saveBtn) saveBtn.addEventListener("click", closeModal);
+          if (saveBtn) saveBtn.addEventListener("click", saveCarData);
+
+          // Add event listener to update commission calculation
+          const commissionInput = document.getElementById("car-commission");
+          if (commissionInput) {
+            commissionInput.addEventListener("input", () => {
+              const percent = parseFloat(commissionInput.value) || 0;
+              const calculated = ((currentCarData?.cost || 0) * percent / 100).toFixed(2);
+              document.querySelector('[id*="commission"]').closest('.grid').querySelector('div:last-child').textContent = `$ ${calculated}`;
+            });
+          }
         }, 0);
+      }
+
+      async function saveCarData() {
+        const extras = Array.from(document.querySelectorAll('.extra-checkbox:checked')).map(cb => cb.value);
+        
+        const data = {
+          id: currentCarData?.id,
+          car_name: document.getElementById('car-name')?.value || '',
+          car_type: document.getElementById('car-type')?.value || '',
+          passengers: parseInt(document.getElementById('car-passengers')?.value) || 0,
+          mileage: document.getElementById('car-mileage')?.value || '',
+          pickup_location: document.getElementById('car-pickup-location')?.value || '',
+          pickup_time: document.getElementById('car-pickup')?.value || '',
+          drop_off_location: document.getElementById('car-dropoff-location')?.value || '',
+          drop_off_time: document.getElementById('car-dropoff')?.value || '',
+          profit_percent: parseFloat(document.getElementById('car-commission')?.value) || 0,
+          unlimited_mileage: document.getElementById('unlimited-mileage')?.checked || false,
+          shuttle_to_counter: document.getElementById('shuttle')?.checked || false,
+          extras: extras
+        };
+
+        try {
+          const response = await fetch('/admin/cms/cars/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: 'Car updated successfully',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: result.error || 'Failed to update car'
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Network error occurred'
+          });
+        }
       }
 
       function showProviderActions(event) {
@@ -610,7 +501,7 @@
         const row = cell.parentElement;
         if (!row) return;
         const cellIndex = Array.from(row.children).indexOf(cell);
-        if (cellIndex !== 10) return; // action column
+        if (cellIndex !== 10) return; // action column is now at index 10 (0-indexed)
         const buttons = Array.from(cell.querySelectorAll("button"));
         const btnIndex = buttons.indexOf(btn);
         if (btnIndex === 0) {

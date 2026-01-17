@@ -312,6 +312,7 @@
           </li>
         </ul>
       </li>
+      {{if .IsSuperAdmin}}
       <li>
         <a
           href="/superadmin/accounting"
@@ -340,7 +341,9 @@
           <span>Accounting</span>
         </a>
       </li>
+      {{end}}
       <li>
+        {{if .IsSuperAdmin}}
         <a
           href="/superadmin/predefined-answers"
           class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-800 hover:bg-gray-100"
@@ -363,6 +366,7 @@
 
           <span>Predefined Answers</span>
         </a>
+        {{end}}
       </li>
     </ul>
   </nav>
@@ -401,7 +405,7 @@
       <span>Customer Support</span>
     </a>
     <a
-      href="/logout"
+      href="/admin/logout"
       class="flex items-center gap-3 px-3 py-2 rounded-md text-red-600 hover:bg-red-50"
     >
       <svg

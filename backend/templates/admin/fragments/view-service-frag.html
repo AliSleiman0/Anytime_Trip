@@ -1,13 +1,12 @@
+{{- with .Provider }}
 <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
-  <main class="">
-    <!-- header -->
+  <main>
     <div
-      hx-get="/admin/header?title=View User"
+      hx-get="/admin/header?title=View Service Provider&subtitle={{.Name}}"
       hx-trigger="load"
       hx-swap="innerHTML"
     ></div>
 
-    <!-- Back Button & filters -->
     <div class="flex justify-between p-4">
       <a
         href="/admin/service-providers"
@@ -25,36 +24,31 @@
         <span class="text-[#336891] text-lg">Back</span>
       </a>
 
-      <div>
+      <div class="flex gap-4">
         <select
           class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           name="bookings"
           id="bookings"
         >
-          <option class="text-[#9B9B9B]" value="" selected>Hotels</option>
+          <option class="text-[#9B9B9B]" value="" selected>{{.Type}}</option>
         </select>
         <select
           class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           name="status"
           id="status"
         >
-          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
-            All Statuses
-          </option>
+          <option class="text-[#9B9B9B]" value="" selected>{{.Status}}</option>
         </select>
         <input
           id="date"
           name="date"
-          type="date"
+          type="text"
           placeholder="Select Date"
-          onblur="if(!this.value){this.type='text'}"
           class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
         />
       </div>
     </div>
 
-    <!-- Service Provider Info Section -->
-    <!-- Profile -->
     <div class="flex justify-between bg-[#33689126] rounded-xl p-4 m-4">
       <div class="flex">
         <img
@@ -64,12 +58,10 @@
         />
 
         <div class="flex flex-col justify-center text-left gap-y-2 ml-6">
-          <h3 class="text-2xl font-semibold">John Doe</h3>
-          <p class="text-[#4A5565]">JohnDoe123@gmail.com</p>
-          <p
-            class="bg-[#DCFCE7] text-[#008236] text-xs rounded-full text-center w-12 h-5"
-          >
-            Active
+          <h3 class="text-2xl font-semibold">{{.Name}}</h3>
+          <p class="text-[#4A5565]">{{.Email}}</p>
+          <p class="text-xs rounded-full text-center px-3 py-1 {{.StatusClass}}">
+            {{.Status}}
           </p>
         </div>
       </div>
@@ -83,41 +75,40 @@
       </div>
     </div>
 
-    <!-- Service Provider Details -->
     <div class="m-10">
       <h3 class="font-bold text-lg my-10">Service Provider Information</h3>
       <div class="flex justify-between">
         <div class="flex flex-col gap-y-5">
           <div>
             <p class="text-sm text-[#6A7282]">Full Name</p>
-            <p class="text-[#101828]">John Doe</p>
+            <p class="text-[#101828]">{{.Name}}</p>
           </div>
           <div>
-            <p class="text-sm text-[#6A7282]">Email Adress</p>
-            <p class="text-[#101828]">JohnDoe123@gmail.com</p>
+            <p class="text-sm text-[#6A7282]">Email Address</p>
+            <p class="text-[#101828]">{{.Email}}</p>
           </div>
           <div>
             <p class="text-sm text-[#6A7282]">Status</p>
-            <p class="text-[#008236]">Active</p>
+            <p class="text-[#101828]">{{.Status}}</p>
           </div>
         </div>
 
         <div class="flex flex-col gap-y-5">
           <div>
             <p class="text-sm text-[#6A7282]">Type</p>
-            <p class="text-[#101828]">Flight Provider</p>
+            <p class="text-[#101828]">{{.Type}}</p>
           </div>
           <div>
             <p class="text-sm text-[#6A7282]">Phone Number</p>
-            <p class="text-[#101828]">+961 70 123 456</p>
+            <p class="text-[#101828]">{{.PhoneNumberDisplay}}</p>
           </div>
           <div>
-            <p class="text-sm text-[#6A7282]">Profit From Provider</p>
+            <p class="text-sm text-[#6A7282]">Profit Share (%)</p>
             <p class="text-[#008236] flex items-center gap-2">
-              10%
-              <!-- edit button -->
+              <span id="profitDisplay">{{.ProfitShareDisplay}}</span>
               <button
-                class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center"
+                onclick="openEmailModal()"
+                class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center hover:opacity-70"
               >
                 <svg
                   width="14"
@@ -139,39 +130,38 @@
         <div class="flex flex-col gap-y-5">
           <div>
             <p class="text-sm text-[#6A7282]">Location</p>
-            <p class="text-[#101828]">Atlanta, GA</p>
+            <p class="text-[#101828]">{{.Location}}</p>
           </div>
           <div>
             <p class="text-sm text-[#6A7282]">Added On</p>
-            <p class="text-[#101828]">14 Jan, 2024</p>
+            <p class="text-[#101828]">{{.CreatedAt}}</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Other Information -->
     <div class="m-10">
       <h3 class="font-bold text-lg my-10">Service Provider Information</h3>
       <div class="flex justify-between">
         <div class="flex flex-col gap-y-5">
           <div>
             <p class="text-sm text-[#6A7282]">Total Bookings</p>
-            <p class="text-[#101828]">1,947</p>
+            <p class="text-[#101828]">{{.TotalBookings}}</p>
           </div>
           <div>
             <p class="text-sm text-[#6A7282]">Total Revenue</p>
-            <p class="text-[#101828]">$ 2,194,019</p>
+            <p class="text-[#101828]">{{.Revenue}}</p>
           </div>
         </div>
 
         <div class="flex flex-col gap-y-5">
           <div>
             <p class="text-sm text-[#6A7282]">Total Bookings (This Month)</p>
-            <p class="text-[#101828]">147</p>
+            <p class="text-[#101828]">{{.TotalBookingsThisMonth}}</p>
           </div>
           <div>
             <p class="text-sm text-[#6A7282]">Total Revenue (This Month)</p>
-            <p class="text-[#101828]">$ 219,401</p>
+            <p class="text-[#101828]">{{.RevenueThisMonth}}</p>
           </div>
         </div>
 
@@ -202,7 +192,7 @@
                   </clipPath>
                 </defs>
               </svg>
-              4.5
+              {{.Rating}}
             </p>
           </div>
         </div>
@@ -211,13 +201,52 @@
   </main>
 </div>
 
+<!-- Profit Percent Edit Modal -->
+<div id="profitModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+  <div class="bg-white rounded-lg p-6 w-96">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Edit Profit Share (%)</h3>
+    <div class="mb-4">
+      <label class="block text-sm text-gray-600 mb-2">Profit Share Percentage</label>
+      <div class="flex items-center gap-2">
+        <input
+          type="number"
+          id="profitInput"
+          value="{{.ProfitShareDisplay}}"
+          min="0"
+          max="1000"
+          step="0.01"
+          class="flex-1 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#336891] focus:border-transparent"
+        />
+        <span class="text-gray-600 font-medium">%</span>
+      </div>
+      <p class="text-xs text-gray-500 mt-2">Range: 0 - 1000</p>
+    </div>
+    <div class="flex gap-3 justify-end">
+      <button onclick="closeEmailModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
+        Cancel
+      </button>
+      <button onclick="saveProfitPercent()" class="px-4 py-2 bg-[#336891] text-white rounded hover:bg-[#2a5573]">
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="profitToast" class="hidden fixed top-6 right-6 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-[60] flex items-center gap-2 transition-all">
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM8 15L3 10L4.41 8.59L8 12.17L15.59 4.58L17 6L8 15Z" fill="white"/>
+  </svg>
+  <span id="profitToastMessage">Profit percent updated successfully!</span>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   function showFreezeConfirmation() {
     Swal.fire({
       icon: "info",
       title: "Freeze Account",
-      html: 'Are you sure you want to freeze <strong>User1958</strong>\'s account?<br><small style="color: #666;">This change cannot be undone</small>',
+      html: 'Are you sure you want to freeze <strong>{{.Name}}</strong>\'s account?<br><small style="color: #666;">This change cannot be undone</small>',
       showCancelButton: true,
       confirmButtonColor: "#1C9BFF",
       confirmButtonText: "Freeze User",
@@ -233,4 +262,94 @@
       },
     });
   }
+
+  function openEmailModal() {
+    document.getElementById('profitModal').classList.remove('hidden');
+  }
+
+  function closeEmailModal() {
+    document.getElementById('profitModal').classList.add('hidden');
+  }
+
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('profitToast');
+    const toastMessage = document.getElementById('profitToastMessage');
+    
+    toastMessage.textContent = message;
+    
+    if (type === 'error') {
+      toast.classList.remove('bg-green-500');
+      toast.classList.add('bg-red-500');
+    } else {
+      toast.classList.remove('bg-red-500');
+      toast.classList.add('bg-green-500');
+    }
+    
+    toast.classList.remove('hidden');
+    
+    setTimeout(() => {
+      toast.classList.add('hidden');
+    }, 3000);
+  }
+
+  function saveProfitPercent() {
+    const newProfit = parseFloat(document.getElementById('profitInput').value);
+    
+    if (isNaN(newProfit)) {
+      showToast('Please enter a valid number', 'error');
+      return;
+    }
+    
+    if (newProfit < 0 || newProfit > 1000) {
+      showToast('Profit percent must be between 0 and 1000', 'error');
+      return;
+    }
+    
+    // Get the provider ID and type from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const providerId = urlParams.get('id');
+    const providerType = urlParams.get('type');
+    
+    if (!providerId || !providerType) {
+      showToast('Provider ID or type not found', 'error');
+      return;
+    }
+    
+    // Call API to update profit percent
+    fetch('/admin/update-service-profit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        provider_id: providerId,
+        provider_type: providerType,
+        profit_percent: newProfit
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Update the display
+        const profitDisplay = document.getElementById('profitDisplay');
+        profitDisplay.textContent = newProfit + '%';
+        
+        closeEmailModal();
+        showToast('Profit percent updated successfully!');
+      } else {
+        showToast(data.message || 'Failed to update profit percent', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showToast('Failed to update profit percent', 'error');
+    });
+  }
+
+  document.getElementById('profitModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeEmailModal();
+    }
+  });
 </script>
+{{- end }}

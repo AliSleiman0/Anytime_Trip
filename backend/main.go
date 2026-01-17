@@ -1,14 +1,18 @@
 package main
 
 import (
+	"context"
 	"log"
+	"time"
 
 	"Anytime_Travel/backend/config"
+	"Anytime_Travel/backend/core/utils"
 	"Anytime_Travel/backend/internal/database"
 	adminhandlers "Anytime_Travel/backend/internal/handlers/admin"
 	apphandlers "Anytime_Travel/backend/internal/handlers/app"
 	superadminhandlers "Anytime_Travel/backend/internal/handlers/superadmin"
 	"Anytime_Travel/backend/internal/middleware"
+	adminmodels "Anytime_Travel/backend/internal/models/admin"
 	adminrepo "Anytime_Travel/backend/internal/repository/admin"
 	apprepo "Anytime_Travel/backend/internal/repository/app"
 	superadminrepo "Anytime_Travel/backend/internal/repository/superadmin"
@@ -17,6 +21,7 @@ import (
 	superAdminRoutes "Anytime_Travel/backend/internal/routes/superadmin"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
@@ -33,15 +38,48 @@ func main() {
 	// Initialize repositories
 	appRepository := apprepo.NewUserRepository(dbConn.DB)
 	adminRepository := adminrepo.NewAdminRepository(dbConn.DB)
+	notificationPrefsRepository := adminrepo.NewNotificationPreferencesRepository(dbConn.DB)
 	superAdminRepository := superadminrepo.NewSystemConfigRepository(dbConn.DB)
+	carBookingRepository := apprepo.NewCarBookingRepository(dbConn.DB)
+	flightBookingRepository := apprepo.NewFlightBookingRepository(dbConn.DB)
+	hotelBookingRepository := apprepo.NewHotelBookingRepository(dbConn.DB)
+	// Support ticket repository
+	supportTicketRepository := apprepo.NewSupportTicketRepository(dbConn.DB)
+	// Payments repository
+	paymentRepository := apprepo.NewPaymentRepository(dbConn.DB)
+	flightRepository := adminrepo.NewFlightRepository(dbConn.DB)
+	carRepository := adminrepo.NewCarRepository(dbConn.DB)
+	hotelRepository := adminrepo.NewHotelRepository(dbConn.DB)
+	bannerRepository := adminrepo.NewBannerRepository(dbConn.DB)
+	travelRepository := adminrepo.NewTravelRepository(dbConn.DB)
+	popularRepository := adminrepo.NewPopularRepository(dbConn.DB)
+
+	if err := ensureDefaultAdmin(adminRepository); err != nil {
+		log.Printf("warning: unable to seed default admin user: %v", err)
+	}
 
 	// Initialize handlers
 	appHandler := apphandlers.NewAppHandler(appRepository)
-	adminHandler := adminhandlers.NewAdminHandler(adminRepository)
+	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, supportTicketRepository, paymentRepository, flightRepository, carRepository, hotelRepository, bannerRepository, travelRepository, popularRepository, cfg.JWTSecret)
 	superAdminHandler := superadminhandlers.NewSuperAdminHandler(superAdminRepository)
 
 	// Initialize Fiber app
 	fiberApp := fiber.New()
+
+	// Configure CORS
+	fiberApp.Use(cors.New(cors.Config{
+		AllowOrigins:     getAllowedOrigins(cfg.Environment),
+		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders:     "Origin,Content-Type,Accept,Authorization,X-Requested-With,HX-Request,HX-Target,HX-Current-URL,HX-Trigger",
+		AllowCredentials: true,
+		ExposeHeaders:    "HX-Redirect,HX-Trigger,HX-Retarget,HX-Reswap",
+		MaxAge:           3600,
+	}))
+
+	// Root route - redirect to admin login
+	fiberApp.Get("/", func(c *fiber.Ctx) error {
+		return c.Redirect("/admin/login")
+	})
 
 	// Setup static files (relative to backend working dir)
 	fiberApp.Static("/static", "./static")
@@ -58,13 +96,12 @@ func main() {
 
 	// Admin routes (with middleware) served under /admin
 	adminGroup := fiberApp.Group("/admin")
-	adminGroup.Use(middleware.AuthMiddleware())
-	adminGroup.Use(middleware.AdminMiddleware())
-	adminRoutes.SetupRoutes(adminGroup, adminHandler)
+	// Apply auth middleware only to protected routes, excluding login pages
+	adminRoutes.SetupRoutes(adminGroup, adminHandler, cfg.JWTSecret)
 
 	// Super Admin routes (with middleware)
 	superAdminGroup := fiberApp.Group("/superadmin")
-	superAdminGroup.Use(middleware.AuthMiddleware())
+	superAdminGroup.Use(middleware.AuthMiddleware(cfg.JWTSecret))
 	superAdminGroup.Use(middleware.SuperAdminMiddleware())
 	superAdminRoutes.SetupRoutes(superAdminGroup, superAdminHandler)
 
@@ -72,4 +109,41 @@ func main() {
 	if err := fiberApp.Listen(":" + cfg.Port); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// ensureDefaultAdmin creates a default admin user if none exists so login works out of the box.
+func ensureDefaultAdmin(repo *adminrepo.AdminRepository) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if _, err := repo.FindByEmail(ctx, "admin@anytime.com"); err == nil {
+		return nil // already exists
+	}
+
+	hashed, err := utils.HashPassword("admin123")
+	if err != nil {
+		return err
+	}
+
+	adminUser := &adminmodels.AdminUser{
+		ID:          1,
+		Username:    "admin",
+		Password:    hashed,
+		Email:       "admin@anytime.com", // stored lowercase
+		Role:        "admin",
+		Permissions: []string{"all"},
+		CreatedAt:   time.Now(),
+	}
+
+	return repo.Create(ctx, adminUser)
+}
+
+// getAllowedOrigins returns CORS allowed origins based on environment
+func getAllowedOrigins(environment string) string {
+	if environment == "production" {
+		// In production, specify exact domains
+		return "https://yourdomain.com,https://www.yourdomain.com,https://admin.yourdomain.com"
+	}
+	// In development, allow localhost origins
+	return "http://localhost:3000,http://localhost:5173,http://localhost:8080,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:8080"
 }

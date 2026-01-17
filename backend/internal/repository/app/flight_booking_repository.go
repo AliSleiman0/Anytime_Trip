@@ -187,3 +187,15 @@ func (r *FlightBookingRepository) CountByUser(ctx context.Context, userID string
 func (r *FlightBookingRepository) CountByStatus(ctx context.Context, status app.FlightBookingStatus) (int64, error) {
 	return r.collection.CountDocuments(ctx, bson.M{"status": status})
 }
+
+// UpdateCustomerEmail updates the customer email for a flight booking
+func (r *FlightBookingRepository) UpdateCustomerEmail(ctx context.Context, id string, email string) error {
+	update := bson.M{
+		"$set": bson.M{
+			"customer.email": email,
+			"updated_at":     time.Now(),
+		},
+	}
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	return err
+}

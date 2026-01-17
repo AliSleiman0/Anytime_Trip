@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}} - Seven Hives Admin</title>
+    <title>{{.Title}} - Anytime Trip Admin</title>
     <!-- Include HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <!-- Include Tailwind CSS or your CSS -->
@@ -13,10 +13,15 @@
 <body class="bg-[#E6F0F9]">
     <!-- Sidebar Component -->
     <div hx-get="/admin/sidebar" hx-trigger="load" hx-swap="innerHTML"></div>
-    
+
     <!-- Main Content Area - Admin Dashboard Fragment -->
     <div id="main-content" hx-get="/admin/payments-frag" hx-trigger="load" hx-swap="innerHTML"></div>
-    
-        
+
+    <!-- Export / client-side libraries required by export.js -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="/static/export.js"></script>
+
 </body>
 </html>

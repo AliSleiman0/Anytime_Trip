@@ -1,5 +1,65 @@
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+<style>
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #336891;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2a5573;
+  }
+  /* Flatpickr appended calendar buttons */
+  .flatpickr-calendar .calendar-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    padding: 0.5rem;
+    border-top: 1px solid #E6EEF6;
+    margin-top: 0.5rem;
+  }
+
+  .flatpickr-calendar .calendar-buttons button {
+    font-size: 0.85rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.5rem;
+    line-height: 1;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+
+  .flatpickr-calendar .calendar-buttons .cancel-btn {
+    background: #ffffff;
+    color: #336891;
+    border-color: #336891;
+  }
+
+  .flatpickr-calendar .calendar-buttons .cancel-btn:hover,
+  .flatpickr-calendar .calendar-buttons .cancel-btn:focus {
+    background: #f3f9ff;
+    outline: none;
+  }
+
+  .flatpickr-calendar .calendar-buttons .clear-btn {
+    background: #336891;
+    color: #ffffff;
+    border-color: #336891;
+  }
+
+  .flatpickr-calendar .calendar-buttons .clear-btn:hover,
+  .flatpickr-calendar .calendar-buttons .clear-btn:focus {
+    background: #254d6b;
+    outline: none;
+  }
+</style>
+
+<div id="payments-fragment" class="fixed top-0 left-64 right-0 h-screen overflow-auto">
   <main>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <div
       hx-get="/admin/header?title=Payments and Transactions&subtitle=Track payments, refunds, and payouts"
       hx-trigger="load"
@@ -14,7 +74,7 @@
             Overall Revenue
           </div>
           <div class="flex items-end justify-between">
-            <div class="text-2xl font-bold text-[#1f3242]">71,000</div>
+            <div class="text-2xl font-bold text-[#1f3242]">{{.OverallRevenue}}</div>
             <div
               class="flex items-center gap-1 text-[#26CE00] text-xs font-semibold"
             >
@@ -40,7 +100,7 @@
         <div class="bg-white rounded-2xl p-4 shadow-xl">
           <div class="text-xs font-semibold text-gray-600 mb-2">Payments</div>
           <div class="flex items-end justify-between">
-            <div class="text-2xl font-bold text-[#1f3242]">71,000</div>
+            <div class="text-2xl font-bold text-[#1f3242]">{{.PaymentsCount}}</div>
             <div
               class="flex items-center gap-1 text-[#D24124] text-xs font-semibold"
             >
@@ -67,7 +127,7 @@
         <div class="bg-white rounded-2xl p-4 shadow-xl">
           <div class="text-xs font-semibold text-gray-600 mb-2">Refunds</div>
           <div class="flex items-end justify-between">
-            <div class="text-2xl font-bold text-[#1f3242]">71,000</div>
+            <div class="text-2xl font-bold text-[#1f3242]">{{.RefundsCount}}</div>
             <div
               class="flex items-center gap-1 text-[#D24124] text-xs font-semibold"
             >
@@ -96,7 +156,7 @@
             Cancellations
           </div>
           <div class="flex items-end justify-between">
-            <div class="text-2xl font-bold text-[#1f3242]">71,000</div>
+            <div class="text-2xl font-bold text-[#1f3242]">{{.CancellationsCount}}</div>
             <div
               class="flex items-center gap-1 text-[#D24124] text-xs font-semibold"
             >
@@ -122,626 +182,257 @@
       </div>
 
       <!-- Filters -->
-      <div class="flex flex-wrap gap-3 mb-4 justify-between">
+      <form class="flex flex-wrap gap-3 mb-4 justify-between"
+            hx-get="/admin/payments-frag"
+            hx-trigger="change, submit"
+            hx-target="#payments-fragment"
+            hx-swap="outerHTML">
         <input
-          type="date"
-          class="w-44 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          id="date"
+          name="date"
+          type="text"
           placeholder="Select Date"
+          value="{{.Filters.Date}}"
+          readonly
+          class="date-input w-44 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891] cursor-pointer"
         />
+          <select
+            name="method"
+            id="filter-payment-method"
+            class="w-52 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          >
+            <option class="text-[#9B9B9B]" value="all" {{if or (eq .Filters.Method "") (eq .Filters.Method "all")}}selected{{end}}>All Methods</option>
+            {{- range .PaymentMethods }}
+              <option value="{{ . }}" {{ if eq . $.Filters.Method }}selected{{ end }}>{{ . }}</option>
+            {{- end }}
+          </select>
         <select
+          name="type"
+          id="filter-booking-type"
           class="w-52 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
         >
-          <option disabled selected hidden>Payment Method</option>
-          <option>Card</option>
-          <option>Bank Transfer</option>
-          <option>Wallet</option>
-          <option>Cash</option>
+            <option class="text-[#9B9B9B]" value="all" {{if or (eq .Filters.Type "") (eq .Filters.Type "all")}}selected{{end}}>All Bookings</option>
+            {{- range .BookingTypes }}
+              <option value="{{ . }}" {{ if eq . $.Filters.Type }}selected{{ end }}>{{ . }}</option>
+            {{- end }}
         </select>
         <select
+          name="status"
+          id="filter-payment-status"
           class="w-52 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
         >
-          <option disabled selected hidden>All Bookings</option>
-          <option>Flight</option>
-          <option>Hotel</option>
-          <option>Car</option>
+            <option class="text-[#9B9B9B]" value="all" {{if or (eq .Filters.Status "") (eq .Filters.Status "all")}}selected{{end}}>All Status</option>
+            {{- range .PaymentStatuses }}
+              <option value="{{ . }}" {{ if eq . $.Filters.Status }}selected{{ end }}>{{ . }}</option>
+            {{- end }}
         </select>
-        <select
-          class="w-52 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
-        >
-          <option disabled selected hidden>All Status</option>
-          <option>Paid</option>
-          <option>Pending</option>
-          <option>Failed</option>
-          <option>Refunded</option>
-        </select>
-      </div>
+      </form>
 
-      <div
-        class="rounded-2xl overflow-hidden bg-white border border-[#CAD9EA] shadow-sm"
-      >
-        <table class="w-full text-sm">
-          <thead class="bg-[#336891] text-white">
-            <tr>
-              <th class="px-3 py-3 text-left font-semibold">Booking ID</th>
-              <th class="px-3 py-3 text-left font-semibold">Type</th>
-              <th class="px-3 py-3 text-left font-semibold">Customer</th>
-              <th class="px-3 py-3 text-left font-semibold">Booking Date</th>
-              <th class="px-3 py-3 text-left font-semibold">Amount</th>
-              <th class="px-3 py-3 text-left font-semibold">Payment Status</th>
-              <th class="px-3 py-3 text-center font-semibold">Action</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-[#E4ECF4] text-gray-800">
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">BK001</td>
-              <td class="px-3 py-3">
-                <div class="flex items-center gap-2">
-                  <svg
-                    width="16"
-                    height="16"
+      <div class="rounded-2xl overflow-hidden bg-white border border-[#CAD9EA] shadow-sm">
+        <div class="overflow-y-auto custom-scrollbar" style="max-height: 560px;">
+          <table class="w-full text-sm">
+            <thead class="bg-[#336891] text-white">
+              <tr>
+                <th class="px-3 py-3 text-center font-semibold" style="width: 12%;">Booking ID</th>
+                <th class="px-3 py-3 text-center font-semibold" style="width: 13%;">Type</th>
+                <th class="px-3 py-3 text-center font-semibold" style="width: 20%;">Customer</th>
+                <th class="px-3 py-3 text-center font-semibold" style="width: 15%;">Booking Date</th>
+                <th class="px-3 py-3 text-center font-semibold" style="width: 13%;">Amount</th>
+                <th class="px-3 py-3 text-center font-semibold" style="width: 15%;">Payment Status</th>
+                <th class="px-3 py-3 text-center font-semibold" style="width: 12%;">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#E4ECF4] text-gray-800">
+              {{- range .Payments }}
+              <tr>
+                <td class="px-3 py-3 text-center font-semibold text-[#1f3242]" style="width: 12%">{{.BookingID}}</td>
+                <td class="px-3 py-3 text-center" style="width: 13%;">
+                  <div class="flex items-center gap-2 justify-center">
+                    {{ if eq .Type "Flight" }}
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M16.5 4.50023C17.3284 3.6718 18.6716 3.6718 19.5 4.50023C20.3284 5.32866 20.3284 6.6718 19.5 7.50023L17 10.0002L18.8633 17.4363C18.9482 17.7751 18.8501 18.1337 18.6046 18.3822L18.3626 18.6271C17.9174 19.0778 17.1706 19.0061 16.8192 18.479L13.5 13.5002L9.50003 17.5002V19.586C9.50003 19.8512 9.39467 20.1056 9.20714 20.2931L8.92581 20.5744C8.45956 21.0407 7.6776 20.9359 7.35046 20.3635L6.00003 18.0002L3.63678 16.6498C3.06428 16.3226 2.95956 15.5407 3.42581 15.0744L3.70714 14.7931C3.89467 14.6056 4.14903 14.5002 4.41424 14.5002H6.50003L10.5 10.5002L5.52128 7.18106C4.99416 6.82965 4.9225 6.08286 5.37319 5.63762L5.61819 5.39558C5.86667 5.1501 6.22523 5.05206 6.56404 5.13696L14 7.00023L16.5 4.50023Z"
+                          stroke="black"
+                          stroke-width="1.5"
+                        />
+                      </svg>
+                    {{ else if eq .Type "Hotel" }}
+                      <svg
+                    width="24"
+                    height="24"
                     viewBox="0 0 24 24"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
+                    <mask id="path-1-inside-1_332_3767" fill="white">
+                      <path d="M19.1147 8.91572H14.7947V3.87281C14.7942 1.73334 13.0614 0.00046875 10.9219 0H4.88458C2.74511 0.00046875 1.01223 1.73334 1.01172 3.87281V24H2.74652V3.87281C2.74698 3.27984 2.98464 2.75081 3.37291 2.36114C3.76262 1.97283 4.29161 1.73522 4.88458 1.7347H10.9219C11.5149 1.73517 12.0439 1.97283 12.4336 2.36114C12.8218 2.75081 13.0595 3.27984 13.06 3.87281V24H14.7947V10.6505H19.1147C19.7077 10.6509 20.2367 10.8886 20.6264 11.2769C21.0147 11.6666 21.2523 12.1956 21.2528 12.7886V24H22.9876V12.7885C22.987 10.6491 21.2542 8.91619 19.1147 8.91572Z" />
+                    </mask>
                     <path
-                      d="M7 13C7.55228 13 8 12.5523 8 12C8 11.4477 7.55228 11 7 11C6.44772 11 6 11.4477 6 12C6 12.5523 6.44772 13 7 13Z"
-                      fill="#1f3242"
+                      d="M19.1147 8.91572L19.1154 5.91572H19.1147V8.91572ZM14.7947 8.91572H11.7947V11.9157H14.7947V8.91572ZM14.7947 3.87281L17.7947 3.87281V3.87216L14.7947 3.87281ZM10.9219 0L10.9225 -3H10.9219V0ZM4.88458 0V-3H4.88392L4.88458 0ZM1.01172 3.87281L-1.98828 3.87209V3.87281H1.01172ZM1.01172 24H-1.98828V27H1.01172V24ZM2.74652 24V27H5.74652V24H2.74652ZM2.74652 3.87281L-0.253484 3.87044V3.87281H2.74652ZM3.37291 2.36114L1.25541 0.235976L1.24775 0.243658L3.37291 2.36114ZM4.88458 1.7347V-1.2653L4.88197 -1.2653L4.88458 1.7347ZM10.9219 1.7347L10.9243 -1.2653H10.9219V1.7347ZM12.4336 2.36114L14.5587 0.243645L14.5512 0.236117L12.4336 2.36114ZM13.06 3.87281L16.06 3.87281L16.06 3.87044L13.06 3.87281ZM13.06 24H10.06V27H13.06V24ZM14.7947 24V27H17.7947V24H14.7947ZM14.7947 10.6505V7.65047H11.7947V10.6505H14.7947ZM19.1147 10.6505L19.1171 7.65047H19.1147V10.6505ZM20.6264 11.2769L22.7514 9.15928L22.744 9.15188L20.6264 11.2769ZM21.2528 12.7886H24.2528L24.2528 12.786L21.2528 12.7886ZM21.2528 24H18.2528V27H21.2528V24ZM22.9876 24V27H25.9876V24H22.9876ZM22.9876 12.7885L25.9876 12.7885V12.7878L22.9876 12.7885ZM19.1147 8.91572V5.91572H14.7947V8.91572V11.9157H19.1147V8.91572ZM14.7947 8.91572H17.7947V3.87281H14.7947H11.7947V8.91572H14.7947ZM14.7947 3.87281L17.7947 3.87216C17.7939 0.0763462 14.7184 -2.99917 10.9225 -3L10.9219 0L10.9212 3C11.4044 3.00011 11.7946 3.39034 11.7947 3.87347L14.7947 3.87281ZM10.9219 0V-3H4.88458V0V3H10.9219V0ZM4.88458 0L4.88392 -3C1.0881 -2.99917 -1.98737 0.0763441 -1.98828 3.87209L1.01172 3.87281L4.01172 3.87354C4.01184 3.39034 4.40212 3.00011 4.88524 3L4.88458 0ZM1.01172 3.87281H-1.98828V24H1.01172H4.01172V3.87281H1.01172ZM1.01172 24V27H2.74652V24V21H1.01172V24ZM2.74652 24H5.74652V3.87281H2.74652H-0.253484V24H2.74652ZM2.74652 3.87281L5.74651 3.87518C5.74633 4.11084 5.64378 4.33237 5.49806 4.47862L3.37291 2.36114L1.24775 0.243658C0.325501 1.16925 -0.25236 2.44884 -0.253484 3.87044L2.74652 3.87281ZM3.37291 2.36114L5.49039 4.48629C5.34415 4.63201 5.12263 4.7345 4.88719 4.7347L4.88458 1.7347L4.88197 -1.2653C3.46059 -1.26406 2.1811 -0.686351 1.25542 0.23599L3.37291 2.36114ZM4.88458 1.7347V4.7347H10.9219V1.7347V-1.2653H4.88458V1.7347ZM10.9219 1.7347L10.9195 4.7347C10.6838 4.73452 10.4622 4.63195 10.316 4.48616L12.4336 2.36114L14.5512 0.236117C13.6255 -0.686293 12.3459 -1.26417 10.9243 -1.2653L10.9219 1.7347ZM12.4336 2.36114L10.3084 4.47862C10.1627 4.33237 10.0601 4.11085 10.06 3.87518L13.06 3.87281L16.06 3.87044C16.0588 2.44884 15.481 1.16925 14.5587 0.243658L12.4336 2.36114ZM13.06 3.87281H10.06V24H13.06H16.06V3.87281H13.06ZM13.06 24V27H14.7947V24V21H13.06V24ZM14.7947 24H17.7947V10.6505H14.7947H11.7947V24H14.7947ZM14.7947 10.6505V13.6505H19.1147V10.6505V7.65047H14.7947V10.6505ZM19.1147 10.6505L19.1123 13.6505C18.8767 13.6503 18.6551 13.5477 18.5088 13.4019L20.6264 11.2769L22.744 9.15188C21.8183 8.22947 20.5387 7.65159 19.1171 7.65047L19.1147 10.6505ZM20.6264 11.2769L18.5014 13.3945C18.3554 13.2481 18.253 13.0265 18.2528 12.7912L21.2528 12.7886L24.2528 12.786C24.2516 11.3647 23.6739 10.0851 22.7514 9.1593L20.6264 11.2769ZM21.2528 12.7886H18.2528V24H21.2528H24.2528V12.7886H21.2528ZM21.2528 24V27H22.9876V24V21H21.2528V24ZM22.9876 24H25.9876V12.7885H22.9876H19.9876V24H22.9876ZM22.9876 12.7885L25.9876 12.7878C25.9866 8.99206 22.9112 5.91655 19.1154 5.91572L19.1147 8.91572L19.114 11.9157C19.5972 11.9158 19.9874 12.3061 19.9876 12.7893L22.9876 12.7885Z"
+                      fill="black"
+                      mask="url(#path-1-inside-1_332_3767)"
                     />
+                    <mask id="path-3-inside-2_332_3767" fill="white">
+                      <path d="M6.70877 6.16846H5.21777V8.69858H6.70877V6.16846Z" />
+                    </mask>
                     <path
-                      d="M18 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V4C20 2.89543 19.1046 2 18 2Z"
-                      stroke="#1f3242"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+                      d="M5.21777 6.16846V4.16846H3.21777V6.16846H5.21777ZM6.70877 6.16846H8.70877V4.16846H6.70877V6.16846ZM6.70877 8.69858V10.6986H8.70877V8.69858H6.70877ZM5.21777 8.69858H3.21777V10.6986H5.21777V8.69858ZM5.21777 6.16846V8.16846H6.70877V6.16846V4.16846H5.21777V6.16846ZM6.70877 6.16846H4.70877V8.69858H6.70877H8.70877V6.16846H6.70877ZM6.70877 8.69858V6.69858H5.21777V8.69858V10.6986H6.70877V8.69858ZM5.21777 8.69858H7.21777V6.16846H5.21777H3.21777V8.69858H5.21777Z"
+                      fill="black"
+                      mask="url(#path-3-inside-2_332_3767)"
+                    />
+                    <mask id="path-5-inside-3_332_3767" fill="white">
+                      <path d="M10.3953 6.16846H8.9043V8.69858H10.3953V6.16846Z" />
+                    </mask>
+                    <path
+                      d="M8.9043 6.16846V4.16846H6.9043V6.16846H8.9043ZM10.3953 6.16846H12.3953V4.16846H10.3953V6.16846ZM10.3953 8.69858V10.6986H12.3953V8.69858H10.3953ZM8.9043 8.69858H6.9043V10.6986H8.9043V8.69858ZM8.9043 6.16846V8.16846H10.3953V6.16846V4.16846H8.9043V6.16846ZM10.3953 6.16846H8.3953V8.69858H10.3953H12.3953V6.16846H10.3953ZM10.3953 8.69858V6.69858H8.9043V8.69858V10.6986H10.3953V8.69858ZM8.9043 8.69858H10.9043V6.16846H8.9043H6.9043V8.69858H8.9043Z"
+                      fill="black"
+                      mask="url(#path-5-inside-3_332_3767)"
+                    />
+                    <mask id="path-7-inside-4_332_3767" fill="white">
+                      <path d="M6.70877 11.9517H5.21777V14.4818H6.70877V11.9517Z" />
+                    </mask>
+                    <path
+                      d="M5.21777 11.9517V9.95166H3.21777V11.9517H5.21777ZM6.70877 11.9517H8.70877V9.95166H6.70877V11.9517ZM6.70877 14.4818V16.4818H8.70877V14.4818H6.70877ZM5.21777 14.4818H3.21777V16.4818H5.21777V14.4818ZM5.21777 11.9517V13.9517H6.70877V11.9517V9.95166H5.21777V11.9517ZM6.70877 11.9517H4.70877V14.4818H6.70877H8.70877V11.9517H6.70877ZM6.70877 14.4818V12.4818H5.21777V14.4818V16.4818H6.70877V14.4818ZM5.21777 14.4818H7.21777V11.9517H5.21777H3.21777V14.4818H5.21777Z"
+                      fill="black"
+                      mask="url(#path-7-inside-4_332_3767)"
+                    />
+                    <mask id="path-9-inside-5_332_3767" fill="white">
+                      <path d="M10.3953 11.9517H8.9043V14.4818H10.3953V11.9517Z" />
+                    </mask>
+                    <path
+                      d="M8.9043 11.9517V9.95166H6.9043V11.9517H8.9043ZM10.3953 11.9517H12.3953V9.95166H10.3953V11.9517ZM10.3953 14.4818V16.4818H12.3953V14.4818H10.3953ZM8.9043 14.4818H6.9043V16.4818H8.9043V14.4818ZM8.9043 11.9517V13.9517H10.3953V11.9517V9.95166H8.9043V11.9517ZM10.3953 11.9517H8.3953V14.4818H10.3953H12.3953V11.9517H10.3953ZM10.3953 14.4818V12.4818H8.9043V14.4818V16.4818H10.3953V14.4818ZM8.9043 14.4818H10.9043V11.9517H8.9043H6.9043V14.4818H8.9043Z"
+                      fill="black"
+                      mask="url(#path-9-inside-5_332_3767)"
+                    />
+                    <mask id="path-11-inside-6_332_3767" fill="white">
+                      <path d="M6.70877 17.7349H5.21777V20.265H6.70877V17.7349Z" />
+                    </mask>
+                    <path
+                      d="M5.21777 17.7349V15.7349H3.21777V17.7349H5.21777ZM6.70877 17.7349H8.70877V15.7349H6.70877V17.7349ZM6.70877 20.265V22.265H8.70877V20.265H6.70877ZM5.21777 20.265H3.21777V22.265H5.21777V20.265ZM5.21777 17.7349V19.7349H6.70877V17.7349V15.7349H5.21777V17.7349ZM6.70877 17.7349H4.70877V20.265H6.70877H8.70877V17.7349H6.70877ZM6.70877 20.265V18.265H5.21777V20.265V22.265H6.70877V20.265ZM5.21777 20.265H7.21777V17.7349H5.21777H3.21777V20.265H5.21777Z"
+                      fill="black"
+                      mask="url(#path-11-inside-6_332_3767)"
+                    />
+                    <mask id="path-13-inside-7_332_3767" fill="white">
+                      <path d="M10.3953 17.7349H8.9043V20.265H10.3953V17.7349Z" />
+                    </mask>
+                    <path
+                      d="M8.9043 17.7349V15.7349H6.9043V17.7349H8.9043ZM10.3953 17.7349H12.3953V15.7349H10.3953V17.7349ZM10.3953 20.265V22.265H12.3953V20.265H10.3953ZM8.9043 20.265H6.9043V22.265H8.9043V20.265ZM8.9043 17.7349V19.7349H10.3953V17.7349V15.7349H8.9043V17.7349ZM10.3953 17.7349H8.3953V20.265H10.3953H12.3953V17.7349H10.3953ZM10.3953 20.265V18.265H8.9043V20.265V22.265H10.3953V20.265ZM8.9043 20.265H10.9043V17.7349H8.9043H6.9043V20.265H8.9043Z"
+                      fill="black"
+                      mask="url(#path-13-inside-7_332_3767)"
+                    />
+                    <mask id="path-15-inside-8_332_3767" fill="white">
+                      <path d="M18.5281 13.5781H17.0371V16.1082H18.5281V13.5781Z" />
+                    </mask>
+                    <path
+                      d="M17.0371 13.5781V11.5781H15.0371V13.5781H17.0371ZM18.5281 13.5781H20.5281V11.5781H18.5281V13.5781ZM18.5281 16.1082V18.1082H20.5281V16.1082H18.5281ZM17.0371 16.1082H15.0371V18.1082H17.0371V16.1082ZM17.0371 13.5781V15.5781H18.5281V13.5781V11.5781H17.0371V13.5781ZM18.5281 13.5781H16.5281V16.1082H18.5281H20.5281V13.5781H18.5281ZM18.5281 16.1082V14.1082H17.0371V16.1082V18.1082H18.5281V16.1082ZM17.0371 16.1082H19.0371V13.5781H17.0371H15.0371V16.1082H17.0371Z"
+                      fill="black"
+                      mask="url(#path-15-inside-8_332_3767)"
+                    />
+                    <mask id="path-17-inside-9_332_3767" fill="white">
+                      <path d="M18.5281 19.1206H17.0371V21.6507H18.5281V19.1206Z" />
+                    </mask>
+                    <path
+                      d="M17.0371 19.1206V17.1206H15.0371V19.1206H17.0371ZM18.5281 19.1206H20.5281V17.1206H18.5281V19.1206ZM18.5281 21.6507V23.6507H20.5281V21.6507H18.5281ZM17.0371 21.6507H15.0371V23.6507H17.0371V21.6507ZM17.0371 19.1206V21.1206H18.5281V19.1206V17.1206H17.0371V19.1206ZM18.5281 19.1206H16.5281V21.6507H18.5281H20.5281V19.1206H18.5281ZM18.5281 21.6507V19.6507H17.0371V21.6507V23.6507H18.5281V21.6507ZM17.0371 21.6507H19.0371V19.1206H17.0371H15.0371V21.6507H17.0371Z"
+                      fill="black"
+                      mask="url(#path-17-inside-9_332_3767)"
                     />
                   </svg>
-                  <span>Flight</span>
-                </div>
-              </td>
-              <td class="px-3 py-3">
-                <div>
-                  <div class="font-semibold text-sm">John Smith</div>
-                  <div class="text-xs text-gray-500">john.smith@gmail.com</div>
-                </div>
-              </td>
-              <td class="px-3 py-3 text-sm">1/15/2025</td>
-              <td class="px-3 py-3 font-semibold">
-                $850.00<br /><span class="text-xs text-gray-500"
-                  >(By Whish)</span
-                >
-              </td>
-              <td class="px-3 py-3">
-                <span
-                  class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]"
-                  >Paid</span
-                >
-              </td>
-              <td class="px-3 py-3 text-center">
-                <button
-                  class="w-8 h-8 rounded-lg bg-[#336891] text-white flex items-center justify-center"
-                  aria-label="More options"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="6"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="18"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">BK002</td>
-              <td class="px-3 py-3">
-                <div class="flex items-center gap-2">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M7 13C7.55228 13 8 12.5523 8 12C8 11.4477 7.55228 11 7 11C6.44772 11 6 11.4477 6 12C6 12.5523 6.44772 13 7 13Z"
-                      fill="#1f3242"
-                    />
-                    <path
-                      d="M18 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V4C20 2.89543 19.1046 2 18 2Z"
-                      stroke="#1f3242"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  <span>Flight</span>
-                </div>
-              </td>
-              <td class="px-3 py-3">
-                <div>
-                  <div class="font-semibold text-sm">John Smith</div>
-                  <div class="text-xs text-gray-500">john.smith@gmail.com</div>
-                </div>
-              </td>
-              <td class="px-3 py-3 text-sm">1/15/2025</td>
-              <td class="px-3 py-3 font-semibold">
-                $850.00<br /><span class="text-xs text-gray-500"
-                  >(By Whish)</span
-                >
-              </td>
-              <td class="px-3 py-3">
-                <span
-                  class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]"
-                  >Paid</span
-                >
-              </td>
-              <td class="px-3 py-3 text-center">
-                <button
-                  class="w-8 h-8 rounded-lg bg-[#336891] text-white flex items-center justify-center"
-                  aria-label="More options"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="6"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="18"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">BK003</td>
-              <td class="px-3 py-3">
-                <div class="flex items-center gap-2">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M7 13C7.55228 13 8 12.5523 8 12C8 11.4477 7.55228 11 7 11C6.44772 11 6 11.4477 6 12C6 12.5523 6.44772 13 7 13Z"
-                      fill="#1f3242"
-                    />
-                    <path
-                      d="M18 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V4C20 2.89543 19.1046 2 18 2Z"
-                      stroke="#1f3242"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  <span>Flight</span>
-                </div>
-              </td>
-              <td class="px-3 py-3">
-                <div>
-                  <div class="font-semibold text-sm">John Smith</div>
-                  <div class="text-xs text-gray-500">john.smith@gmail.com</div>
-                </div>
-              </td>
-              <td class="px-3 py-3 text-sm">1/15/2025</td>
-              <td class="px-3 py-3 font-semibold">
-                $850.00<br /><span class="text-xs text-gray-500"
-                  >(By Whish)</span
-                >
-              </td>
-              <td class="px-3 py-3">
-                <span
-                  class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]"
-                  >Paid</span
-                >
-              </td>
-              <td class="px-3 py-3 text-center">
-                <button
-                  class="w-8 h-8 rounded-lg bg-[#336891] text-white flex items-center justify-center"
-                  aria-label="More options"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="6"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="18"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">BK004</td>
-              <td class="px-3 py-3">
-                <div class="flex items-center gap-2">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M7 13C7.55228 13 8 12.5523 8 12C8 11.4477 7.55228 11 7 11C6.44772 11 6 11.4477 6 12C6 12.5523 6.44772 13 7 13Z"
-                      fill="#1f3242"
-                    />
-                    <path
-                      d="M18 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V4C20 2.89543 19.1046 2 18 2Z"
-                      stroke="#1f3242"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  <span>Flight</span>
-                </div>
-              </td>
-              <td class="px-3 py-3">
-                <div>
-                  <div class="font-semibold text-sm">John Smith</div>
-                  <div class="text-xs text-gray-500">john.smith@gmail.com</div>
-                </div>
-              </td>
-              <td class="px-3 py-3 text-sm">1/15/2025</td>
-              <td class="px-3 py-3 font-semibold">
-                $850.00<br /><span class="text-xs text-gray-500"
-                  >(By Whish)</span
-                >
-              </td>
-              <td class="px-3 py-3">
-                <span
-                  class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]"
-                  >Paid</span
-                >
-              </td>
-              <td class="px-3 py-3 text-center">
-                <button
-                  class="w-8 h-8 rounded-lg bg-[#336891] text-white flex items-center justify-center"
-                  aria-label="More options"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="6"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="18"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">BK005</td>
-              <td class="px-3 py-3">
-                <div class="flex items-center gap-2">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M7 13C7.55228 13 8 12.5523 8 12C8 11.4477 7.55228 11 7 11C6.44772 11 6 11.4477 6 12C6 12.5523 6.44772 13 7 13Z"
-                      fill="#1f3242"
-                    />
-                    <path
-                      d="M18 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V4C20 2.89543 19.1046 2 18 2Z"
-                      stroke="#1f3242"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  <span>Flight</span>
-                </div>
-              </td>
-              <td class="px-3 py-3">
-                <div>
-                  <div class="font-semibold text-sm">John Smith</div>
-                  <div class="text-xs text-gray-500">john.smith@gmail.com</div>
-                </div>
-              </td>
-              <td class="px-3 py-3 text-sm">1/15/2025</td>
-              <td class="px-3 py-3 font-semibold">
-                $850.00<br /><span class="text-xs text-gray-500"
-                  >(By Whish)</span
-                >
-              </td>
-              <td class="px-3 py-3">
-                <span
-                  class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]"
-                  >Paid</span
-                >
-              </td>
-              <td class="px-3 py-3 text-center">
-                <button
-                  class="w-8 h-8 rounded-lg bg-[#336891] text-white flex items-center justify-center"
-                  aria-label="More options"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="6"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="18"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">BK006</td>
-              <td class="px-3 py-3">
-                <div class="flex items-center gap-2">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M7 13C7.55228 13 8 12.5523 8 12C8 11.4477 7.55228 11 7 11C6.44772 11 6 11.4477 6 12C6 12.5523 6.44772 13 7 13Z"
-                      fill="#1f3242"
-                    />
-                    <path
-                      d="M18 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V4C20 2.89543 19.1046 2 18 2Z"
-                      stroke="#1f3242"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  <span>Flight</span>
-                </div>
-              </td>
-              <td class="px-3 py-3">
-                <div>
-                  <div class="font-semibold text-sm">John Smith</div>
-                  <div class="text-xs text-gray-500">john.smith@gmail.com</div>
-                </div>
-              </td>
-              <td class="px-3 py-3 text-sm">1/15/2025</td>
-              <td class="px-3 py-3 font-semibold">
-                $850.00<br /><span class="text-xs text-gray-500"
-                  >(By Whish)</span
-                >
-              </td>
-              <td class="px-3 py-3">
-                <span
-                  class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]"
-                  >Paid</span
-                >
-              </td>
-              <td class="px-3 py-3 text-center">
-                <button
-                  class="w-8 h-8 rounded-lg bg-[#336891] text-white flex items-center justify-center"
-                  aria-label="More options"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="6"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="18"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td class="px-3 py-3 font-semibold text-[#1f3242]">BK007</td>
-              <td class="px-3 py-3">
-                <div class="flex items-center gap-2">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M7 13C7.55228 13 8 12.5523 8 12C8 11.4477 7.55228 11 7 11C6.44772 11 6 11.4477 6 12C6 12.5523 6.44772 13 7 13Z"
-                      fill="#1f3242"
-                    />
-                    <path
-                      d="M18 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V4C20 2.89543 19.1046 2 18 2Z"
-                      stroke="#1f3242"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  <span>Flight</span>
-                </div>
-              </td>
-              <td class="px-3 py-3">
-                <div>
-                  <div class="font-semibold text-sm">John Smith</div>
-                  <div class="text-xs text-gray-500">john.smith@gmail.com</div>
-                </div>
-              </td>
-              <td class="px-3 py-3 text-sm">1/15/2025</td>
-              <td class="px-3 py-3 font-semibold">
-                $850.00<br /><span class="text-xs text-gray-500"
-                  >(By Whish)</span
-                >
-              </td>
-              <td class="px-3 py-3">
-                <span
-                  class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]"
-                  >Paid</span
-                >
-              </td>
-              <td class="px-3 py-3 text-center">
-                <button
-                  class="w-8 h-8 rounded-lg bg-[#336891] text-white flex items-center justify-center"
-                  aria-label="More options"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="6"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                    <circle
-                      cx="12"
-                      cy="18"
-                      r="2"
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                    {{ else }}
+                      <svg
+                        width="24"
+                        height="15"
+                        viewBox="0 0 24 15"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M4.94531 0.5H12.4453C13.1858 0.5 13.8808 0.828713 14.3584 1.39941H14.3594L17.2891 4.8916L17.3926 5.01562L17.5488 5.05469L21.6035 6.08594L21.6064 6.08691C22.7165 6.36279 23.5 7.36387 23.5 8.50781V11.25C23.5 11.7942 23.0442 12.25 22.5 12.25H21.2461L21.1484 12.625C20.8688 13.7036 19.9002 14.5 18.75 14.5C17.5998 14.5 16.6312 13.7036 16.3516 12.625L16.2539 12.25H8.49609L8.39844 12.625C8.11876 13.7036 7.15016 14.5 6 14.5C4.80183 14.5 3.7941 13.6438 3.55957 12.5078L3.49707 12.2012L3.19336 12.125L1.24805 11.6328L1.24707 11.6318L1.08887 11.5781C0.736007 11.422 0.5 11.0672 0.5 10.6641V5.69531C0.5 5.34824 0.599257 5.01683 0.790039 4.73047L0.791016 4.73145L2.87695 1.61426V1.61328C3.342 0.915718 4.11257 0.5 4.94531 0.5ZM6 10C4.88597 10 4 10.886 4 12C4 13.114 4.88597 14 6 14C7.11403 14 8 13.114 8 12C8 10.886 7.11403 10 6 10ZM18.75 10C17.636 10 16.75 10.886 16.75 12C16.75 13.114 17.636 14 18.75 14C19.864 14 20.75 13.114 20.75 12C20.75 10.886 19.864 10 18.75 10ZM1 11.0527L1.37695 11.1484L3.04102 11.5703L3.49609 11.6855L3.63965 11.2393C3.96637 10.2274 4.89867 9.5 6 9.5C7.15016 9.5 8.11876 10.2964 8.39844 11.375L8.49609 11.75H16.2539L16.3516 11.375C16.6312 10.2964 17.5998 9.5 18.75 9.5C19.9002 9.5 20.8688 10.2964 21.1484 11.375L21.2461 11.75H23V8.50781C23 7.64967 22.4683 6.89379 21.6611 6.61816L21.4961 6.56934L17.2773 5.51465L17.2178 5.5H1V11.0527ZM4.94531 1C4.28065 1 3.66175 1.31596 3.28711 1.87988L3.20312 2.00488V2.02832L1.74023 4.22266L1.22168 5H8.75V1H4.94531ZM9.25 5H16.7275L16.0391 4.17871L13.9766 1.71777C13.5971 1.26151 13.038 1 12.4453 1H9.25V5Z"
+                          stroke="black"
+                        />
+                      </svg>
+                    {{ end }}
+                    <span>{{.Type}}</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3 text-center">
+                  <div>
+                    <div class="font-semibold text-sm">{{.CustomerName}}</div>
+                    <div class="text-xs text-gray-500">{{.CustomerEmail}}</div>
+                  </div>
+                </td>
+                <td class="px-3 py-3 text-center text-sm">{{ .BookingDate.Format "1/2/2006" }}</td>
+                <td class="px-3 py-3 text-center font-semibold">{{ printf "$%.2f" .Amount }}<br /><span class="text-xs text-gray-500">(By {{.PaymentMethod}})</span></td>
+                <td class="px-3 py-3 text-center">
+                  {{ if eq .PaymentStatus "Paid" }}
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">{{.PaymentStatus}}</span>
+                  {{ else if eq .PaymentStatus "Pending" }}
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#FFF4D6] text-[#C27800]">{{.PaymentStatus}}</span>
+                  {{ else if eq .PaymentStatus "Failed" }}
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#FFE4E6] text-[#D24124]">{{.PaymentStatus}}</span>
+                  {{ else }}
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">{{.PaymentStatus}}</span>
+                  {{ end }}
+                </td>
+                <td class="px-3 py-3 flex items-center justify-center">
+                  <button class="w-8 h-8 rounded-lg bg-[#336891] text-white flex items-center justify-center" aria-label="More options">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="6" r="2" stroke="white" stroke-width="2"/>
+                      <circle cx="12" cy="12" r="2" stroke="white" stroke-width="2"/>
+                      <circle cx="12" cy="18" r="2" stroke="white" stroke-width="2"/>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+              {{- end }}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>
 </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+      function initDatePicker() {
+        const dateInput = document.getElementById('date');
+        if (dateInput && !dateInput._flatpickr) {
+          flatpickr(dateInput, {
+            dateFormat: 'Y-m-d',
+            allowInput: false,
+            disableMobile: true,
+            onChange: function(selectedDates, dateStr, instance) {
+              dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+            },
+            onReady: function(selectedDates, dateStr, instance) {
+              const calendar = instance.calendarContainer;
+              const buttonsDiv = document.createElement('div');
+              buttonsDiv.className = 'calendar-buttons';
+              buttonsDiv.innerHTML = `
+                <button type="button" class="cancel-btn">Cancel</button>
+                <button type="button" class="clear-btn">Clear</button>
+              `;
+              calendar.appendChild(buttonsDiv);
+
+              buttonsDiv.querySelector('.cancel-btn').addEventListener('click', function() {
+                instance.close();
+              });
+              buttonsDiv.querySelector('.clear-btn').addEventListener('click', function() {
+                instance.clear();
+                instance.close();
+                dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+              });
+            }
+          });
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function() { initDatePicker(); });
+      document.addEventListener('htmx:afterSwap', function() { initDatePicker(); });
+    </script>
