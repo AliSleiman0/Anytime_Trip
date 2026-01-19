@@ -99,6 +99,7 @@ func formatProfitPercent(percent float64, profit float64, revenue float64) strin
 type AdminHandler struct {
 	adminRepo             *adminrepo.AdminRepository
 	notificationPrefsRepo *adminrepo.NotificationPreferencesRepository
+	passwordResetRepo     *adminrepo.PasswordResetRepository
 	userRepo              *app.UserRepository
 	carBookingRepo        *app.CarBookingRepository
 	flightBookingRepo     *app.FlightBookingRepository
@@ -114,10 +115,11 @@ type AdminHandler struct {
 	jwtSecret             string
 }
 
-func NewAdminHandler(adminRepo *adminrepo.AdminRepository, notificationPrefsRepo *adminrepo.NotificationPreferencesRepository, userRepo *app.UserRepository, carBookingRepo *app.CarBookingRepository, flightBookingRepo *app.FlightBookingRepository, hotelBookingRepo *app.HotelBookingRepository, supportTicketRepo *app.SupportTicketRepository, paymentRepo *app.PaymentRepository, flightRepo *adminrepo.FlightRepository, carRepo *adminrepo.CarRepository, hotelRepo *adminrepo.HotelRepository, bannerRepo *adminrepo.BannerRepository, travelRepo *adminrepo.TravelRepository, popularRepo *adminrepo.PopularRepository, jwtSecret string) *AdminHandler {
+func NewAdminHandler(adminRepo *adminrepo.AdminRepository, notificationPrefsRepo *adminrepo.NotificationPreferencesRepository, passwordResetRepo *adminrepo.PasswordResetRepository, userRepo *app.UserRepository, carBookingRepo *app.CarBookingRepository, flightBookingRepo *app.FlightBookingRepository, hotelBookingRepo *app.HotelBookingRepository, supportTicketRepo *app.SupportTicketRepository, paymentRepo *app.PaymentRepository, flightRepo *adminrepo.FlightRepository, carRepo *adminrepo.CarRepository, hotelRepo *adminrepo.HotelRepository, bannerRepo *adminrepo.BannerRepository, travelRepo *adminrepo.TravelRepository, popularRepo *adminrepo.PopularRepository, jwtSecret string) *AdminHandler {
 	return &AdminHandler{
 		adminRepo:             adminRepo,
 		notificationPrefsRepo: notificationPrefsRepo,
+		passwordResetRepo:     passwordResetRepo,
 		userRepo:              userRepo,
 		carBookingRepo:        carBookingRepo,
 		flightBookingRepo:     flightBookingRepo,

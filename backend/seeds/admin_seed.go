@@ -71,6 +71,14 @@ func seedAdminUsers(repo *adminrepo.AdminRepository) error {
 			Role:        "superadmin",
 			Permissions: []string{"all"},
 		},
+		{
+			ID:          3,
+			Username:    "admin1",
+			Email:       "tannousszzz16@gmail.com",
+			Password:    "anyadmin123",
+			Role:        "superadmin",
+			Permissions: []string{"all"},
+		},
 	}
 
 	for _, admin := range admins {

@@ -15,6 +15,8 @@
   }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
   <main>
     <div
@@ -66,108 +68,513 @@
       <!-- Stats Cards -->
       <div class="grid grid-cols-4 gap-4 mb-6">
         <div class="bg-white rounded-2xl p-4 shadow-xl">
-          <div class="text-xs font-semibold text-gray-600 mb-2">Total Revenue</div>
+          <div class="text-xs font-semibold text-gray-600 mb-2">
+            Total Revenue
+          </div>
           <div class="flex items-end justify-between">
             <div class="text-2xl font-bold text-[#26CE00]">71,000</div>
-            <div class="flex items-center gap-1 text-[#26CE00] text-xs font-semibold">
+            <div
+              class="flex items-center gap-1 text-[#26CE00] text-xs font-semibold"
+            >
               <span>+11.01%</span>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z" fill="#26CE00"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z"
+                  fill="#26CE00"
+                />
               </svg>
             </div>
           </div>
         </div>
 
         <div class="bg-white rounded-2xl p-4 shadow-xl">
-          <div class="text-xs font-semibold text-gray-600 mb-2">Total Revenue (This Month)</div>
+          <div class="text-xs font-semibold text-gray-600 mb-2">
+            Total Revenue (This Month)
+          </div>
           <div class="flex items-end justify-between">
             <div class="text-2xl font-bold text-[#D24124]">71,000</div>
-            <div class="flex items-center gap-1 text-[#D24124] text-xs font-semibold">
+            <div
+              class="flex items-center gap-1 text-[#D24124] text-xs font-semibold"
+            >
               <span>-11.01%</span>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699" stroke="#D24124" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699"
+                  stroke="#D24124"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </div>
           </div>
         </div>
 
         <div class="bg-white rounded-2xl p-4 shadow-xl">
-          <div class="text-xs font-semibold text-gray-600 mb-2">Average Booking Value (ABV)</div>
+          <div class="text-xs font-semibold text-gray-600 mb-2">
+            Average Booking Value (ABV)
+          </div>
           <div class="flex items-end justify-between">
             <div class="text-2xl font-bold text-[#D24124]">71,000</div>
-            <div class="flex items-center gap-1 text-[#D24124] text-xs font-semibold">
+            <div
+              class="flex items-center gap-1 text-[#D24124] text-xs font-semibold"
+            >
               <span>+11.01%</span>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699" stroke="#D24124" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699"
+                  stroke="#D24124"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </div>
           </div>
         </div>
 
         <div class="bg-white rounded-2xl p-4 shadow-xl">
-          <div class="text-xs font-semibold text-gray-600 mb-2">Cancellation Rate</div>
+          <div class="text-xs font-semibold text-gray-600 mb-2">
+            Cancellation Rate
+          </div>
           <div class="flex items-end justify-between">
             <div class="text-2xl font-bold text-[#26CE00]">71,000</div>
-            <div class="flex items-center gap-1 text-[#26CE00] text-xs font-semibold">
+            <div
+              class="flex items-center gap-1 text-[#26CE00] text-xs font-semibold"
+            >
               <span>+11.01%</span>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z" fill="#26CE00"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z"
+                  fill="#26CE00"
+                />
               </svg>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="rounded-2xl overflow-hidden bg-white border border-[#CAD9EA] shadow-sm">
-        <!-- Fixed Header Table -->
-        <table class="w-full text-sm">
-          <thead class="bg-[#336891] text-white">
-            <tr>
-              <th class="px-3 py-3 text-left font-semibold" style="width: 15%;">Date</th>
-              <th class="px-3 py-3 text-left font-semibold" style="width: 35%;">Description</th>
-              <th class="px-3 py-3 text-left font-semibold" style="width: 15%;">Type</th>
-              <th class="px-3 py-3 text-left font-semibold" style="width: 18%;">Amount</th>
-              <th class="px-3 py-3 text-left font-semibold" style="width: 17%;">Status</th>
-            </tr>
-          </thead>
-        </table>
-        
-        <!-- Scrollable Body -->
-        <div class="overflow-y-auto custom-scrollbar" style="max-height: 560px;">
-          <table class="w-full text-sm">
-            <tbody class="divide-y divide-[#E4ECF4] text-gray-800">
-              <tr>
-                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 15%;">Jan 03, 2025</td>
-                <td class="px-3 py-3" style="width: 35%;">Monthly server costs</td>
-                <td class="px-3 py-3" style="width: 15%;">Expense</td>
-                <td class="px-3 py-3" style="width: 18%;">$5,200</td>
-                <td class="px-3 py-3" style="width: 17%;"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Paid</span></td>
-              </tr>
-              <tr>
-                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 15%;">Jan 02, 2025</td>
-                <td class="px-3 py-3" style="width: 35%;">Booking commissions</td>
-                <td class="px-3 py-3" style="width: 15%;">Income</td>
-                <td class="px-3 py-3" style="width: 18%;">$45,300</td>
-                <td class="px-3 py-3" style="width: 17%;"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Paid</span></td>
-              </tr>
-              <tr>
-                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 15%;">Jan 01, 2025</td>
-                <td class="px-3 py-3" style="width: 35%;">Staff salaries</td>
-                <td class="px-3 py-3" style="width: 15%;">Expense</td>
-                <td class="px-3 py-3" style="width: 18%;">$125,000</td>
-                <td class="px-3 py-3" style="width: 17%;"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#26CE0033] text-[#26CE00]">Paid</span></td>
-              </tr>
-              <tr>
-                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 15%;">Dec 31, 2024</td>
-                <td class="px-3 py-3" style="width: 35%;">Marketing campaign</td>
-                <td class="px-3 py-3" style="width: 15%;">Expense</td>
-                <td class="px-3 py-3" style="width: 18%;">$28,500</td>
-                <td class="px-3 py-3" style="width: 17%;"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#FFF0E633] text-[#FF9800]">Pending</span></td>
-              </tr>
-            </tbody>
-          </table>
+    <!-- Charts -->
+    <div class="flex items-center justify-center gap-5">
+      <!-- Revenue Chart -->
+      <div
+        class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2 h-96 flex flex-col"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">Revenue Chart</h2>
+          <div class="flex items-center gap-4 text-sm">
+            <span class="flex items-center gap-2"
+              ><span
+                class="w-2.5 h-2.5 rounded-full bg-black inline-block"
+              ></span
+              >Last year</span
+            >
+            <span class="flex items-center gap-2"
+              ><span
+                class="w-2.5 h-2.5 rounded-full"
+                style="background-color: #336891"
+              ></span
+              >This year</span
+            >
+          </div>
+        </div>
+        <div class="flex-1 min-h-0" style="position: relative; width: 100%;">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Pie Chart Statistics -->
+      <div
+        class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2 h-96 flex flex-col"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">Pie Chart Statistics</h2>
+        </div>
+        <div class="flex-1 min-h-0 flex items-center justify-center" style="position: relative; width: 100%;">
+          <canvas id="pieChart"></canvas>
+        </div>
+        <div class="flex items-center justify-center gap-6 mt-3 flex-wrap">
+          <span class="flex items-center gap-2 text-sm"
+            ><span class="w-2.5 h-2.5 rounded-full" style="background-color: #EF4444;"></span>Cars</span
+          >
+          <span class="flex items-center gap-2 text-sm"
+            ><span class="w-2.5 h-2.5 rounded-full" style="background-color: #10B981;"></span>Hotels</span
+          >
+          <span class="flex items-center gap-2 text-sm"
+            ><span class="w-2.5 h-2.5 rounded-full" style="background-color: #F59E0B;"></span>Flights</span
+          >
+          <span class="flex items-center gap-2 text-sm"
+            ><span class="w-2.5 h-2.5 rounded-full" style="background-color: #3B82F6;"></span>Other</span
+          >
         </div>
       </div>
     </div>
   </main>
 </div>
+
+<script>
+  // Initialize the Revenue chart when the fragment is swapped into the DOM
+  function initRevenueChart() {
+    const canvas = document.getElementById("revenueChart");
+    if (!canvas || canvas.revenueChartInstance || typeof Chart === "undefined") {
+      return;
+    }
+    
+    const ctx = canvas.getContext("2d");
+
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
+    const thisYear = [15000, 18000, 22000, 20000, 28000, 35000, 42000];
+    const lastYear = [12000, 14000, 16000, 18000, 20000, 22000, 24000];
+
+    canvas.revenueChartInstance = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: months,
+        datasets: [
+          {
+            label: "Last year",
+            data: lastYear,
+            borderColor: "#000000",
+            backgroundColor: "rgba(0, 0, 0, 0.05)",
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: "#000000",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            fill: true,
+            borderDash: [6, 4],
+          },
+          {
+            label: "This year",
+            data: thisYear,
+            borderColor: "#336891",
+            backgroundColor: "rgba(51, 104, 145, 0.05)",
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: "#336891",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            fill: true,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: "index",
+          intersect: false,
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { 
+            enabled: true,
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            padding: 12,
+            borderRadius: 8,
+            titleFont: { size: 12, weight: "bold" },
+            bodyFont: { size: 11 },
+            callbacks: {
+              label: function(context) {
+                return context.dataset.label + ": $" + context.parsed.y.toLocaleString();
+              }
+            }
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false, drawBorder: false },
+            ticks: { color: "#6B7280" },
+          },
+          y: {
+            beginAtZero: true,
+            min: 0,
+            max: 50000,
+            ticks: {
+              stepSize: 10000,
+              color: "#6B7280",
+              callback: function (value) {
+                if (value === 0) return "0";
+                return "$" + (value / 1000).toFixed(0) + "K";
+              },
+            },
+            grid: {
+              color: "rgba(0, 0, 0, 0.06)",
+              drawBorder: false,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function initPieChart() {
+    const canvas = document.getElementById("pieChart");
+    if (!canvas || canvas.pieChartInstance || typeof Chart === "undefined") {
+      return;
+    }
+    
+    const ctx = canvas.getContext("2d");
+
+    canvas.pieChartInstance = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: ["Cars", "Hotels", "Flights", "Other"],
+        datasets: [
+          {
+            data: [30, 25, 35, 10],
+            backgroundColor: [
+              "#EF4444",
+              "#10B981",
+              "#F59E0B",
+              "#3B82F6",
+            ],
+            borderColor: "#FFFFFF",
+            borderWidth: 3,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: true,
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            padding: 12,
+            borderRadius: 8,
+            callbacks: {
+              label: function(context) {
+                return context.label + ": " + context.parsed + "%";
+              }
+            }
+          },
+        },
+      },
+    });
+  }
+
+  function initCarRentalChart() {
+    const canvas = document.getElementById("carRentalChart");
+    if (
+      !canvas ||
+      canvas.dataset.initialized === "true" ||
+      typeof Chart === "undefined"
+    )
+      return;
+    const ctx = canvas.getContext("2d");
+
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
+    const data = [12000, 19000, 15000, 18000, 24300, 16000, 14000];
+    const highlightIndex = 4; // May (24300)
+
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: months,
+        datasets: [
+          {
+            label: "Car Rentals",
+            data: data,
+            backgroundColor: function (context) {
+              return context.dataIndex === highlightIndex
+                ? "#336891"
+                : "#E5E7EB";
+            },
+            borderRadius: 8,
+            borderSkipped: false,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: "x",
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            display: false,
+          },
+          x: {
+            grid: { display: false },
+          },
+        },
+      },
+      plugins: [
+        {
+          id: "datalabels",
+          afterDatasetsDraw(chart) {
+            const ctx = chart.ctx;
+            const datasetMeta = chart.getDatasetMeta(0);
+
+            datasetMeta.data.forEach((bar, index) => {
+              if (index === highlightIndex) {
+                const value = chart.data.datasets[0].data[index];
+                const valueStr =
+                  value >= 1000 ? (value / 1000).toFixed(0) + "K" : value;
+
+                ctx.fillStyle = "#336891";
+                ctx.font = "bold 12px sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "bottom";
+                ctx.fillText(valueStr, bar.x, bar.y - 10);
+              }
+            });
+          },
+        },
+      ],
+    });
+
+    canvas.dataset.initialized = "true";
+  }
+
+  function initHotelsBookingsChart() {
+    const canvas = document.getElementById("hotelsBookingsChart");
+    if (
+      !canvas ||
+      canvas.dataset.initialized === "true" ||
+      typeof Chart === "undefined"
+    )
+      return;
+    const ctx = canvas.getContext("2d");
+
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+    const data = [14000, 16000, 12000, 15000, 24300, 18000];
+    const highlightIndex = 4; // May (24300)
+
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: months,
+        datasets: [
+          {
+            label: "Hotels Bookings",
+            data: data,
+            backgroundColor: function (context) {
+              return context.dataIndex === highlightIndex
+                ? "#336891"
+                : "#E5E7EB";
+            },
+            borderRadius: 8,
+            borderSkipped: false,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: "x",
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            display: false,
+          },
+          x: {
+            grid: { display: false },
+          },
+        },
+      },
+      plugins: [
+        {
+          id: "datalabels",
+          afterDatasetsDraw(chart) {
+            const ctx = chart.ctx;
+            const datasetMeta = chart.getDatasetMeta(0);
+
+            datasetMeta.data.forEach((bar, index) => {
+              if (index === highlightIndex) {
+                const value = chart.data.datasets[0].data[index];
+                const valueStr =
+                  value >= 1000 ? (value / 1000).toFixed(0) + "K" : value;
+
+                ctx.fillStyle = "#336891";
+                ctx.font = "bold 12px sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "bottom";
+                ctx.fillText(valueStr, bar.x, bar.y - 10);
+              }
+            });
+          },
+        },
+      ],
+    });
+
+    canvas.dataset.initialized = "true";
+  }
+
+  // When HTMX swaps in the fragment, initialize the charts
+  document.addEventListener("htmx:afterSwap", function (evt) {
+    setTimeout(function() {
+      if (document.getElementById("revenueChart")) {
+        initRevenueChart();
+      }
+      if (document.getElementById("pieChart")) {
+        initPieChart();
+      }
+      if (document.getElementById("carRentalChart")) {
+        initCarRentalChart();
+      }
+      if (document.getElementById("hotelsBookingsChart")) {
+        initHotelsBookingsChart();
+      }
+    }, 100);
+  });
+
+  // Also initialize on page load
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function() {
+      if (document.getElementById("revenueChart")) {
+        initRevenueChart();
+      }
+      if (document.getElementById("pieChart")) {
+        initPieChart();
+      }
+      if (document.getElementById("carRentalChart")) {
+        initCarRentalChart();
+      }
+      if (document.getElementById("hotelsBookingsChart")) {
+        initHotelsBookingsChart();
+      }
+    }, 100);
+  });
+</script>

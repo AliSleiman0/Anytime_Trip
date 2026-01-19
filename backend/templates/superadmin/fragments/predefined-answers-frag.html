@@ -15,7 +15,9 @@
   }
 </style>
 
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+<div
+  class="fixed top-0 left-64 right-0 h-screen overflow-auto custom-scrollbar"
+>
   <main>
     <div
       hx-get="/admin/header?title=Predefined Answers&subtitle=Manage customer support responses"
@@ -23,116 +25,364 @@
       hx-swap="innerHTML"
     ></div>
 
-    <div class="p-4">
-      <!-- Add Button -->
-      <div class="mb-4 flex justify-end">
-        <button class="px-6 py-2 bg-[#336891] text-white rounded-lg hover:bg-[#254d6f] transition font-semibold text-sm">
-          + Add Answer
+    <div class="p-6">
+      <div>
+        <button
+          id="create-provider-btn"
+          class="bg-[#336891] w-126 h-12 text-white text-lg rounded-xl flex justify-between items-center p-2"
+        >
+          <span
+            id="create-provider-icon"
+            class="inline-flex items-center justify-center w-8 h-8"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18 12.998H13V17.998C13 18.2633 12.8946 18.5176 12.7071 18.7052C12.5196 18.8927 12.2652 18.998 12 18.998C11.7348 18.998 11.4804 18.8927 11.2929 18.7052C11.1054 18.5176 11 18.2633 11 17.998V12.998H6C5.73478 12.998 5.48043 12.8927 5.29289 12.7052C5.10536 12.5176 5 12.2633 5 11.998C5 11.7328 5.10536 11.4785 5.29289 11.2909C5.48043 11.1034 5.73478 10.998 6 10.998H11V5.99805C11 5.73283 11.1054 5.47848 11.2929 5.29094C11.4804 5.1034 11.7348 4.99805 12 4.99805C12.2652 4.99805 12.5196 5.1034 12.7071 5.29094C12.8946 5.47848 13 5.73283 13 5.99805V10.998H18C18.2652 10.998 18.5196 11.1034 18.7071 11.2909C18.8946 11.4785 19 11.7328 19 11.998C19 12.2633 18.8946 12.5176 18.7071 12.7052C18.5196 12.8927 18.2652 12.998 18 12.998Z"
+                fill="white"
+              />
+            </svg>
+          </span>
+          <span id="create-provider-text">Add New Predefined Answer</span>
         </button>
       </div>
 
-      <div class="rounded-2xl overflow-hidden bg-white border border-[#CAD9EA] shadow-sm">
-        <!-- Fixed Header Table -->
-        <table class="w-full text-sm">
-          <thead class="bg-[#336891] text-white">
-            <tr>
-              <th class="px-3 py-3 text-left font-semibold" style="width: 18%;">Category</th>
-              <th class="px-3 py-3 text-left font-semibold" style="width: 20%;">Title</th>
-              <th class="px-3 py-3 text-left font-semibold" style="width: 35%;">Response</th>
-              <th class="px-3 py-3 text-left font-semibold" style="width: 12%;">Usage Count</th>
-              <th class="px-3 py-3 text-center font-semibold" style="width: 15%;">Action</th>
-            </tr>
-          </thead>
-        </table>
-        
-        <!-- Scrollable Body -->
-        <div class="overflow-y-auto custom-scrollbar" style="max-height: 560px;">
-          <table class="w-full text-sm">
-            <tbody class="divide-y divide-[#E4ECF4] text-gray-800">
-              <tr>
-                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 18%;">Booking Issues</td>
-                <td class="px-3 py-3" style="width: 20%;">Cannot Confirm Booking</td>
-                <td class="px-3 py-3 text-sm" style="width: 35%;">Your booking couldn't be confirmed. Please try again...</td>
-                <td class="px-3 py-3" style="width: 12%;">234</td>
-                <td class="px-3 py-3 text-center" style="width: 15%;">
-                <div class="flex justify-center gap-2">
-                  <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
-                    </svg>
-                  </button>
-                  <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-              <tr>
-                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 18%;">Payment Issues</td>
-                <td class="px-3 py-3" style="width: 20%;">Payment Failed</td>
-                <td class="px-3 py-3 text-sm" style="width: 35%;">Your payment failed. Please check your card details...</td>
-                <td class="px-3 py-3" style="width: 12%;">189</td>
-                <td class="px-3 py-3 text-center" style="width: 15%;">
-                <div class="flex justify-center gap-2">
-                  <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
-                    </svg>
-                  </button>
-                  <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-              <tr>
-                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 18%;">Account Issues</td>
-                <td class="px-3 py-3" style="width: 20%;">Account Locked</td>
-                <td class="px-3 py-3 text-sm" style="width: 35%;">Your account has been locked for security. Contact support...</td>
-                <td class="px-3 py-3" style="width: 12%;">67</td>
-                <td class="px-3 py-3 text-center" style="width: 15%;">
-                <div class="flex justify-center gap-2">
-                  <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
-                    </svg>
-                  </button>
-                  <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-              <tr>
-                <td class="px-3 py-3 font-semibold text-[#1f3242]" style="width: 18%;">General</td>
-                <td class="px-3 py-3" style="width: 20%;">Welcome Message</td>
-                <td class="px-3 py-3 text-sm" style="width: 35%;">Welcome to our platform! How can we assist you today?</td>
-                <td class="px-3 py-3" style="width: 12%;">456</td>
-                <td class="px-3 py-3 text-center" style="width: 15%;">
-                <div class="flex justify-center gap-2">
-                  <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
-                    </svg>
-                  </button>
-                  <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
-                    <svg width="12" height="12" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
-                    </svg>
-                  </button>
-                </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <div class="flex items-center py-5">
+        <div
+          class="mr-4 bg-[#F8F8F8] p-2 rounded-lg shadow-md w-1/6 h-20 flex flex-col justify-center items-center text-[#6B6B6B] cursor-pointer hover:bg-gray-200 transition-colors"
+          onclick="openShortcutBindingPopup(1, 'Ctrl + 1')"
+          data-answer-id="1"
+        >
+          <p id="shortcut-display-1">Ctrl + 1</p>
         </div>
+        <div
+          class="bg-[#F8F8F8] p-2 px-5 rounded-lg shadow-md w-5/6 h-20 flex items-center justify-between"
+        >
+          <p>Predefined Answer 1</p>
+
+          <div class="flex gap-2.5">
+            <button
+              class="bg-[#336891] w-5 h-5 flex items-center justify-center rounded-md"
+            >
+              <svg
+                width="11"
+                height="11"
+                viewBox="0 0 11 11"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9.2155 0.341584C8.99672 0.122868 8.70002 0 8.39067 0C8.08131 0 7.78462 0.122868 7.56583 0.341584L6.60625 1.30175L9.69967 4.39517L10.6593 3.43617C10.7676 3.32783 10.8536 3.19919 10.9123 3.05762C10.9709 2.91604 11.0011 2.76429 11.0011 2.61104C11.0011 2.45779 10.9709 2.30605 10.9123 2.16447C10.8536 2.02289 10.7676 1.89426 10.6593 1.78592L9.2155 0.341584ZM8.87483 5.22L5.78142 2.12658L0.627667 7.28033L0 11.002L3.72167 10.3738L8.87483 5.22Z"
+                  fill="white"
+                />
+              </svg>
+            </button>
+            <button
+              class="bg-[#D24124] w-5 h-5 flex items-center justify-center rounded-md delete-answer-btn"
+              data-answer-name="Predefined Answer 1"
+            >
+              <svg
+                width="9"
+                height="11"
+                viewBox="0 0 9 11"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M0.583333 9.33333C0.583333 9.975 1.10833 10.5 1.75 10.5H6.41667C7.05833 10.5 7.58333 9.975 7.58333 9.33333V3.5C7.58333 2.85833 7.05833 2.33333 6.41667 2.33333H1.75C1.10833 2.33333 0.583333 2.85833 0.583333 3.5V9.33333ZM7.58333 0.583333H6.125L5.71083 0.169167C5.60583 0.0641666 5.45417 0 5.3025 0H2.86417C2.7125 0 2.56083 0.0641666 2.45583 0.169167L2.04167 0.583333H0.583333C0.2625 0.583333 0 0.845833 0 1.16667C0 1.4875 0.2625 1.75 0.583333 1.75H7.58333C7.90417 1.75 8.16667 1.4875 8.16667 1.16667C8.16667 0.845833 7.90417 0.583333 7.58333 0.583333Z"
+                  fill="white"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <input
+          type="text"
+          placeholder="Add Predefined Answer..."
+          id="edit"
+          class="w-full p-3 bg-[#F8F8F8] h-20 hidden rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
     </div>
   </main>
 </div>
+
+<script>
+  // Intercept HTMX confirmations and show SweetAlert2 instead of native confirm
+  document.addEventListener('htmx:confirm', function(event) {
+    // Prevent HTMX from using the native window.confirm
+    event.preventDefault();
+
+    const detail = event.detail || {};
+    const elt = detail.elt || null;
+    const question = elt ? (elt.getAttribute('hx-confirm') || 'Are you sure?') : 'Are you sure?';
+
+    Swal.fire({
+      title: 'Delete Answer',
+      html: question,
+      icon: 'warning',
+      iconColor: '#D24124',
+      showCancelButton: true,
+      confirmButtonText: 'Delete content',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#D24124',
+      cancelButtonColor: 'transparent',
+      reverseButtons: true,
+      customClass: {
+        confirmButton: 'swal-confirm-btn',
+        cancelButton: 'swal-cancel-btn',
+        popup: 'swal-popup'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Tell HTMX to proceed with the original request
+        if (typeof detail.issueRequest === 'function') {
+          detail.issueRequest(true);
+        }
+      } else {
+        // Explicitly cancel if needed
+        if (typeof detail.issueRequest === 'function') {
+          detail.issueRequest(false);
+        }
+      }
+    });
+  });
+
+  // Keyboard shortcut binding functionality
+  let capturedKeys = [];
+  let isCapturingShortcut = false;
+  let currentAnswerId = null;
+  let pressedKeys = new Set();
+
+  function openShortcutBindingPopup(answerId, currentShortcut) {
+    currentAnswerId = answerId;
+    capturedKeys = [];
+    pressedKeys.clear();
+    isCapturingShortcut = true;
+    
+    Swal.fire({
+      title: 'Enter a Key Bind',
+      html: `
+        <div class="text-center">
+          <p class="text-gray-600 mb-4">Press two keys together to set as shortcut</p>
+          <div id="captured-keys" class="text-2xl font-bold text-blue-600 min-h-[40px]">
+            Waiting for input...
+          </div>
+          <p class="text-sm text-gray-500 mt-2">Current: ${currentShortcut || 'None'}</p>
+        </div>
+      `,
+      showCancelButton: true,
+      showConfirmButton: false,
+      cancelButtonText: 'Cancel',
+      cancelButtonColor: '#336891',
+      customClass: {
+        cancelButton: 'swal-cancel-btn',
+        popup: 'swal-popup'
+      },
+      didOpen: () => {
+        document.addEventListener('keydown', handleShortcutCapture, true);
+        document.addEventListener('keyup', handleKeyRelease, true);
+      },
+      willClose: () => {
+        document.removeEventListener('keydown', handleShortcutCapture, true);
+        document.removeEventListener('keyup', handleKeyRelease, true);
+        isCapturingShortcut = false;
+        capturedKeys = [];
+        pressedKeys.clear();
+      }
+    });
+  }
+
+  function handleKeyRelease(event) {
+    if (!isCapturingShortcut) return;
+    pressedKeys.clear();
+  }
+
+  function handleShortcutCapture(event) {
+    if (!isCapturingShortcut) return;
+    
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // Ignore repeated keys
+    if (event.repeat) return;
+    
+    // Build the shortcut string from currently pressed keys
+    let shortcut = [];
+    
+    // Add modifier keys first
+    if (event.ctrlKey) shortcut.push('Ctrl');
+    if (event.altKey) shortcut.push('Alt');
+    if (event.shiftKey) shortcut.push('Shift');
+    if (event.metaKey) shortcut.push('Meta');
+    
+    // Don't capture modifier keys alone - wait for a regular key
+    if (['Control', 'Alt', 'Shift', 'Meta'].includes(event.key)) {
+      return;
+    }
+    
+    // Add the main key
+    let mainKey = '';
+    if (event.key.length === 1) {
+      mainKey = event.key.toUpperCase();
+    } else if (event.code.startsWith('Digit')) {
+      mainKey = event.code.replace('Digit', '');
+    } else if (event.code.startsWith('Key')) {
+      mainKey = event.code.replace('Key', '');
+    } else if (event.code.startsWith('Arrow')) {
+      mainKey = event.code.replace('Arrow', '');
+    } else if (['Enter', 'Space', 'Tab', 'Escape', 'Backspace'].includes(event.key)) {
+      mainKey = event.key;
+    } else {
+      mainKey = event.key;
+    }
+    
+    shortcut.push(mainKey);
+    
+    // We need at least 2 components (modifier + key) to make a valid shortcut
+    if (shortcut.length < 2) {
+      document.getElementById('captured-keys').textContent = 'Please press a modifier key (Ctrl, Alt, Shift) + another key';
+      return;
+    }
+    
+    const shortcutString = shortcut.join(' + ');
+    
+    // Update display
+    document.getElementById('captured-keys').textContent = shortcutString;
+    
+    // Save the shortcut after a short delay
+    setTimeout(() => {
+      if (isCapturingShortcut) {
+        saveShortcut(currentAnswerId, shortcutString);
+      }
+    }, 300);
+  }
+
+  function saveShortcut(answerId, shortcut) {
+    isCapturingShortcut = false; // Stop capturing immediately
+    
+    fetch(`/superadmin/predefined-answers/${answerId}/shortcut`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ shortcut: shortcut })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Server responded with error');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        // Update the display
+        const displayElement = document.getElementById(`shortcut-display-${answerId}`);
+        if (displayElement) {
+          displayElement.textContent = shortcut;
+        }
+        
+        // Close the popup and show success
+        Swal.close();
+        Swal.fire({
+          title: 'Success!',
+          text: `Shortcut set to: ${shortcut}`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      } else {
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to save shortcut',
+          icon: 'error'
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error saving shortcut:', error);
+      Swal.fire({
+        title: 'Error',
+        text: 'Failed to save shortcut',
+        icon: 'error'
+      });
+    });
+  }
+
+  // Expose function globally for inline onclick
+  window.openShortcutBindingPopup = openShortcutBindingPopup;
+
+  // Use event delegation for dynamically loaded content
+  document.addEventListener('click', function(e) {
+    // Check if clicked element or its parent is the delete button
+    const deleteBtn = e.target.closest('.delete-answer-btn');
+    
+    if (deleteBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const answerName = deleteBtn.getAttribute('data-answer-name');
+      
+      Swal.fire({
+        title: 'Delete Answer',
+        html: `Are you sure you want to delete <strong>${answerName}</strong>?<br>This change cannot be undone`,
+        icon: 'warning',
+        iconColor: '#D24124',
+        showCancelButton: true,
+        confirmButtonText: 'Delete content',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#D24124',
+        cancelButtonColor: 'transparent',
+        reverseButtons: true,
+        customClass: {
+          confirmButton: 'swal-confirm-btn',
+          cancelButton: 'swal-cancel-btn',
+          popup: 'swal-popup'
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Handle delete action here
+          console.log('Deleting:', answerName);
+          // Add your delete logic here
+        }
+      });
+    }
+  });
+</script>
+
+<style>
+  .swal-popup {
+    border-radius: 20px !important;
+    padding: 2rem !important;
+  }
+  
+  .swal-confirm-btn {
+    background-color: #D24124 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 10px 24px !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+  }
+  
+  .swal-cancel-btn {
+    background-color: transparent !important;
+    color: #336891 !important;
+    border: 2px solid #336891 !important;
+    border-radius: 8px !important;
+    padding: 10px 24px !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+  }
+  
+  .swal2-icon.swal2-warning {
+    border-color: #D24124 !important;
+    color: #D24124 !important;
+  }
+</style>
