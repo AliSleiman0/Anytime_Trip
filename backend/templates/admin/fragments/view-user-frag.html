@@ -67,10 +67,11 @@
           Delete Account
         </button>
         <button
+          id="freezeBtn"
           class="w-56 h-12 border border-[#1C9BFF] text-[#1C9BFF] rounded-lg font-semibold text-lg hover:bg-blue-50 transition-colors"
           onclick="showFreezeConfirmation()"
         >
-          Unfreeze Account
+          {{.FreezeActionText}}
         </button>
       </div>
     </div>
@@ -95,17 +96,78 @@
             confirmButton: "swal2-confirm",
             cancelButton: "swal2-cancel",
           },
+        }).then((result) => {
+          if (result.isConfirmed) {
+            deleteUser();
+          }
+        });
+      }
+
+      function deleteUser() {
+        // Get the user ID from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('id');
+        
+        if (!userId) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'User ID not found'
+          });
+          return;
+        }
+        
+        // Call API to delete user
+        fetch('/admin/delete-user', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: userId
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'User account has been deleted.',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            
+            // Redirect to users page after 2 seconds
+            setTimeout(() => {
+              window.location.href = '/admin/users';
+            }, 2000);
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.message || 'Failed to delete user'
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to delete user'
+          });
         });
       }
 
       function showFreezeConfirmation() {
         Swal.fire({
           icon: "info",
-          title: "Freeze Account",
-          html: 'Are you sure you want to freeze <strong>{{.Name}}</strong>\'s account?<br><small style="color: #666;">This change cannot be undone</small>',
+          title: "Freeze / Unfreeze Account",
+          html: 'Are you sure you want to toggle freeze state for <strong>{{.Name}}</strong>\'s account?<br><small style="color: #666;">This will enable or disable the account</small>',
           showCancelButton: true,
           confirmButtonColor: "#1C9BFF",
-          confirmButtonText: "Freeze User",
+          confirmButtonText: "Proceed",
           cancelButtonText: "Cancel",
           customClass: {
             container: "swal2-container",
@@ -116,6 +178,43 @@
             confirmButton: "swal2-confirm",
             cancelButton: "swal2-cancel",
           },
+        }).then((result) => {
+          if (result.isConfirmed) {
+            toggleFreeze();
+          }
+        });
+      }
+
+      function toggleFreeze() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('id');
+
+        if (!userId) {
+          Swal.fire({icon: 'error', title: 'Error', text: 'User ID not found'});
+          return;
+        }
+
+        fetch('/admin/toggle-freeze-user', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: userId })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const isFreezed = data.is_freezed;
+            const freezeBtn = document.getElementById('freezeBtn');
+            if (freezeBtn) {
+              freezeBtn.textContent = isFreezed ? 'Unfreeze Account' : 'Freeze Account';
+            }
+            Swal.fire({icon: 'success', title: 'Updated', text: isFreezed ? 'Account frozen' : 'Account unfrozen', timer: 1500, showConfirmButton: false});
+          } else {
+            Swal.fire({icon: 'error', title: 'Error', text: data.message || 'Failed to update state'});
+          }
+        })
+        .catch(err => {
+          console.error('Error toggling freeze:', err);
+          Swal.fire({icon: 'error', title: 'Error', text: 'Failed to update state'});
         });
       }
     </script>

@@ -33,4 +33,5 @@ type Hotel struct {
 	ProfitPercent float64   `json:"profit_percent" bson:"profit_percent"`
 	CreatedAt     time.Time `json:"created_at" bson:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at" bson:"updated_at"`
+	IsFreezed     bool      `json:"is_freezed" bson:"is_freezed"`
 }

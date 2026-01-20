@@ -338,24 +338,32 @@ func (h *AdminHandler) GetViewUserFragment(c *fiber.Ctx) error {
 		statusClass = "px-3 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
 	}
 
+	// Freeze action text
+	freezeActionText := "Freeze Account"
+	if user.IsFreezed {
+		freezeActionText = "Unfreeze Account"
+	}
+
 	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "view-user-frag.html")))
 	if err != nil {
 		return c.Status(500).SendString("Error loading template")
 	}
 
 	data := fiber.Map{
-		"Name":          user.Name,
-		"Email":         user.Email,
-		"Phone":         user.PhoneNumber,
-		"Status":        statusLabel,
-		"StatusClass":   statusClass,
-		"TotalBookings": fmt.Sprintf("%d", bookingCount),
-		"LastBooking":   lastBooking,
-		"CreatedOn":     formatDate(user.CreatedAt),
-		"LastLogin":     formatDate(user.LastLogin),
-		"Location":      "-",
-		"Role":          "Customer",
-		"Bookings":      bookings,
+		"Name":             user.Name,
+		"Email":            user.Email,
+		"Phone":            user.PhoneNumber,
+		"Status":           statusLabel,
+		"StatusClass":      statusClass,
+		"IsFreezed":        user.IsFreezed,
+		"FreezeActionText": freezeActionText,
+		"TotalBookings":    fmt.Sprintf("%d", bookingCount),
+		"LastBooking":      lastBooking,
+		"CreatedOn":        formatDate(user.CreatedAt),
+		"LastLogin":        formatDate(user.LastLogin),
+		"Location":         "-",
+		"Role":             "Customer",
+		"Bookings":         bookings,
 	}
 
 	c.Set("Content-Type", "text/html")
@@ -407,4 +415,80 @@ func (h *AdminHandler) UpdateUserEmail(c *fiber.Ctx) error {
 		"success": true,
 		"message": "Email updated successfully",
 	})
+}
+
+// DeleteUser deletes a user from the database
+func (h *AdminHandler) DeleteUser(c *fiber.Ctx) error {
+	ctx := c.Context()
+
+	type DeleteUserRequest struct {
+		UserID string `json:"user_id"`
+	}
+
+	var req DeleteUserRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"message": "Invalid request",
+		})
+	}
+
+	if req.UserID == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"message": "User ID is required",
+		})
+	}
+
+	// Check if user exists
+	user, err := h.userRepo.FindByID(ctx, req.UserID)
+	if err != nil || user == nil {
+		return c.Status(404).JSON(fiber.Map{
+			"success": false,
+			"message": "User not found",
+		})
+	}
+
+	// Delete user
+	if err := h.userRepo.Delete(ctx, req.UserID); err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"message": "Failed to delete user",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "User deleted successfully",
+	})
+}
+
+// ToggleFreezeUser toggles the is_freezed flag for a user
+func (h *AdminHandler) ToggleFreezeUser(c *fiber.Ctx) error {
+	ctx := c.Context()
+
+	type Req struct {
+		UserID string `json:"user_id"`
+	}
+
+	var req Req
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "Invalid request"})
+	}
+
+	if req.UserID == "" {
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "User ID is required"})
+	}
+
+	user, err := h.userRepo.FindByID(ctx, req.UserID)
+	if err != nil || user == nil {
+		return c.Status(404).JSON(fiber.Map{"success": false, "message": "User not found"})
+	}
+
+	newState := !user.IsFreezed
+	if err := h.userRepo.UpdateFreeze(ctx, req.UserID, newState); err != nil {
+		return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update user state"})
+	}
+
+	return c.JSON(fiber.Map{"success": true, "is_freezed": newState})
 }

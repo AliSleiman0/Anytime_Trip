@@ -8,11 +8,13 @@ import (
 
 // TicketReply represents a reply on a support ticket
 type TicketReply struct {
-	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	Message   string             `bson:"message" json:"message"`
-	IsAdmin   bool               `bson:"is_admin" json:"is_admin"`
-	AdminName string             `bson:"admin_name,omitempty" json:"admin_name,omitempty"`
-	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Message     string             `bson:"message" json:"message"`
+	IsAdmin     bool               `bson:"is_admin" json:"is_admin"`
+	ReadByAdmin bool               `bson:"read_by_admin,omitempty" json:"read_by_admin,omitempty"`
+	AdminName   string             `bson:"admin_name,omitempty" json:"admin_name,omitempty"`
+	UserName    string             `bson:"user_name,omitempty" json:"user_name,omitempty"`
+	CreatedAt   time.Time          `bson:"created_at" json:"created_at"`
 }
 
 // SupportTicket represents a support ticket with embedded replies
@@ -30,4 +32,9 @@ type SupportTicket struct {
 	Replies       []TicketReply      `bson:"replies,omitempty" json:"replies,omitempty"`
 	CreatedAt     time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt     time.Time          `bson:"updated_at" json:"updated_at"`
+	// UnreadCount is computed at runtime (not stored in DB)
+	UnreadCount int `bson:"-" json:"unread_count,omitempty"`
+	// Last message preview and timestamp (computed at runtime)
+	LastMessage   string    `bson:"-" json:"last_message,omitempty"`
+	LastMessageAt time.Time `bson:"-" json:"last_message_at,omitempty"`
 }

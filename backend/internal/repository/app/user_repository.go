@@ -124,3 +124,14 @@ func (r *UserRepository) UpdateEmail(ctx context.Context, id string, email strin
 	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
 	return err
 }
+
+// UpdateFreeze updates the is_freezed field for a user
+func (r *UserRepository) UpdateFreeze(ctx context.Context, id string, freeze bool) error {
+	update := bson.M{
+		"$set": bson.M{
+			"is_freezed": freeze,
+		},
+	}
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	return err
+}

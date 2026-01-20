@@ -37,7 +37,35 @@ func (h *AdminHandler) GetSupportFragment(c *fiber.Ctx) error {
 		return c.Status(500).SendString("Error fetching tickets: " + err.Error())
 	}
 
-	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "support-frag.html")))
+	// compute unread counts for admin (user replies not yet read)
+	for i := range tickets {
+		count := 0
+		// determine last message and timestamp
+		if len(tickets[i].Replies) > 0 {
+			last := tickets[i].Replies[len(tickets[i].Replies)-1]
+			tickets[i].LastMessage = last.Message
+			tickets[i].LastMessageAt = last.CreatedAt
+		} else {
+			tickets[i].LastMessage = tickets[i].Subject
+			tickets[i].LastMessageAt = tickets[i].CreatedAt
+		}
+
+		for _, r := range tickets[i].Replies {
+			if !r.IsAdmin && !r.ReadByAdmin {
+				count++
+			}
+		}
+		tickets[i].UnreadCount = count
+	}
+
+	// Create template with custom functions
+	funcMap := template.FuncMap{
+		"sub": func(a, b int) int {
+			return a - b
+		},
+	}
+
+	tmpl, err := template.New("support-frag.html").Funcs(funcMap).ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "support-frag.html")))
 	if err != nil {
 		return c.Status(500).SendString("Error loading template: " + err.Error())
 	}
@@ -123,7 +151,7 @@ func (h *AdminHandler) ReplyToTicket(c *fiber.Ctx) error {
 		}
 	}
 
-	reply := appmodels.TicketReply{Message: req.Message, IsAdmin: true, AdminName: adminName, CreatedAt: time.Now()}
+	reply := appmodels.TicketReply{Message: req.Message, IsAdmin: true, ReadByAdmin: true, AdminName: adminName, CreatedAt: time.Now()}
 
 	if err := h.supportTicketRepo.AddReply(ctx, ticket.ID, reply); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to add reply"})

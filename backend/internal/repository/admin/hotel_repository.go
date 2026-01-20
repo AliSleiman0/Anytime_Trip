@@ -161,3 +161,15 @@ func (r *HotelRepository) Count(ctx context.Context) (int64, error) {
 func (r *HotelRepository) CountByStatus(ctx context.Context, status admin.HotelStatus) (int64, error) {
 	return r.collection.CountDocuments(ctx, bson.M{"status": status})
 }
+
+// UpdateFreeze updates the is_freezed flag for a hotel provider
+func (r *HotelRepository) UpdateFreeze(ctx context.Context, id string, freeze bool) error {
+	update := bson.M{
+		"$set": bson.M{
+			"is_freezed": freeze,
+			"updated_at": time.Now(),
+		},
+	}
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	return err
+}

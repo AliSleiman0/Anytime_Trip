@@ -1,11 +1,23 @@
+<!--
+  Admin Support Fragment Template
+  This template renders the admin support dashboard page, including:
+  - Support ticket cards with filtering options
+  - Floating action button for messages
+  - Chat panel for quick access to conversations
+  - Conversation panel for detailed chat interactions
+  - Real-time WebSocket connections for live updates
+-->
 <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+  <!-- Main content area -->
   <main>
+    <!-- Page header with title and subtitle -->
     <div
       hx-get="/admin/header?title=Customer Support&subtitle=Manage customer support tickets and inquiries"
       hx-trigger="load"
       hx-swap="innerHTML"
     ></div>
 
+    <!-- Filters section for ticket categorization -->
     <div class="flex justify-end p-4">
       <div class="flex items-center gap-4">
         <p class="flex items-center gap-2">
@@ -60,11 +72,22 @@
       </div>
     </div>
 
+    <!-- Support ticket cards grid -->
     <div class="p-4">
       <div class="grid grid-cols-3 gap-6 mb-6">
         <!-- Support Ticket Detail Card -->
-         {{range .Tickets}}
-        <div onclick="showModal('ticket-modal-{{.ID.Hex}}')" role="button" tabindex="0" class="ticket-card bg-white rounded-2xl shadow-xl p-6 max-w-2xl cursor-pointer hover:shadow-2xl transition" data-category="{{.Category}}" data-status="{{.Status}}" data-priority="{{.Priority}}">
+        {{range .Tickets}}
+        <div
+          role="button"
+          tabindex="0"
+          class="ticket-card bg-white rounded-2xl shadow-xl p-6 max-w-2xl cursor-pointer hover:shadow-2xl transition"
+          data-category="{{.Category}}"
+          data-status="{{.Status}}"
+          data-priority="{{.Priority}}"
+          data-customer-name="{{.CustomerName}}"
+          data-avatar="/static/admin/images/pp1.jpg"
+          data-ticket-id="{{if .TicketID}}{{.TicketID}}{{else}}{{printf "%.6s" .ID.Hex}}{{end}}"
+        >
           <!-- Customer Info -->
           <div
             class="flex items-start gap-4 mb-6 pb-6 border-b border-gray-200"
@@ -104,59 +127,19 @@
               <span class="text-sm font-semibold text-gray-600"
                 >Ticket ID:</span
               >
-                <span class="text-sm font-semibold text-gray-800">{{if .TicketID}}{{.TicketID}}{{else}}{{printf "%.6s" .ID.Hex}}{{end}}</span>
+              <span class="text-sm font-semibold text-gray-800"
+                >{{if .TicketID}}{{.TicketID}}{{else}}{{printf "%.6s"
+                .ID.Hex}}{{end}}</span
+              >
             </div>
           </div>
 
           <!-- Message Content -->
           <div class="mb-6 p-4 bg-[#D9D9D9] rounded-lg">
-            <p class="text-sm text-[#1D1D1D] leading-relaxed">
-              {{.Subject}}
-            </p>
+            <p class="text-sm text-[#1D1D1D] leading-relaxed">{{.Subject}}</p>
           </div>
 
-          <!-- Modal (hidden) -->
-          <div id="ticket-modal-{{.ID.Hex}}" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center bg-black/40 cursor-default">
-            <div onclick="event.stopPropagation()" class="modal-content bg-white w-11/12 md:w-2/3 lg:w-1/2 rounded-xl shadow-lg overflow-hidden cursor-default">
-              <div class="p-4 border-b flex items-center justify-between">
-                <div>
-                  <h3 class="text-lg font-bold">{{.CustomerName}} — {{if .TicketID}}{{.TicketID}}{{else}}{{printf "%.6s" .ID.Hex}}{{end}}</h3>
-                  <p class="text-sm text-gray-500">{{.CustomerEmail}}</p>
-                </div>
-                <button onclick="event.stopPropagation(); hideModal('ticket-modal-{{.ID.Hex}}')" class="text-gray-600">Close</button>
-              </div>
-              <div class="p-4 max-h-[60vh] overflow-y-auto">
-                <div class="mb-4">
-                  <h4 class="font-semibold">Subject</h4>
-                  <p class="text-sm text-gray-800">{{.Subject}}</p>
-                </div>
-                <div class="mb-4">
-                  <h4 class="font-semibold">Description</h4>
-                  <div class="p-3 bg-gray-100 rounded">{{.Description}}</div>
-                </div>
-
-                <div class="mb-4">
-                  <h4 class="font-semibold">Conversation</h4>
-                  <div class="space-y-3 replies">
-                    {{range .Replies}}
-                      <div class="p-3 rounded-lg max-w-[80%] {{if .IsAdmin}}ml-auto bg-blue-50 text-right{{else}}bg-gray-50 text-left{{end}}">
-                        <div class="text-xs text-gray-500 mb-1">{{if .IsAdmin}}{{.AdminName}} (Admin){{else}}Customer{{end}} — {{.CreatedAt.Format "Jan 02, 2006 15:04"}}</div>
-                        <div class="text-sm">{{.Message}}</div>
-                      </div>
-                    {{else}}
-                      <div class="text-sm text-gray-500">No replies yet.</div>
-                    {{end}}
-                  </div>
-                </div>
-              </div>
-              <div class="p-4 border-t bg-gray-50">
-                <form onsubmit="event.preventDefault(); event.stopPropagation(); submitReply(this, 'ticket-modal-{{.ID.Hex}}');" action="/admin/support/tickets/{{if .TicketID}}{{.TicketID}}{{else}}{{.ID.Hex}}{{end}}/reply" method="post" class="flex gap-2">
-                  <input name="message" required placeholder="Write a reply..." class="flex-1 px-3 py-2 rounded border" />
-                  <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Send</button>
-                </form>
-              </div>
-            </div>
-          </div>
+          <!-- per-ticket modal removed: conversation panel will open instead -->
 
           <!-- Reply Input -->
           <div class="flex items-end gap-3 bg-[#D9D9D9] rounded-xl">
@@ -186,147 +169,1067 @@
         {{else}}
         <p class="text-center text-gray-500">No support tickets found.</p>
         {{end}}
-        
+      </div>
+    </div>
+    <!-- Floating Messages Button -->
+    <div id="messages-fab" class="fixed bottom-0 right-20 z-50">
+      <button
+        onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+        class="flex items-center gap-3 bg-[#336891] text-white px-4 py-2 rounded-t shadow-lg hover:opacity-95"
+      >
+        <span class="font-semibold">Messages</span>
+        <span class="text-sm">(<span id="messages-count">0</span>)</span>
+        <div class="ml-44">
+          <svg
+            width="12"
+            height="10"
+            viewBox="0 0 12 10"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M12 10H0L5.98909 0L12 10Z" fill="white" />
+          </svg>
+        </div>
+      </button>
+    </div>
+    <!-- Chat panel (frontend only) -->
+    <div
+      id="chat-panel"
+      class="fixed bottom-0 right-20 z-50 hidden"
+      aria-hidden="true"
+    >
+      <div
+        class="w-[360px] h-[620px] bg-[#EBF5FE] rounded-t shadow-lg overflow-hidden flex flex-col"
+      >
+        <div
+          id="chat-header"
+          class="p-4 bg-[#336891] text-white border-b flex items-center justify-between"
+        >
+          <h4 class="font-semibold">Messages (<span id="chat-header-count">0</span>)</h4>
+          <button id="chat-close-btn" class="text-gray-600">
+            <svg
+              width="12"
+              height="10"
+              viewBox="0 0 12 10"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M0 0H12L6.01091 10L0 0Z" fill="white" />
+            </svg>
+          </button>
+        </div>
+        <div
+          class="flex-1 bg-[#EBF5FE] overflow-y-auto"
+          style="-webkit-overflow-scrolling: touch"
+        >
+          <div class="p-2 space-y-2">
+            <!-- Dynamic chat items from support tickets -->
+            {{range .Tickets}}
+            <div
+              class="chat-item flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
+              data-ticket-id="{{.TicketID}}"
+              data-unread="{{.UnreadCount}}"
+            >
+              <div class="relative w-12 h-12 flex-shrink-0">
+                <img
+                  src="/static/admin/images/pp1.jpg"
+                  alt="avatar"
+                  class="w-full h-full rounded-full object-cover"
+                />
+                <span
+                  class="absolute bottom-0 right-0 w-3 h-3 {{if eq .Status "open"}}bg-green-400{{else}}bg-gray-400{{end}} rounded-full ring-2 ring-white"
+                ></span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <div class="font-medium truncate">{{.CustomerName}}</div>
+                  <div class="text-xs text-gray-400">{{.LastMessageAt.Format "Jan 2"}}</div>
+                </div>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-600 mt-1"
+                >
+                  <div class="truncate">{{.LastMessage}}</div>
+                  <div class="ml-2">
+                    {{if gt .UnreadCount 0}}
+                    <span
+                      class="inline-flex items-center justify-center bg-[#336891] text-white text-xs rounded-full w-6 h-6"
+                      >{{.UnreadCount}}</span
+                    >
+                    {{else}}
+                    &nbsp;
+                    {{end}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {{end}}
+            {{if not .Tickets}}
+            <div class="p-4 text-center text-gray-500">
+              No support tickets found
+            </div>
+            {{end}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversation panel (appears to the left of the chat panel) -->
+    <div
+      id="conversation-panel"
+      class="fixed bottom-0 right-[450px] z-50 hidden"
+      aria-hidden="true"
+    >
+      <div
+        class="w-[400px] h-[620px] bg-white rounded-t shadow-lg overflow-hidden flex flex-col"
+      >
+        <div class="p-3 border-b flex items-center gap-3 bg-[#336891]">
+          <div class="relative w-10 h-10 flex-shrink-0">
+            <img
+              src="/static/admin/images/pp1.jpg"
+              alt="avatar"
+              class="w-full h-full rounded-full object-cover"
+            />
+            <span
+              class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full ring-2 ring-white"
+            ></span>
+          </div>
+          <div class="flex-1">
+            <div class="font-semibold text-white">Samuel. T</div>
+            <div class="text-xs text-gray-400">Online</div>
+          </div>
+          <div class="text-xs text-gray-400">
+            <button id="conversation-close-btn">
+              <svg
+                width="12"
+                height="10"
+                viewBox="0 0 12 10"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M0 0H12L6.01091 10L0 0Z" fill="white" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="messages-container" class="flex-1 p-4 overflow-y-auto bg-[#f3fbff] space-y-4">
+          <div class="text-center text-xs text-gray-400">Yesterday</div>
+
+          <div class="max-w-[80%] bg-white rounded-xl p-3 shadow-sm">
+            <div class="text-sm text-gray-800">
+              Hi! I saw your project listing for the e-commerce redesign.
+            </div>
+            <div class="text-xs text-gray-400 mt-2">10:30 AM</div>
+          </div>
+
+          <div
+            class="ml-auto max-w-[80%] bg-[#336891] text-white rounded-xl p-3"
+          >
+            <div class="text-sm">
+              Hi! I saw your project listing for the e-commerce redesign.
+            </div>
+            <div class="text-xs text-white/70 mt-2">10:30 AM</div>
+          </div>
+
+          <div class="text-center text-xs text-gray-400">10:30 AM</div>
+
+          <div class="max-w-[80%] bg-white rounded-xl p-3 shadow-sm">
+            <div class="text-sm text-gray-800">
+              Hi! I saw your project listing for the e-commerce redesign.
+            </div>
+            <div class="text-xs text-gray-400 mt-2">10:30 AM</div>
+          </div>
+        </div>
+
+        <div class="p-3 border-t bg-white flex items-center gap-3">
+          <button class="p-2 text-gray-400">
+            <svg
+              width="18"
+              height="19"
+              viewBox="0 0 18 19"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M11.6656 4.16699L4.65388 11.322C4.34126 11.6346 4.16563 12.0586 4.16563 12.5007C4.16563 12.9429 4.34126 13.3669 4.65388 13.6795C4.96651 13.9921 5.39052 14.1677 5.83263 14.1677C6.27475 14.1677 6.69876 13.9921 7.01138 13.6795L14.0231 6.52449C14.6482 5.89935 14.9994 5.05148 14.9994 4.1674C14.9994 3.28333 14.6482 2.43546 14.0231 1.81032C13.3979 1.18518 12.55 0.833984 11.666 0.833984C10.7819 0.833984 9.93402 1.18518 9.30888 1.81032L2.32638 8.93615C1.85588 9.39905 1.48169 9.95053 1.22538 10.5588C0.969079 11.167 0.835737 11.82 0.833049 12.48C0.830362 13.14 0.958381 13.7941 1.20972 14.4044C1.46107 15.0147 1.83076 15.5692 2.29747 16.0359C2.76419 16.5026 3.31869 16.8723 3.929 17.1236C4.53931 17.375 5.19334 17.503 5.85337 17.5003C6.5134 17.4976 7.16636 17.3643 7.7746 17.108C8.38284 16.8517 8.93432 16.4775 9.39722 16.007L16.3797 8.88115"
+                stroke="#717182"
+                stroke-width="1.66667"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          <input
+            id="message-input"
+            placeholder="Type your message..."
+            class="flex-1 px-3 py-2 border rounded-lg"
+          />
+          <button id="send-btn" class="bg-[#336891] text-white p-3 rounded-lg">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M22 2L11 13"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M22 2L15 22L11 13L2 9L22 2Z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
   </main>
 </div>
 
-    <script>
-    function showModal(id){
-      const el = document.getElementById(id);
-      if(!el) return;
-      el.classList.remove('hidden');
-      el.style.display = 'flex';
-    }
-    function hideModal(id){
-      const el = document.getElementById(id);
-      if(!el) return;
-      el.classList.add('hidden');
-      el.style.display = 'none';
-    }
-    async function submitReply(form, modalId){
-      const action = form.action;
-      const data = new FormData(form);
-      try{
-        const resp = await fetch(action, {method: 'POST', body: data, credentials: 'same-origin'});
-        const j = await resp.json();
-        if(resp.ok && j.success){
-          // append reply to conversation without closing modal
-          const modal = document.getElementById(modalId);
-          if(modal){
-            const replies = modal.querySelector('.replies');
-            if(replies){
-              const message = data.get('message');
-              const now = new Date();
-              const wrapper = document.createElement('div');
-              wrapper.className = 'p-3 rounded-lg max-w-[80%] ml-auto bg-blue-50 text-right';
-              wrapper.innerHTML = `<div class="text-xs text-gray-500 mb-1">Admin — ${now.toLocaleString()}</div><div class="text-sm"></div>`;
-              wrapper.querySelector('div:last-child').textContent = message;
-              replies.appendChild(wrapper);
-              // scroll replies to bottom
-              replies.scrollTop = replies.scrollHeight;
-            }
+<style>
+  /* Animate chat panel open/close */
+  #chat-panel {
+    transition:
+      transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.18s ease;
+    transform: translateY(12px);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #chat-panel.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Animate conversation panel open/close */
+  #conversation-panel {
+    transition:
+      transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.18s ease;
+    transform: translateY(12px);
+    opacity: 0;
+    pointer-events: none;
+  }
+  #conversation-panel.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+</style>
+
+<!-- JavaScript for interactivity, WebSocket connections, and UI updates -->
+<script>
+  // Load predefined answers and set up keyboard shortcuts
+  let predefinedAnswers = {};
+
+  async function loadPredefinedAnswers() {
+    try {
+      const response = await fetch('/admin/api/predefined-answers');
+      const data = await response.json();
+      if (data.success && data.data) {
+        // Map shortcuts to answers
+        data.data.forEach(item => {
+          if (item.shortcut && item.answer) {
+            predefinedAnswers[item.shortcut.toLowerCase()] = item.answer;
           }
-          // clear input
-          const input = form.querySelector('input[name="message"]');
-          if(input) input.value = '';
-          return true;
-        }
-        alert(j.error || 'Failed to send reply');
-      }catch(e){
-        alert('Network error');
+        });
+        console.log('Loaded predefined answers:', Object.keys(predefinedAnswers));
       }
+    } catch (err) {
+      console.error('Failed to load predefined answers:', err);
+    }
+  }
+
+  // Call on page load
+  loadPredefinedAnswers();
+
+  // Listen for keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    // Build shortcut string from pressed keys
+    let shortcut = [];
+    
+    if (e.ctrlKey) shortcut.push('ctrl');
+    if (e.altKey) shortcut.push('alt');
+    if (e.shiftKey) shortcut.push('shift');
+    if (e.metaKey) shortcut.push('meta');
+    
+    // Don't trigger on modifier keys alone
+    if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) {
+      return;
+    }
+    
+    // Add the main key
+    let mainKey = '';
+    if (e.key.length === 1) {
+      mainKey = e.key.toLowerCase();
+    } else if (e.code.startsWith('Digit')) {
+      mainKey = e.code.replace('Digit', '');
+    } else if (e.code.startsWith('Key')) {
+      mainKey = e.code.replace('Key', '').toLowerCase();
+    } else {
+      mainKey = e.key.toLowerCase();
+    }
+    
+    shortcut.push(mainKey);
+    const shortcutString = shortcut.join(' + ');
+    
+    // Check if this shortcut exists and if conversation panel is open
+    if (predefinedAnswers[shortcutString]) {
+      const conversationPanel = document.getElementById('conversation-panel');
+      const messageInput = document.getElementById('message-input');
+      
+      if (conversationPanel && conversationPanel.classList.contains('open') && messageInput) {
+        e.preventDefault();
+        // Set the predefined answer in the input
+        messageInput.value = predefinedAnswers[shortcutString];
+        // Trigger send
+        const sendBtn = document.getElementById('send-btn');
+        if (sendBtn) {
+          sendBtn.click();
+        }
+      }
+    }
+  });
+
+  function showModal(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove("hidden");
+    el.style.display = "flex";
+  }
+  function hideModal(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add("hidden");
+    el.style.display = "none";
+  }
+  async function submitReply(form, modalId) {
+    const action = form.action;
+    const data = new FormData(form);
+    try {
+      const resp = await fetch(action, {
+        method: "POST",
+        body: data,
+        credentials: "same-origin",
+      });
+      const j = await resp.json();
+      if (resp.ok && j.success) {
+        // append reply to conversation without closing modal
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          const replies = modal.querySelector(".replies");
+          if (replies) {
+            const message = data.get("message");
+            const now = new Date();
+            const wrapper = document.createElement("div");
+            wrapper.className =
+              "p-3 rounded-lg max-w-[80%] ml-auto bg-blue-50 text-right";
+            wrapper.innerHTML = `<div class="text-xs text-gray-500 mb-1">Admin — ${now.toLocaleString()}</div><div class="text-sm"></div>`;
+            wrapper.querySelector("div:last-child").textContent = message;
+            replies.appendChild(wrapper);
+            // scroll replies to bottom
+            replies.scrollTop = replies.scrollHeight;
+          }
+        }
+        // clear input
+        const input = form.querySelector('input[name="message"]');
+        if (input) input.value = "";
+        return true;
+      }
+      alert(j.error || "Failed to send reply");
+    } catch (e) {
+      alert("Network error");
+    }
+    return false;
+  }
+
+  // Close modal when clicking overlay (more reliable than inline handlers)
+  document.addEventListener("click", function (e) {
+    try {
+      if (
+        e.target &&
+        e.target.classList &&
+        e.target.classList.contains("modal-overlay")
+      ) {
+        hideModal(e.target.id);
+      }
+    } catch (err) {
+      /* ignore */
+    }
+  });
+
+  // Close open modals on Escape
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      document.querySelectorAll(".modal-overlay").forEach(function (el) {
+        if (el && !el.classList.contains("hidden")) {
+          hideModal(el.id);
+        }
+      });
+    }
+  });
+
+  // Ticket filtering
+  function applyFilters() {
+    const cat = (
+      document.getElementById("filter-category")?.value || ""
+    ).toLowerCase();
+    const status = (
+      document.getElementById("filter-status")?.value || ""
+    ).toLowerCase();
+    const prio = (
+      document.getElementById("filter-priority")?.value || ""
+    ).toLowerCase();
+    document.querySelectorAll(".ticket-card").forEach(function (card) {
+      try {
+        const c = (card.dataset.category || "").toLowerCase();
+        const s = (card.dataset.status || "").toLowerCase();
+        const p = (card.dataset.priority || "").toLowerCase();
+        const matchCategory = !cat || c === cat;
+        const matchStatus = !status || s === status;
+        const matchPriority = !prio || p === prio;
+        if (matchCategory && matchStatus && matchPriority) {
+          card.style.display = "";
+        } else {
+          card.style.display = "none";
+        }
+      } catch (e) {
+        /* ignore */
+      }
+    });
+  }
+
+  ["filter-category", "filter-status", "filter-priority"].forEach(
+    function (id) {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener("change", applyFilters);
+    },
+  );
+
+  // Run initial filter pass
+  applyFilters();
+
+  // Apply colors to category badges based on category
+  function applyCategoryColors() {
+    document.querySelectorAll(".ticket-card").forEach(function (card) {
+      try {
+        const cat = (card.dataset.category || "").toLowerCase();
+        const span = card.querySelector(".ticket-category");
+        if (!span) return;
+        const base =
+          "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ticket-category";
+        let extra = " bg-gray-100 text-gray-800";
+        if (cat === "flight" || cat === "flights")
+          extra = " bg-blue-100 text-blue-800";
+        else if (cat === "hotel" || cat === "hotels")
+          extra = " bg-green-100 text-green-800";
+        else if (cat === "car" || cat === "cars")
+          extra = " bg-yellow-100 text-yellow-800";
+        else if (cat === "other") extra = " bg-gray-100 text-gray-800";
+        span.className = base + extra;
+      } catch (e) {
+        /* ignore */
+      }
+    });
+  }
+
+  applyCategoryColors();
+
+  // Apply colors to status badges based on status
+  function applyStatusColors() {
+    document.querySelectorAll(".ticket-card").forEach(function (card) {
+      try {
+        const s = (card.dataset.status || "").toLowerCase();
+        const span = card.querySelector(".ticket-status");
+        if (!span) return;
+        const base =
+          "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ticket-status";
+        let extra = " bg-gray-100 text-gray-800";
+        if (s === "open") extra = " bg-green-100 text-green-800";
+        else if (s === "pending") extra = " bg-yellow-100 text-yellow-800";
+        else if (s === "closed") extra = " bg-red-100 text-red-800";
+        span.className = base + extra;
+      } catch (e) {
+        /* ignore */
+      }
+    });
+  }
+
+  applyStatusColors();
+
+  // Chat panel toggle handlers (frontend-only)
+  (function () {
+    const fab = document
+      .getElementById("messages-fab")
+      ?.querySelector("button");
+    const panel = document.getElementById("chat-panel");
+    const closeBtn = document.getElementById("chat-close-btn");
+    function showPanel() {
+      if (!panel) return;
+      // make element visible so transitions can run
+      panel.classList.remove("hidden");
+      // next frame, add open to trigger transition
+      requestAnimationFrame(function () {
+        panel.classList.add("open");
+        panel.setAttribute("aria-hidden", "false");
+      });
+    }
+    function hidePanel() {
+      if (!panel) return;
+      // start transition
+      panel.classList.remove("open");
+      panel.setAttribute("aria-hidden", "true");
+      // after transition ends, hide element to remove from layout
+      const onEnd = function (ev) {
+        // ensure event for this element
+        if (ev && ev.target !== panel) return;
+        panel.classList.add("hidden");
+        panel.removeEventListener("transitionend", onEnd);
+      };
+      panel.addEventListener("transitionend", onEnd);
+      // fallback: ensure hidden after animation duration
+      setTimeout(function () {
+        if (!panel.classList.contains("open")) panel.classList.add("hidden");
+      }, 450);
+    }
+    if (fab) {
+      fab.addEventListener("click", function (e) {
+        // keep existing onclick behavior (scroll) then toggle panel
+        e.stopPropagation();
+        if (!panel) return;
+        if (!panel.classList.contains("open")) showPanel();
+        else hidePanel();
+      });
+    }
+    if (closeBtn)
+      closeBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        hidePanel();
+      });
+    // allow clicking the header area to also close the panel
+    const headerEl = document.getElementById("chat-header");
+    if (headerEl)
+      headerEl.addEventListener("click", function (e) {
+        e.stopPropagation();
+        hidePanel();
+      });
+    // click outside to close
+    document.addEventListener("click", function (e) {
+      try {
+        if (panel && panel.classList.contains("open")) {
+          if (!panel.contains(e.target) && !(fab && fab.contains(e.target))) {
+            hidePanel();
+          }
+        }
+      } catch (err) {}
+    });
+    // Escape to close
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        if (panel && panel.classList.contains("open")) hidePanel();
+      }
+    });
+    // stop clicks inside panel from closing
+    if (panel)
+      panel.addEventListener("click", function (e) {
+        e.stopPropagation();
+      });
+  })();
+
+  // Conversation panel toggle handlers
+  (function () {
+    const conversationPanel = document.getElementById("conversation-panel");
+    const conversationCloseBtn = document.getElementById(
+      "conversation-close-btn",
+    );
+    const messagesContainer = document.getElementById("messages-container");
+    const messageInput = document.getElementById("message-input");
+    const sendBtn = document.getElementById("send-btn");
+
+    let ws = null;
+    let currentTicketID = null;
+    let currentAdminID = "admin123"; // TODO: Get from session
+    let currentAdminName = "Admin"; // TODO: Get from session
+
+    // Compute unread total across chat items and update counters
+    function computeUnreadTotal() {
+      try {
+        let total = 0;
+        document.querySelectorAll('.chat-item').forEach(function (item) {
+          try {
+            // Prefer dataset.unread if present
+            const ds = item.dataset && item.dataset.unread;
+            if (ds != null) {
+              total += parseInt(ds, 10) || 0;
+              return;
+            }
+            // Fallback: check displayed badge
+            const span = item.querySelector('.ml-2 span');
+            if (span) total += parseInt(span.textContent, 10) || 0;
+          } catch (e) {}
+        });
+        const fabEl = document.getElementById('messages-count');
+        const headerEl = document.getElementById('chat-header-count');
+        if (fabEl) fabEl.textContent = String(total);
+        if (headerEl) headerEl.textContent = String(total);
+      } catch (err) {
+        console.error('computeUnreadTotal error', err);
+      }
+    }
+
+    // Run initial unread tally after page load and notify socket connect
+    setTimeout(computeUnreadTotal, 50);
+
+    function formatTime(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+    }
+
+    function appendMessage(message, isAdmin, adminName, timestamp) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = isAdmin
+        ? "ml-auto max-w-[80%] bg-[#336891] text-white rounded-xl p-3"
+        : "max-w-[80%] bg-white rounded-xl p-3 shadow-sm";
+
+      const textDiv = document.createElement("div");
+      textDiv.className = "text-sm" + (isAdmin ? "" : " text-gray-800");
+      textDiv.textContent = message;
+
+      const timeDiv = document.createElement("div");
+      timeDiv.className =
+        "text-xs mt-2 " + (isAdmin ? "text-white/70" : "text-gray-400");
+      timeDiv.textContent = formatTime(timestamp);
+
+      messageDiv.appendChild(textDiv);
+      messageDiv.appendChild(timeDiv);
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Update the chat list preview and unread badge for a ticket
+    function updateChatListPreview(ticketID, message, createdAt, fromAdmin) {
+      try {
+        const item = document.querySelector('.chat-item[data-ticket-id="' + ticketID + '"]');
+        if (!item) return;
+
+        // Update preview text: choose the last `.truncate` inside the item
+        const truncates = item.querySelectorAll('.truncate');
+        const preview = truncates && truncates.length ? truncates[truncates.length - 1] : null;
+        if (preview) preview.textContent = message;
+
+        // Update preview date (format: "Jan 2")
+        const dateEl = item.querySelector('.text-xs.text-gray-400');
+        if (dateEl) {
+          const d = createdAt ? new Date(createdAt) : new Date();
+          try {
+            dateEl.textContent = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          } catch (e) {
+            dateEl.textContent = d.toDateString();
+          }
+        }
+
+        // If conversation panel for this ticket is open, clear unread badge
+        if (currentTicketID && currentTicketID === ticketID && conversationPanel && conversationPanel.classList.contains('open')) {
+          const badgeContainer = item.querySelector('.ml-2');
+          if (badgeContainer) {
+            const span = badgeContainer.querySelector('span');
+            if (span) span.remove();
+          }
+          try { item.dataset.unread = '0'; } catch (e) {}
+          try { computeUnreadTotal(); } catch (e) {}
+          return;
+        }
+
+        // If the message is from an admin, do not increment unread count
+        if (fromAdmin) {
+          try { item.dataset.unread = item.dataset.unread || '0'; } catch (e) {}
+          try { computeUnreadTotal(); } catch (e) {}
+          return;
+        }
+
+        // Otherwise, increment or create unread badge
+        const badgeContainer = item.querySelector('.ml-2');
+        if (!badgeContainer) return;
+        const existingSpan = badgeContainer.querySelector('span');
+        if (existingSpan) {
+          const n = parseInt(existingSpan.textContent, 10) || 0;
+          existingSpan.textContent = String(n + 1);
+          try { item.dataset.unread = String(n + 1); } catch (e) {}
+        } else {
+          const span = document.createElement('span');
+          span.className = 'inline-flex items-center justify-center bg-[#336891] text-white text-xs rounded-full w-6 h-6';
+          span.textContent = '1';
+          badgeContainer.innerHTML = '';
+          badgeContainer.appendChild(span);
+          try { item.dataset.unread = '1'; } catch (e) {}
+        }
+        try { computeUnreadTotal(); } catch (e) {}
+      } catch (err) {
+        console.error('updateChatListPreview error', err);
+      }
+    }
+    // Make function global for header notifications
+    window.updateChatListPreview = updateChatListPreview;
+
+    // Set the chat list preview text/date without touching unread badge
+    function setChatListPreview(ticketID, message, createdAt, fromAdmin) {
+      try {
+        const item = document.querySelector('.chat-item[data-ticket-id="' + ticketID + '"]');
+        if (!item) return;
+        const truncates = item.querySelectorAll('.truncate');
+        const preview = truncates && truncates.length ? truncates[truncates.length - 1] : null;
+        if (preview) preview.textContent = message;
+        const dateEl = item.querySelector('.text-xs.text-gray-400');
+        if (dateEl) {
+          const d = createdAt ? new Date(createdAt) : new Date();
+          try {
+            dateEl.textContent = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          } catch (e) {
+            dateEl.textContent = d.toDateString();
+          }
+        }
+      } catch (err) {
+        console.error('setChatListPreview error', err);
+      }
+    }
+
+    // Determine if a message payload represents an admin message.
+    // Uses explicit `is_admin` when available, but falls back to
+    // checking `user_id`/`admin_id` so mis-labelled payloads still render correctly.
+    function isMessageFromAdmin(payload) {
+      if (payload == null) return false;
+      if (payload.is_admin === true) return true;
+      // If payload explicitly carries a user_id that is not the current admin,
+      // treat it as a user message.
+      if (payload.user_id && payload.user_id !== currentAdminID) return false;
+      // If payload carries an admin_id matching the current admin, it's admin.
+      if (payload.admin_id && payload.admin_id === currentAdminID) return true;
+      // Last resort: if payload.admin_name is present but no user_id, assume admin.
+      if (payload.admin_name && !payload.user_id) return true;
       return false;
     }
 
-    // Close modal when clicking overlay (more reliable than inline handlers)
-    document.addEventListener('click', function(e){
-      try{
-        if(e.target && e.target.classList && e.target.classList.contains('modal-overlay')){
-          hideModal(e.target.id);
+    function loadChatHistory(ticketID) {
+      fetch("/admin/chat/history?ticket_id=" + ticketID)
+        .then((res) => res.json())
+        .then((data) => {
+          messagesContainer.innerHTML = "";
+          if (data.replies && data.replies.length > 0) {
+            data.replies.forEach((reply) => {
+              const fromAdmin = isMessageFromAdmin(reply);
+              appendMessage(
+                reply.message,
+                fromAdmin,
+                fromAdmin
+                  ? (reply.admin_name || "Admin")
+                  : (reply.user_name || "User"),
+                reply.created_at,
+              );
+            });
+            // Ensure chat list preview shows the latest message when opening
+            try {
+              const last = data.replies[data.replies.length - 1];
+              if (last) {
+                const fromAdmin = isMessageFromAdmin(last);
+                setChatListPreview(ticketID, last.message, last.created_at, fromAdmin);
+              }
+            } catch (e) {}
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to load chat history:", err);
+        });
+    }
+
+    function connectWebSocket(ticketID) {
+      if (ws) {
+        ws.close();
+      }
+
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const wsURL =
+        protocol +
+        "//" +
+        window.location.host +
+        "/admin/chat/ws?ticket_id=" +
+        ticketID +
+        "&admin_id=" +
+        currentAdminID +
+        "&admin_name=" +
+        currentAdminName;
+
+      ws = new WebSocket(wsURL);
+
+      ws.onopen = function () {
+        console.log("WebSocket connected for ticket:", ticketID);
+      };
+
+      ws.onmessage = function (event) {
+        try {
+          const data = JSON.parse(event.data);
+          const fromAdmin = isMessageFromAdmin(data);
+          appendMessage(
+            data.message,
+            fromAdmin,
+            fromAdmin ? (data.admin_name || "Admin") : (data.user_name || "User"),
+            data.created_at || new Date().toISOString(),
+          );
+
+          // Update chat list preview and unread badge
+          if (data.ticket_id) {
+            updateChatListPreview(data.ticket_id, data.message, data.created_at, fromAdmin);
+          }
+        } catch (err) {
+          console.error("Failed to parse message:", err);
         }
-      }catch(err){/* ignore */}
+      };
+
+      ws.onerror = function (error) {
+        console.error("WebSocket error:", error);
+      };
+
+      ws.onclose = function () {
+        console.log("WebSocket closed for ticket:", ticketID);
+      };
+    }
+
+    function sendMessage() {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        console.error("WebSocket not connected");
+        return;
+      }
+
+      const message = messageInput.value.trim();
+      if (!message) return;
+
+      const payload = {
+        ticket_id: currentTicketID,
+        message: message,
+        is_admin: true,
+        admin_id: currentAdminID,
+        admin_name: currentAdminName,
+      };
+
+      ws.send(JSON.stringify(payload));
+      messageInput.value = "";
+    }
+
+    function showConversationPanel(name, avatar, status, ticketID) {
+      if (!conversationPanel) return;
+      
+      currentTicketID = ticketID;
+
+      // Update conversation panel content
+      const nameEl = conversationPanel.querySelector(
+        ".font-semibold.text-white",
+      );
+      const statusEl = conversationPanel.querySelector(
+        ".text-xs.text-gray-400",
+      );
+      const avatarEl = conversationPanel.querySelector("img[alt='avatar']");
+
+      if (nameEl) nameEl.textContent = name;
+      if (statusEl) statusEl.textContent = status || "Online";
+      if (avatarEl) avatarEl.src = avatar;
+
+      // Load chat history and connect WebSocket
+      loadChatHistory(ticketID);
+      // Clear unread badge immediately when opening conversation
+        try {
+          const item = document.querySelector('.chat-item[data-ticket-id="' + ticketID + '"]');
+          if (item) {
+            const badgeContainer = item.querySelector('.ml-2');
+            if (badgeContainer) {
+              const span = badgeContainer.querySelector('span');
+              if (span) span.remove();
+            }
+            try { item.dataset.unread = '0'; } catch (e) {}
+            try { computeUnreadTotal(); } catch (e) {}
+          }
+        } catch (e) {}
+      connectWebSocket(ticketID);
+
+      conversationPanel.classList.remove("hidden");
+      requestAnimationFrame(function () {
+        conversationPanel.classList.add("open");
+        conversationPanel.setAttribute("aria-hidden", "false");
+      });
+    }
+
+    function hideConversationPanel() {
+      if (!conversationPanel) return;
+
+      // Close WebSocket
+      if (ws) {
+        ws.close();
+        ws = null;
+      }
+
+      conversationPanel.classList.remove("open");
+      conversationPanel.setAttribute("aria-hidden", "true");
+      const onEnd = function (ev) {
+        if (ev && ev.target !== conversationPanel) return;
+        conversationPanel.classList.add("hidden");
+        conversationPanel.removeEventListener("transitionend", onEnd);
+      };
+      conversationPanel.addEventListener("transitionend", onEnd);
+      setTimeout(function () {
+        if (!conversationPanel.classList.contains("open"))
+          conversationPanel.classList.add("hidden");
+        // Clear the current ticket when the panel fully hides
+        currentTicketID = null;
+      }, 450);
+    }
+
+    if (conversationCloseBtn) {
+      conversationCloseBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        hideConversationPanel();
+      });
+    }
+
+    // Allow clicking the conversation header area to close the panel
+    if (conversationPanel) {
+      const convHeader = conversationPanel.querySelector('.p-3.border-b');
+      if (convHeader) {
+        convHeader.addEventListener('click', function (e) {
+          e.stopPropagation();
+          hideConversationPanel();
+        });
+      }
+    }
+
+    // Send message on button click
+    if (sendBtn) {
+      sendBtn.addEventListener("click", sendMessage);
+    }
+
+    // Send message on Enter key
+    if (messageInput) {
+      messageInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          sendMessage();
+        }
+      });
+    }
+
+    // Add click handlers to chat items to open conversation panel
+    document.querySelectorAll(".chat-item").forEach(function (item) {
+      item.addEventListener("click", function () {
+        const name = item.querySelector(".font-medium")?.textContent || "User";
+        const avatar =
+          item.querySelector("img")?.src || "/static/admin/images/pp1.jpg";
+        const statusIndicator = item.querySelector(".bg-green-400");
+        const status = statusIndicator ? "Online" : "Offline";
+        const ticketID = item.getAttribute("data-ticket-id") || "T000";
+        showConversationPanel(name, avatar, status, ticketID);
+      });
     });
 
-    // Close open modals on Escape
-    document.addEventListener('keydown', function(e){
-      if(e.key === 'Escape'){
-        document.querySelectorAll('.modal-overlay').forEach(function(el){
-          if(el && !el.classList.contains('hidden')){
-            hideModal(el.id);
+    // Add click handlers to ticket cards (detail cards) to open conversation panel
+    document.querySelectorAll(".ticket-card").forEach(function (card) {
+      card.addEventListener("click", function (e) {
+        try {
+          e.stopPropagation();
+          const name = card.dataset.customerName || card.querySelector(".text-lg")?.textContent || "User";
+          const avatar = card.dataset.avatar || card.querySelector("img")?.src || "/static/admin/images/pp1.jpg";
+          const status = (card.dataset.status && card.dataset.status.toLowerCase() === 'open') ? 'Online' : (card.dataset.status || 'Offline');
+          const ticketID = card.dataset.ticketId || card.getAttribute('data-ticket-id') || 'T000';
+          showConversationPanel(name, avatar, status, ticketID);
+        } catch (err) {
+          console.error('ticket-card click handler error', err);
+        }
+      });
+    });
+
+    // Click outside to close
+    document.addEventListener("click", function (e) {
+      try {
+        if (conversationPanel && conversationPanel.classList.contains("open")) {
+          if (!conversationPanel.contains(e.target)) {
+            hideConversationPanel();
           }
-        });
+        }
+      } catch (err) {}
+    });
+
+    // Escape to close
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        if (conversationPanel && conversationPanel.classList.contains("open"))
+          hideConversationPanel();
       }
     });
 
-    // Ticket filtering
-    function applyFilters(){
-      const cat = (document.getElementById('filter-category')?.value || '').toLowerCase();
-      const status = (document.getElementById('filter-status')?.value || '').toLowerCase();
-      const prio = (document.getElementById('filter-priority')?.value || '').toLowerCase();
-      document.querySelectorAll('.ticket-card').forEach(function(card){
-        try{
-          const c = (card.dataset.category || '').toLowerCase();
-          const s = (card.dataset.status || '').toLowerCase();
-          const p = (card.dataset.priority || '').toLowerCase();
-          const matchCategory = !cat || c === cat;
-          const matchStatus = !status || s === status;
-          const matchPriority = !prio || p === prio;
-          if(matchCategory && matchStatus && matchPriority){
-            card.style.display = '';
-          } else {
-            card.style.display = 'none';
-          }
-        }catch(e){ /* ignore */ }
+    // Stop clicks inside panel from closing
+    if (conversationPanel) {
+      conversationPanel.addEventListener("click", function (e) {
+        e.stopPropagation();
       });
     }
 
-    ['filter-category','filter-status','filter-priority'].forEach(function(id){
-      const el = document.getElementById(id);
-      if(el) el.addEventListener('change', applyFilters);
-    });
-
-    // Run initial filter pass
-    applyFilters();
-
-    // Apply colors to category badges based on category
-    function applyCategoryColors(){
-      document.querySelectorAll('.ticket-card').forEach(function(card){
-        try{
-          const cat = (card.dataset.category || '').toLowerCase();
-          const span = card.querySelector('.ticket-category');
-          if(!span) return;
-          const base = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ticket-category';
-          let extra = ' bg-gray-100 text-gray-800';
-          if(cat === 'flight' || cat === 'flights') extra = ' bg-blue-100 text-blue-800';
-          else if(cat === 'hotel' || cat === 'hotels') extra = ' bg-green-100 text-green-800';
-          else if(cat === 'car' || cat === 'cars') extra = ' bg-yellow-100 text-yellow-800';
-          else if(cat === 'other') extra = ' bg-gray-100 text-gray-800';
-          span.className = base + extra;
-        }catch(e){/* ignore */}
-      });
+    // Check for ticket_id in URL and open conversation if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const ticketId = urlParams.get('ticket_id');
+    if (ticketId) {
+      // Wait a bit for the DOM to be ready
+      setTimeout(() => {
+        const item = document.querySelector('.chat-item[data-ticket-id="' + ticketId + '"]');
+        if (item) {
+          item.click();
+        }
+      }, 100);
     }
+  })();
+</script>
 
-    applyCategoryColors();
 
-    // Apply colors to status badges based on status
-    function applyStatusColors(){
-      document.querySelectorAll('.ticket-card').forEach(function(card){
-        try{
-          const s = (card.dataset.status || '').toLowerCase();
-          const span = card.querySelector('.ticket-status');
-          if(!span) return;
-          const base = 'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ticket-status';
-          let extra = ' bg-gray-100 text-gray-800';
-          if(s === 'open') extra = ' bg-green-100 text-green-800';
-          else if(s === 'pending') extra = ' bg-yellow-100 text-yellow-800';
-          else if(s === 'closed') extra = ' bg-red-100 text-red-800';
-          span.className = base + extra;
-        }catch(e){/* ignore */}
-      });
-    }
 
-    applyStatusColors();
-    </script>
+<!-- 
+user message test script web console
+(() => {
+const ticketId = "T004";
+const userId = "6968c60611aa6c1fa9cbfae7";
+const userName = "Emily Davis";
+const host = "localhost:8080"; // adjust if your server uses a different host/port
+const wsUrl =
+(location.protocol === "https:" ? "wss:" : "ws:") +
+"//" +
+host +
+"/admin/chat/ws?ticket_id=" +
+ticketId +
+"&user_id=" +
+userId +
+"&user_name=" +
+encodeURIComponent(userName);
+console.log("Connecting as USER to", wsUrl);
+const ws = new WebSocket(wsUrl);
+ws.onopen = () => {
+ws.send(JSON.stringify({
+ticket_id: ticketId,
+message: "3543165123",
+is_admin: false,
+user_id: userId,
+user_name: userName
+}));
+console.log("Sent user message");
+};
+ws.onmessage = (e) => console.log("USER WS got:", e.data);
+ws.onerror = (e) => console.error("USER WS error:", e);
+ws.onclose = () => console.log("USER WS closed");
+window._userWs = ws;
+})();
+-->

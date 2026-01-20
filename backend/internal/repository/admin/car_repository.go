@@ -146,6 +146,18 @@ func (r *CarRepository) UpdateProfitPercent(ctx context.Context, id string, prof
 	return err
 }
 
+// UpdateFreeze updates the is_freezed flag for a car provider
+func (r *CarRepository) UpdateFreeze(ctx context.Context, id string, freeze bool) error {
+	update := bson.M{
+		"$set": bson.M{
+			"is_freezed": freeze,
+			"updated_at": time.Now(),
+		},
+	}
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	return err
+}
+
 // Delete deletes a car
 func (r *CarRepository) Delete(ctx context.Context, id string) error {
 	_, err := r.collection.DeleteOne(ctx, bson.M{"_id": id})

@@ -7,6 +7,8 @@ import (
 
 	adminrepo "Anytime_Travel/backend/internal/repository/admin"
 	"Anytime_Travel/backend/internal/repository/app"
+	superadminrepo "Anytime_Travel/backend/internal/repository/superadmin"
+	"Anytime_Travel/backend/internal/ws"
 )
 
 // ServiceProviderView is a flattened view model for the table
@@ -41,6 +43,8 @@ type ProviderDetailView struct {
 	PhoneNumberDisplay     string
 	RevenueThisMonth       string
 	TotalBookingsThisMonth string
+	IsFreezed              bool
+	FreezeActionText       string
 }
 
 func statusBadgeClass(status string) string {
@@ -112,10 +116,13 @@ type AdminHandler struct {
 	travelRepo            *adminrepo.TravelRepository
 	bannerRepo            *adminrepo.BannerRepository
 	popularRepo           *adminrepo.PopularRepository
+	predefinedAnswerRepo  *superadminrepo.PredefinedAnswerRepository
 	jwtSecret             string
+	chatHub               *ws.Hub
+	notifyHub             *ws.AdminHub
 }
 
-func NewAdminHandler(adminRepo *adminrepo.AdminRepository, notificationPrefsRepo *adminrepo.NotificationPreferencesRepository, passwordResetRepo *adminrepo.PasswordResetRepository, userRepo *app.UserRepository, carBookingRepo *app.CarBookingRepository, flightBookingRepo *app.FlightBookingRepository, hotelBookingRepo *app.HotelBookingRepository, supportTicketRepo *app.SupportTicketRepository, paymentRepo *app.PaymentRepository, flightRepo *adminrepo.FlightRepository, carRepo *adminrepo.CarRepository, hotelRepo *adminrepo.HotelRepository, bannerRepo *adminrepo.BannerRepository, travelRepo *adminrepo.TravelRepository, popularRepo *adminrepo.PopularRepository, jwtSecret string) *AdminHandler {
+func NewAdminHandler(adminRepo *adminrepo.AdminRepository, notificationPrefsRepo *adminrepo.NotificationPreferencesRepository, passwordResetRepo *adminrepo.PasswordResetRepository, userRepo *app.UserRepository, carBookingRepo *app.CarBookingRepository, flightBookingRepo *app.FlightBookingRepository, hotelBookingRepo *app.HotelBookingRepository, supportTicketRepo *app.SupportTicketRepository, paymentRepo *app.PaymentRepository, flightRepo *adminrepo.FlightRepository, carRepo *adminrepo.CarRepository, hotelRepo *adminrepo.HotelRepository, bannerRepo *adminrepo.BannerRepository, travelRepo *adminrepo.TravelRepository, popularRepo *adminrepo.PopularRepository, predefinedAnswerRepo *superadminrepo.PredefinedAnswerRepository, jwtSecret string, chatHub *ws.Hub, notifyHub *ws.AdminHub) *AdminHandler {
 	return &AdminHandler{
 		adminRepo:             adminRepo,
 		notificationPrefsRepo: notificationPrefsRepo,
@@ -132,6 +139,9 @@ func NewAdminHandler(adminRepo *adminrepo.AdminRepository, notificationPrefsRepo
 		bannerRepo:            bannerRepo,
 		travelRepo:            travelRepo,
 		popularRepo:           popularRepo,
+		predefinedAnswerRepo:  predefinedAnswerRepo,
 		jwtSecret:             jwtSecret,
+		chatHub:               chatHub,
+		notifyHub:             notifyHub,
 	}
 }

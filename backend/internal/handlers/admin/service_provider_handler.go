@@ -143,6 +143,14 @@ func (h *AdminHandler) GetViewServiceFragment(c *fiber.Ctx) error {
 		}
 
 		detail = ProviderDetailView{
+			IsFreezed: flight.IsFreezed,
+			FreezeActionText: func() string {
+				if flight.IsFreezed {
+					return "Unfreeze Account"
+				} else {
+					return "Freeze Account"
+				}
+			}(),
 			ID:                     flight.ID,
 			Name:                   flight.ProviderName,
 			Email:                  flight.ContactEmail,
@@ -172,6 +180,14 @@ func (h *AdminHandler) GetViewServiceFragment(c *fiber.Ctx) error {
 		}
 
 		detail = ProviderDetailView{
+			IsFreezed: car.IsFreezed,
+			FreezeActionText: func() string {
+				if car.IsFreezed {
+					return "Unfreeze Account"
+				} else {
+					return "Freeze Account"
+				}
+			}(),
 			ID:                     car.ID,
 			Name:                   car.ProviderName,
 			Email:                  car.ContactEmail,
@@ -201,6 +217,14 @@ func (h *AdminHandler) GetViewServiceFragment(c *fiber.Ctx) error {
 		}
 
 		detail = ProviderDetailView{
+			IsFreezed: hotel.IsFreezed,
+			FreezeActionText: func() string {
+				if hotel.IsFreezed {
+					return "Unfreeze Account"
+				} else {
+					return "Freeze Account"
+				}
+			}(),
 			ID:                     hotel.ID,
 			Name:                   hotel.ProviderName,
 			Email:                  hotel.ContactEmail,
@@ -325,4 +349,58 @@ func (h *AdminHandler) UpdateServiceProviderProfitPercent(c *fiber.Ctx) error {
 		"message":        "Profit percent updated successfully",
 		"profit_percent": req.ProfitPercent,
 	})
+}
+
+// ToggleFreezeProvider toggles the is_freezed flag for a service provider
+func (h *AdminHandler) ToggleFreezeProvider(c *fiber.Ctx) error {
+	ctx := c.Context()
+
+	type Req struct {
+		ProviderID   string `json:"provider_id"`
+		ProviderType string `json:"provider_type"`
+	}
+
+	var req Req
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "Invalid request"})
+	}
+
+	if req.ProviderID == "" || req.ProviderType == "" {
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "Provider ID and type are required"})
+	}
+
+	switch strings.ToLower(req.ProviderType) {
+	case "flight":
+		flight, err := h.flightRepo.FindByID(ctx, req.ProviderID)
+		if err != nil || flight == nil {
+			return c.Status(404).JSON(fiber.Map{"success": false, "message": "Flight provider not found"})
+		}
+		newState := !flight.IsFreezed
+		if err := h.flightRepo.UpdateFreeze(ctx, req.ProviderID, newState); err != nil {
+			return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update provider state"})
+		}
+		return c.JSON(fiber.Map{"success": true, "is_freezed": newState})
+	case "car":
+		car, err := h.carRepo.FindByID(ctx, req.ProviderID)
+		if err != nil || car == nil {
+			return c.Status(404).JSON(fiber.Map{"success": false, "message": "Car provider not found"})
+		}
+		newState := !car.IsFreezed
+		if err := h.carRepo.UpdateFreeze(ctx, req.ProviderID, newState); err != nil {
+			return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update provider state"})
+		}
+		return c.JSON(fiber.Map{"success": true, "is_freezed": newState})
+	case "hotel":
+		hotel, err := h.hotelRepo.FindByID(ctx, req.ProviderID)
+		if err != nil || hotel == nil {
+			return c.Status(404).JSON(fiber.Map{"success": false, "message": "Hotel provider not found"})
+		}
+		newState := !hotel.IsFreezed
+		if err := h.hotelRepo.UpdateFreeze(ctx, req.ProviderID, newState); err != nil {
+			return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update provider state"})
+		}
+		return c.JSON(fiber.Map{"success": true, "is_freezed": newState})
+	default:
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "Invalid provider type"})
+	}
 }
