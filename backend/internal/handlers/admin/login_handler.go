@@ -2,13 +2,19 @@ package admin
 
 import (
 	"context"
+	crand "crypto/rand"
+	"encoding/hex"
+	"fmt"
 	"html/template"
 	"log"
+	"math/big"
+	"net/url"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"Anytime_Travel/backend/core/utils"
+	"Anytime_Travel/backend/internal/models/admin"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -153,7 +159,7 @@ func (h *AdminHandler) GetForgetFragment(c *fiber.Ctx) error {
 
 // HandleForgotPassword handles the forgot password form submission
 func (h *AdminHandler) HandleForgotPassword(c *fiber.Ctx) error {
-	email := c.FormValue("email")
+	email := strings.ToLower(strings.TrimSpace(c.FormValue("email")))
 
 	var errs []string
 	if msg := utils.ValidateEmail("Email", email); msg != "" {
@@ -163,16 +169,78 @@ func (h *AdminHandler) HandleForgotPassword(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"errors": errs})
 	}
 
-	// TODO: Implement password reset logic:
-	// 1. Check if user exists with this email
-	// 2. Generate reset token
-	// 3. Store token in database with expiration
-	// 4. Send email with reset link
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-	// For now, return success message
-	return c.JSON(fiber.Map{
-		"message": "If an account exists with this email, you will receive a password reset link",
-	})
+	// Check if user exists with this email
+	adminUser, err := h.adminRepo.FindByEmail(ctx, email)
+	if err != nil {
+		// Don't reveal if user exists for security reasons
+		log.Printf("[FORGOT] No user found for email: %s", email)
+		return c.JSON(fiber.Map{
+			"message": "If an account exists with this email, you will receive a password reset link",
+		})
+	}
+
+	// Generate 6-digit numeric code
+	code := generateNumericCode(6)
+	log.Printf("[FORGOT] Generated verification code for %s", email)
+
+	// Create password reset record with code (valid for 15 minutes)
+	id := generateSecureToken(16)
+	passwordReset := &admin.PasswordReset{
+		ID:        id,
+		Email:     email,
+		Code:      code,
+		ExpiresAt: time.Now().Add(15 * time.Minute),
+		CreatedAt: time.Now(),
+		Used:      false,
+	}
+
+	// Store code in database
+	if err := h.passwordResetRepo.Create(ctx, passwordReset); err != nil {
+		log.Printf("[FORGOT] Failed to store reset code: %v", err)
+		return c.JSON(fiber.Map{"message": "If an account exists with this email, you will receive a verification code"})
+	}
+
+	// Send email with verification code
+	emailService := utils.NewEmailService()
+	if err := emailService.SendPasswordResetCodeEmail(adminUser.Email, code); err != nil {
+		log.Printf("[FORGOT] Failed to send reset code to %s: %v", adminUser.Email, err)
+	}
+
+	// Redirect user to verify page (do not reveal whether email exists)
+	return c.JSON(fiber.Map{"message": "If an account exists with this email, you will receive a verification code", "redirect": "/admin/verify?email=" + urlEncode(email)})
+}
+
+// generateSecureToken generates a random secure token
+func generateSecureToken(length int) string {
+	bytes := make([]byte, length)
+	_, err := crand.Read(bytes)
+	if err != nil {
+		log.Printf("Error generating token: %v", err)
+		return ""
+	}
+	return hex.EncodeToString(bytes)
+}
+
+// generateNumericCode creates a numeric code of given length
+func generateNumericCode(length int) string {
+	max := 1
+	for i := 0; i < length; i++ {
+		max *= 10
+	}
+	n, err := crand.Int(crand.Reader, big.NewInt(int64(max)))
+	if err != nil {
+		log.Printf("Error generating numeric code: %v", err)
+		return "000000"
+	}
+	format := fmt.Sprintf("%%0%dd", length)
+	return fmt.Sprintf(format, n.Int64())
+}
+
+func urlEncode(s string) string {
+	return url.QueryEscape(s)
 }
 
 // Verify renders the email verification page
@@ -211,16 +279,26 @@ func (h *AdminHandler) HandleVerify(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"errors": errs})
 	}
 
-	// TODO: Implement verification logic:
-	// 1. Check if verification code matches the one sent to email
-	// 2. Check if code has not expired
-	// 3. If valid, mark email as verified
-	// 4. Redirect to password reset page
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-	// For now, return success message
-	return c.JSON(fiber.Map{
-		"message": "Email verified successfully",
-	})
+	// Find the code record
+	resetRecord, err := h.passwordResetRepo.FindByCode(ctx, email, code)
+	if err != nil {
+		log.Printf("[VERIFY] Code verification failed for %s: %v", email, err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid or expired verification code"})
+	}
+
+	// Generate a token to allow password reset and update the record
+	token := generateSecureToken(32)
+	expiresAt := time.Now().Add(15 * time.Minute)
+	if err := h.passwordResetRepo.UpdateTokenByID(ctx, resetRecord.ID, token, expiresAt); err != nil {
+		log.Printf("[VERIFY] Failed to update reset token: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to process verification"})
+	}
+
+	// Respond with redirect to reset page containing token
+	return c.JSON(fiber.Map{"message": "Verification successful", "redirect": "/admin/reset?token=" + token})
 }
 
 // Reset renders the reset password page
@@ -245,10 +323,14 @@ func (h *AdminHandler) GetResetFragment(c *fiber.Ctx) error {
 
 // HandleResetPassword handles the password reset form submission
 func (h *AdminHandler) HandleResetPassword(c *fiber.Ctx) error {
+	token := c.Query("token", c.FormValue("token"))
 	password := c.FormValue("password")
 	confirmPassword := c.FormValue("confirm_password")
 
 	var errs []string
+	if strings.TrimSpace(token) == "" {
+		errs = append(errs, "Invalid or missing reset token")
+	}
 	if msg := utils.ValidateLengthBetween("Password", password, 8, 72); msg != "" {
 		errs = append(errs, msg)
 	}
@@ -262,16 +344,56 @@ func (h *AdminHandler) HandleResetPassword(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"errors": errs})
 	}
 
-	// TODO: Implement password reset logic:
-	// 1. Get the user email from session/context
-	// 2. Hash the new password
-	// 3. Update the password in database
-	// 4. Clear any reset tokens for this user
-	// 5. Redirect to login page
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-	// For now, return success message
+	// Find and validate reset token
+	resetRecord, err := h.passwordResetRepo.FindByToken(ctx, token)
+	if err != nil {
+		log.Printf("[RESET] Invalid or expired token: %v", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid or expired reset token",
+		})
+	}
+
+	// Find the admin user
+	adminUser, err := h.adminRepo.FindByEmail(ctx, resetRecord.Email)
+	if err != nil {
+		log.Printf("[RESET] User not found: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to reset password",
+		})
+	}
+
+	// Hash new password
+	hashedPassword, err := utils.HashPassword(password)
+	if err != nil {
+		log.Printf("[RESET] Failed to hash password: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to reset password",
+		})
+	}
+
+	// Update password in database
+	adminUser.Password = hashedPassword
+	err = h.adminRepo.UpdateByEmail(ctx, adminUser.Email, adminUser)
+	if err != nil {
+		log.Printf("[RESET] Failed to update password: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to reset password",
+		})
+	}
+
+	// Mark token as used
+	if err := h.passwordResetRepo.MarkAsUsed(ctx, token); err != nil {
+		log.Printf("[RESET] Failed to mark token as used: %v", err)
+		// Don't fail the reset even if we can't mark token
+	}
+
+	log.Printf("[RESET] Password successfully reset for %s", adminUser.Email)
 	return c.JSON(fiber.Map{
-		"message": "Password reset successfully",
+		"message":  "Password reset successfully. You can now login with your new password.",
+		"redirect": "/admin/login",
 	})
 }
 

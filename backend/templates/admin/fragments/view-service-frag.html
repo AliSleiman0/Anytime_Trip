@@ -67,10 +67,11 @@
       </div>
       <div class="flex flex-col items-center justify-center gap-y-4">
         <button
+          id="freezeBtn"
           class="w-56 h-12 border bg-[#1C9BFF] text-white rounded-lg font-semibold text-lg hover:bg-blue-500 transition-colors"
           onclick="showFreezeConfirmation()"
         >
-          freeze account
+          {{.FreezeActionText}}
         </button>
       </div>
     </div>
@@ -245,11 +246,11 @@
   function showFreezeConfirmation() {
     Swal.fire({
       icon: "info",
-      title: "Freeze Account",
-      html: 'Are you sure you want to freeze <strong>{{.Name}}</strong>\'s account?<br><small style="color: #666;">This change cannot be undone</small>',
+      title: "Freeze / Unfreeze Account",
+      html: 'Are you sure you want to toggle freeze state for <strong>{{.Name}}</strong>\'s account?<br><small style="color: #666;">This will enable or disable the account</small>',
       showCancelButton: true,
       confirmButtonColor: "#1C9BFF",
-      confirmButtonText: "Freeze User",
+      confirmButtonText: "Proceed",
       cancelButtonText: "Cancel",
       customClass: {
         container: "swal2-container",
@@ -260,6 +261,44 @@
         confirmButton: "swal2-confirm",
         cancelButton: "swal2-cancel",
       },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        toggleFreeze();
+      }
+    });
+  }
+
+  function toggleFreeze() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const providerId = urlParams.get('id');
+    const providerType = urlParams.get('type');
+
+    if (!providerId || !providerType) {
+      Swal.fire({icon: 'error', title: 'Error', text: 'Provider ID or type not found'});
+      return;
+    }
+
+    fetch('/admin/toggle-freeze-provider', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider_id: providerId, provider_type: providerType })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const isFreezed = data.is_freezed;
+        const freezeBtn = document.getElementById('freezeBtn');
+        if (freezeBtn) {
+          freezeBtn.textContent = isFreezed ? 'Unfreeze Account' : 'Freeze Account';
+        }
+        Swal.fire({icon: 'success', title: 'Updated', text: isFreezed ? 'Account frozen' : 'Account unfrozen', timer: 1500, showConfirmButton: false});
+      } else {
+        Swal.fire({icon: 'error', title: 'Error', text: data.message || 'Failed to update state'});
+      }
+    })
+    .catch(err => {
+      console.error('Error toggling freeze:', err);
+      Swal.fire({icon: 'error', title: 'Error', text: 'Failed to update state'});
     });
   }
 

@@ -26,4 +26,8 @@ func SetupRoutes(router fiber.Router, handler *superadmin.SuperAdminHandler) {
 	// Predefined Answers routes
 	router.Get("/predefined-answers", handler.GetPredefinedAnswers)
 	router.Get("/predefined-answers-frag", handler.GetPredefinedAnswersFragment)
+	router.Post("/predefined-answers", handler.CreatePredefinedAnswer)
+	router.Put("/predefined-answers/:id", handler.UpdatePredefinedAnswer)
+	router.Put("/predefined-answers/:id/shortcut", handler.UpdatePredefinedAnswerShortcut)
+	router.Delete("/predefined-answers/:id", handler.DeletePredefinedAnswer)
 }

@@ -104,6 +104,16 @@ func (r *AdminRepository) UpdatePassword(ctx context.Context, emailOrID string, 
 	return err
 }
 
+// UpdateByEmail updates an admin user by email
+func (r *AdminRepository) UpdateByEmail(ctx context.Context, email string, adminUser *admin.AdminUser) error {
+	_, err := r.collection.UpdateOne(
+		ctx,
+		bson.M{"email": strings.ToLower(email)},
+		bson.M{"$set": adminUser},
+	)
+	return err
+}
+
 // UpdateCurrency updates an admin's currency preference
 func (r *AdminRepository) UpdateCurrency(ctx context.Context, emailOrID string, currency string) error {
 	// Try to find the admin by email first (since JWT stores email in Subject)

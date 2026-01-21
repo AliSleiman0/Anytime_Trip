@@ -67,6 +67,17 @@ func (r *SupportTicketRepository) AddReply(ctx context.Context, ticketID primiti
 	return err
 }
 
+// MarkRepliesReadByAdmin marks all user replies (is_admin == false) as read_by_admin = true
+func (r *SupportTicketRepository) MarkRepliesReadByAdmin(ctx context.Context, ticketID primitive.ObjectID) error {
+	filter := bson.M{"_id": ticketID}
+	update := bson.M{"$set": bson.M{"replies.$[elem].read_by_admin": true}}
+	arrayFilters := options.Update().SetArrayFilters(options.ArrayFilters{
+		Filters: []interface{}{bson.M{"elem.is_admin": false, "elem.read_by_admin": bson.M{"$ne": true}}},
+	})
+	_, err := r.collection.UpdateOne(ctx, filter, update, arrayFilters)
+	return err
+}
+
 // UpdateTicketStatus sets the ticket status and updates updated_at
 func (r *SupportTicketRepository) UpdateTicketStatus(ctx context.Context, ticketID primitive.ObjectID, status string) error {
 	update := bson.M{"$set": bson.M{"status": status, "updated_at": time.Now()}}

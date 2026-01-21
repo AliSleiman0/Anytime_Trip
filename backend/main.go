@@ -19,6 +19,7 @@ import (
 	adminRoutes "Anytime_Travel/backend/internal/routes/admin"
 	appRoutes "Anytime_Travel/backend/internal/routes/app"
 	superAdminRoutes "Anytime_Travel/backend/internal/routes/superadmin"
+	"Anytime_Travel/backend/internal/ws"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -38,6 +39,7 @@ func main() {
 	// Initialize repositories
 	appRepository := apprepo.NewUserRepository(dbConn.DB)
 	adminRepository := adminrepo.NewAdminRepository(dbConn.DB)
+	passwordResetRepository := adminrepo.NewPasswordResetRepository(dbConn.DB)
 	notificationPrefsRepository := adminrepo.NewNotificationPreferencesRepository(dbConn.DB)
 	superAdminRepository := superadminrepo.NewSystemConfigRepository(dbConn.DB)
 	carBookingRepository := apprepo.NewCarBookingRepository(dbConn.DB)
@@ -53,15 +55,23 @@ func main() {
 	bannerRepository := adminrepo.NewBannerRepository(dbConn.DB)
 	travelRepository := adminrepo.NewTravelRepository(dbConn.DB)
 	popularRepository := adminrepo.NewPopularRepository(dbConn.DB)
+	predefinedAnswerRepository := superadminrepo.NewPredefinedAnswerRepository(dbConn.DB)
 
 	if err := ensureDefaultAdmin(adminRepository); err != nil {
 		log.Printf("warning: unable to seed default admin user: %v", err)
 	}
 
+	// Initialize WebSocket hub
+	chatHub := ws.NewHub()
+	go chatHub.Run()
+	// Admin notification hub (global) for ticket unlock / notify events
+	notifyHub := ws.NewAdminHub()
+	go notifyHub.Run()
+
 	// Initialize handlers
 	appHandler := apphandlers.NewAppHandler(appRepository)
-	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, supportTicketRepository, paymentRepository, flightRepository, carRepository, hotelRepository, bannerRepository, travelRepository, popularRepository, cfg.JWTSecret)
-	superAdminHandler := superadminhandlers.NewSuperAdminHandler(superAdminRepository)
+	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, passwordResetRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, supportTicketRepository, paymentRepository, flightRepository, carRepository, hotelRepository, bannerRepository, travelRepository, popularRepository, predefinedAnswerRepository, cfg.JWTSecret, chatHub, notifyHub)
+	superAdminHandler := superadminhandlers.NewSuperAdminHandler(superAdminRepository, predefinedAnswerRepository)
 
 	// Initialize Fiber app
 	fiberApp := fiber.New()

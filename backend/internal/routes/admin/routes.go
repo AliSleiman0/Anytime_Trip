@@ -5,6 +5,7 @@ import (
 	"Anytime_Travel/backend/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/websocket/v2"
 )
 
 // SetupRoutes sets up admin routes
@@ -31,6 +32,11 @@ func SetupRoutes(router fiber.Router, handler *admin.AdminHandler, jwtSecret str
 	router.Post("/logout", handler.HandleLogout)
 	router.Get("/logout", handler.HandleLogout)
 
+	// WebSocket chat routes (public for easier connection)
+	router.Get("/chat/ws", websocket.New(handler.HandleChatWebSocket))
+	router.Get("/notify/ws", websocket.New(handler.HandleNotifyWebSocket))
+	router.Get("/chat/history", handler.GetChatHistory)
+
 	// Protected routes (require authentication)
 	protected := router.Use(middleware.AuthMiddleware(jwtSecret))
 	protected.Use(middleware.AdminMiddleware())
@@ -56,6 +62,7 @@ func SetupRoutes(router fiber.Router, handler *admin.AdminHandler, jwtSecret str
 	protected.Get("/reports-frag", handler.GetReportsFragment)
 	protected.Get("/support", handler.GetSupport)
 	protected.Get("/support-frag", handler.GetSupportFragment)
+	protected.Get("/api/predefined-answers", handler.GetPredefinedAnswers)
 	protected.Get("/settings", handler.GetSettings)
 	protected.Get("/settings-frag", handler.GetSettingsFragment)
 	protected.Post("/change-password", handler.ChangePassword)
@@ -91,11 +98,14 @@ func SetupRoutes(router fiber.Router, handler *admin.AdminHandler, jwtSecret str
 	protected.Get("/view-user", handler.ViewUser)
 	protected.Get("/view-user-frag", handler.GetViewUserFragment)
 	protected.Post("/update-user-email", handler.UpdateUserEmail)
+	protected.Delete("/delete-user", handler.DeleteUser)
+	protected.Patch("/toggle-freeze-user", handler.ToggleFreezeUser)
 	protected.Get("/service-providers", handler.ManageServiceProviders)
 	protected.Get("/service-provider-frag", handler.GetServiceProvidersFragment)
 	protected.Get("/view-service", handler.ViewService)
 	protected.Get("/view-service-frag", handler.GetViewServiceFragment)
 	protected.Post("/update-service-profit", handler.UpdateServiceProviderProfitPercent)
+	protected.Patch("/toggle-freeze-provider", handler.ToggleFreezeProvider)
 
 	// Support ticket routes
 	protected.Get("/support/tickets", handler.GetAllTickets)

@@ -9,6 +9,7 @@ type User struct {
 	Email         string    `json:"email" bson:"email"`
 	PhoneNumber   string    `json:"phone_number" bson:"phone_number"`
 	IsActive      bool      `json:"is_active" bson:"is_active"`
+	IsFreezed     bool      `json:"is_freezed" bson:"is_freezed"`
 	TotalBookings int       `json:"total_bookings" bson:"total_bookings"`
 	LastBooking   time.Time `json:"last_booking" bson:"last_booking,omitempty"`
 	CreatedAt     time.Time `json:"created_at" bson:"created_at"`

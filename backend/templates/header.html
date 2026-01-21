@@ -102,3 +102,118 @@
     </button>
   </div>
 </header>
+
+<!-- Toast notification container for global notifications -->
+<div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+<script>
+  // Toast notification functions for global use
+  function showToast(message, ticketId) {
+    const container = document.getElementById('toast-container');
+    if (!container) return; // In case not loaded
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    toast.onclick = function() {
+      // If on support page, open the conversation
+      if (window.updateChatListPreview && ticketId) {
+        const item = document.querySelector('.chat-item[data-ticket-id="' + ticketId + '"]');
+        if (item) {
+          item.click();
+        }
+      } else {
+        // Otherwise, navigate to support page with ticket_id
+        window.location.href = '/admin/support?ticket_id=' + encodeURIComponent(ticketId);
+      }
+      hideToast(toast);
+    };
+    container.appendChild(toast);
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+    // Auto-hide after 5 seconds
+    setTimeout(() => hideToast(toast), 5000);
+  }
+
+  function hideToast(toast) {
+    toast.classList.add('hide');
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }
+
+  // Notification WebSocket for global admin notifications
+  let notifyWS = null;
+  let currentAdminID = "admin123"; // TODO: Get from session or data attribute
+
+  function connectNotifyWebSocket() {
+    try {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const url = protocol + "//" + window.location.host + "/admin/notify/ws?admin_id=" + encodeURIComponent(currentAdminID);
+      notifyWS = new WebSocket(url);
+
+      notifyWS.onopen = function () {
+        console.log("Notify WebSocket connected");
+      };
+
+      notifyWS.onmessage = function (ev) {
+        try {
+          const data = JSON.parse(ev.data);
+          if (data && data.type === 'ticket_unlocked' && data.ticket_id) {
+            // Show toast notification
+            const toastMessage = `New message from ${data.user_name || 'User'} in ticket ${data.ticket_id}`;
+            showToast(toastMessage, data.ticket_id);
+
+            // If on support page, update the chat list
+            if (window.updateChatListPreview) {
+              const preview = data.message || (data.user_name ? (data.user_name + ' sent a message') : 'New message');
+              window.updateChatListPreview(data.ticket_id, preview, data.timestamp || new Date().toISOString(), false);
+            }
+          }
+        } catch (err) {
+          console.error('notifyWS parse error', err);
+        }
+      };
+
+      notifyWS.onerror = function (err) {
+        console.error('Notify WebSocket error', err);
+      };
+
+      notifyWS.onclose = function () {
+        console.log('Notify WebSocket closed, retrying in 3s');
+        setTimeout(connectNotifyWebSocket, 3000);
+      };
+    } catch (err) {
+      console.error('Failed to connect notify WS', err);
+    }
+  }
+
+  // Start notify socket immediately so admin receives global notifications
+  connectNotifyWebSocket();
+</script>
+
+<style>
+  /* Toast notification styles */
+  .toast {
+    background: #336891;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    max-width: 300px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .toast.hide {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+</style>

@@ -19,30 +19,26 @@
           <!-- Heading -->
           <h2 class="text-3xl font-semibold text-center text-gray-800 mb-8">Forgot Password</h2>
           
+          <!-- Error Message -->
+          <div id="errorMessage" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-5 hidden"></div>
+          
+          <!-- Success Message -->
+          <div id="successMessage" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-5 hidden"></div>
+          
           <!-- Forgot Password Form -->
-          <form action="/admin/forgot-password" method="POST" class="space-y-5">
+          <form id="forgotForm" class="space-y-5">
             <!-- Email Field with Verify Button -->
             <div>
               <label for="email" class="block text-sm text-gray-600 mb-2">Your email</label>
-              <div class="flex gap-2">
-                <input 
-                  type="email" 
-                  id="email" 
-                  name="email" 
-                  class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 focus:border-transparent" 
-                  style="--tw-ring-color: #336891;"
-                  placeholder=""
-                />
-                <button 
-                  type="button" 
-                  class="px-6 py-3 font-medium text-white rounded-lg transition duration-200 whitespace-nowrap"
-                  style="background-color: #336891;"
-                  onmouseover="this.style.backgroundColor='#264d6e';"
-                  onmouseout="this.style.backgroundColor='#336891';"
-                >
-                  Verify
-                </button>
-              </div>
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 focus:border-transparent" 
+                style="--tw-ring-color: #336891;"
+                placeholder="Enter your email address"
+                required
+              />
             </div>
             
             <!-- Next Button -->
@@ -53,12 +49,71 @@
               onmouseover="this.style.backgroundColor='#264d6e';"
               onmouseout="this.style.backgroundColor='#336891';"
             >
-              Next
+              Send Reset Email
             </button>
           </form>
+          
+          <!-- Back to Login Link -->
+          <p class="text-center mt-6 text-gray-600">
+            <a href="/admin/login" class="text-blue-600 hover:underline">Back to Login</a>
+          </p>
         </div>
       </div>
     </div>
   </div>
   
-</div>
+  <script>
+    const form = document.getElementById('forgotForm');
+    const errorDiv = document.getElementById('errorMessage');
+    const successDiv = document.getElementById('successMessage');
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Clear messages
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+      
+      const email = document.getElementById('email').value.trim();
+      
+      // Client-side validation
+      if (!email) {
+        errorDiv.textContent = 'Email is required';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        errorDiv.textContent = 'Please enter a valid email address';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      
+      // Submit form
+      const formData = new FormData();
+      formData.append('email', email);
+      
+      try {
+        const response = await fetch('/admin/forgot-password', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await response.json();
+        
+        successDiv.textContent = data.message || 'If an account exists with this email, you will receive a verification code.';
+        successDiv.classList.remove('hidden');
+        form.reset();
+        // Redirect to verify page if provided
+        if (data.redirect) {
+          setTimeout(() => { window.location.href = data.redirect; }, 700);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        errorDiv.textContent = 'An error occurred. Please try again.';
+        errorDiv.classList.remove('hidden');
+      }
+    });
+  </script></div>
