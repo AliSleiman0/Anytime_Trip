@@ -74,22 +74,23 @@
             <thead class="bg-[#336891] text-white sticky top-0 z-10">
               <tr>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Name</th>
-                <th class="px-4 py-3 text-center font-semibold" style="width: 14%;">Type</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 14%;">Provider</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Status</th>
-                <th class="px-4 py-3 text-center font-semibold" style="width: 15%;">Number of Travelers</th>
-                <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Dates</th>
-                <th class="px-4 py-3 text-center font-semibold" style="width: 15%;">Details</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 15%;">Location</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Cost</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Commission</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 15%;">Property Details</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 6%;">Action</th>
               </tr>
             </thead>
             <tbody class="bg-white text-gray-900">
               {{range .Hotels}}
-              <tr class="border-b border-gray-200">
+              <tr class="border-b border-gray-200" data-hotel-id="{{.ID}}" data-hotel-code="{{.HotelID}}" data-hotel-name="{{.HotelName}}" data-status="{{.Status}}" data-cost="{{.Cost}}" data-profit-percent="{{.ProfitPercent}}" data-location="{{.Location}}" data-property-details="{{.PropertyDetails}}">
                 <td class="px-4 py-3 text-center text-sm font-semibold" style="width: 12%;">
-                  {{.ProviderName}}
+                  {{.HotelName}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 14%;">
-                  Deluxe Room,<br/>1 King Bed
+                  {{.ProviderName}}
                 </td>
                 <td class="px-4 py-3 text-center" style="width: 8%;">
                   {{if eq .Status "active"}}
@@ -101,13 +102,35 @@
                   {{end}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 15%;">
-                  1 Adult, 2 Children<br/>1 Room
+                  {{.Location}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 12%;">
-                  7 Nov 22<br/>-<br/>13 Nov 22
+                  <div class="flex items-center justify-center gap-2">
+                    <span>{{printf "%.0f" .Cost}}$</span>
+                    <button
+                      class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center topup-btn"
+                      onclick="openTopUpModal(event)"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
+                          fill="white"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </td>
-                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 15%;">
-                  Indoor Pool<br/>Free WIFI<br/>Valet Parking
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 12%;">
+                  {{printf "%.1f%%" .ProfitPercent}} commission
+                </td>
+                <td class="px-4 py-3 text-center text-xs text-gray-800" style="width: 15%;">
+                  {{.PropertyDetails}}
                 </td>
                 <td class="px-4 py-3 text-center" style="width: 6%;">
                   <div class="flex justify-center gap-2">
@@ -152,29 +175,60 @@
       }
     </style>
     <script>
+      // Store current hotel data for editing
+      let currentHotelData = null;
+
       function openHotelModal(event) {
         if (event) {
           event.stopPropagation();
           event.preventDefault();
         }
 
+        // Get the row data
+        const row = event.target.closest('tr');
+        if (row) {
+          currentHotelData = {
+            id: row.dataset.hotelId,
+            hotelCode: row.dataset.hotelCode,
+            hotelName: row.dataset.hotelName,
+            status: row.dataset.status,
+            cost: parseFloat(row.dataset.cost) || 0,
+            profitPercent: parseFloat(row.dataset.profitPercent) || 0,
+            location: row.dataset.location || '',
+            propertyDetails: row.dataset.propertyDetails || ''
+          };
+        }
+
         const modalHtml = `
           <div class="flex flex-col gap-4 text-[#1d1d1d] font-sans">
             <div class="text-center">
-              <div class="text-lg font-bold text-[#1f3242]">Beirut Hotel</div>
-              <div class="text-xs text-[#5b7282] mt-1">1DLRT190/GMARSAN-SMITH</div>
+              <div class="text-lg font-bold text-[#1f3242]">${currentHotelData?.hotelName || 'Hotel'}</div>
+              <div class="text-xs text-[#5b7282] mt-1 flex items-center justify-center gap-1">
+                ${currentHotelData?.hotelCode || ''}
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="#336891"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-xs font-semibold text-[#5b7282]">Location</label>
+              <input id="hotel-location" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" placeholder="e.g., Beirut, Lebanon" value="${currentHotelData?.location || ''}" />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-xs font-semibold text-[#5b7282]">Total Commission</label>
+              <div class="grid grid-cols-[1fr_auto] gap-2">
+                <input id="commission-percent" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="number" step="0.1" placeholder="10%" value="${currentHotelData?.profitPercent || 0}" />
+                <div class="h-10 px-3 rounded-md border border-[#8aaecd] bg-[#f7fafc] text-sm font-semibold flex items-center justify-center text-[#1d1d1d]">~ $ ${((currentHotelData?.cost || 0) * (currentHotelData?.profitPercent || 0) / 100).toFixed(2)}</div>
+              </div>
             </div>
 
             <div class="flex flex-col gap-2">
               <label class="text-xs font-semibold text-[#5b7282]">Property Details</label>
               <div class="relative">
-                <textarea class="w-full h-40 rounded-md border border-[#8aaecd] px-3 py-2 text-sm text-[#1d1d1d] placeholder-[#93a7b5] resize-none" placeholder="">Indoor Pool
-Valet Parking Available
-American Restaurant
-Vegetarian Breakfast
-Dogs And Cats Allowed
-Free Wifi</textarea>
-                <div class="absolute bottom-2 right-3 text-xs text-[#5b7282]">481/3000</div>
+                <textarea id="property-details" class="w-full h-40 rounded-md border border-[#8aaecd] px-3 py-2 text-sm text-[#1d1d1d] placeholder-[#93a7b5] resize-none" placeholder="Indoor Pool, Valet Parking, Free WiFi, etc." maxlength="3000">${currentHotelData?.propertyDetails || ''}</textarea>
+                <div class="absolute bottom-2 right-3 text-xs text-[#5b7282]" id="char-count">${(currentHotelData?.propertyDetails || '').length}/3000</div>
               </div>
             </div>
 
@@ -193,6 +247,16 @@ Free Wifi</textarea>
                 <div class="font-semibold">Drag & Drop or Upload Photo</div>
                 <div class="text-xs text-[#5b7282] mt-1">Accepted formats: PNG, JPG, or SVG</div>
                 <div class="text-xs text-[#5b7282]">Maximum file size: 2MB</div>
+              </div>
+            </div>
+
+            <div class="grid gap-2">
+              <div class="text-sm font-bold text-[#1f3242]">Change Status</div>
+              <div class="grid grid-cols-4 gap-3 text-sm font-medium text-[#1d1d1d]">
+                <label class="flex items-center gap-2"><input type="radio" name="status" value="active" class="h-4 w-4" ${currentHotelData?.status === 'active' ? 'checked' : ''} /> Active</label>
+                <label class="flex items-center gap-2"><input type="radio" name="status" value="inactive" class="h-4 w-4" ${currentHotelData?.status === 'inactive' ? 'checked' : ''} /> Inactive</label>
+                <label class="flex items-center gap-2"><input type="radio" name="status" value="maintenance" class="h-4 w-4" ${currentHotelData?.status === 'maintenance' ? 'checked' : ''} /> Maintenance</label>
+                <label class="flex items-center gap-2"><input type="radio" name="status" value="fully_booked" class="h-4 w-4" ${currentHotelData?.status === 'fully_booked' ? 'checked' : ''} /> Full</label>
               </div>
             </div>
 
@@ -217,7 +281,184 @@ Free Wifi</textarea>
           const cancelBtn = document.getElementById("hotel-modal-cancel");
           const saveBtn = document.getElementById("hotel-modal-save");
           if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
-          if (saveBtn) saveBtn.addEventListener("click", closeModal);
+          if (saveBtn) saveBtn.addEventListener("click", saveHotelData);
+
+          // Add event listener to update commission calculation
+          const commissionInput = document.getElementById("commission-percent");
+          if (commissionInput) {
+            commissionInput.addEventListener("input", () => {
+              const percent = parseFloat(commissionInput.value) || 0;
+              const calculated = ((currentHotelData?.cost || 0) * percent / 100).toFixed(2);
+              document.querySelector('[id*="commission"]').closest('.grid').querySelector('div:last-child').textContent = `~ $ ${calculated}`;
+            });
+          }
+
+          // Add event listener to update character count
+          const propertyDetails = document.getElementById("property-details");
+          if (propertyDetails) {
+            propertyDetails.addEventListener("input", () => {
+              const charCount = document.getElementById('char-count');
+              if (charCount) {
+                charCount.textContent = `${propertyDetails.value.length}/3000`;
+              }
+            });
+          }
+        }, 0);
+      }
+
+      async function saveHotelData() {
+        const location = document.getElementById('hotel-location')?.value;
+        const propertyDetails = document.getElementById('property-details')?.value;
+        
+        const data = {
+          id: currentHotelData?.id,
+          hotel_id: currentHotelData?.hotelCode,
+          hotel_name: currentHotelData?.hotelName,
+          status: document.querySelector('input[name="status"]:checked')?.value,
+          cost: parseFloat(currentHotelData?.cost) || 0,
+          profit_percent: parseFloat(document.getElementById('commission-percent')?.value) || 0,
+          location: location || '',
+          property_details: propertyDetails || ''
+        };
+
+        try {
+          const response = await fetch('/admin/cms/hotels/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: 'Hotel updated successfully',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: result.error || 'Failed to update hotel'
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Network error occurred'
+          });
+        }
+      }
+
+      function openTopUpModal(event) {
+        if (event) {
+          event.stopPropagation();
+          event.preventDefault();
+        }
+
+        // Get the row data
+        const row = event.target.closest('tr');
+        const hotelId = row?.dataset.hotelId;
+        const currentCost = parseFloat(row?.dataset.cost) || 0;
+
+        const modalHtml = `
+          <div class="flex flex-col gap-3 text-[#1d1d1d] font-sans">
+            <div class="text-center text-sm font-semibold text-[#1f3242]">Top Up</div>
+            <div class="relative">
+              <input type="number" id="topup-value" value="${currentCost}" step="0.01" class="w-full h-11 rounded border border-[#9bb6c9] px-3 pr-10 text-sm text-[#1d1d1d] placeholder-[#9bb6c9] focus:outline-none focus:ring-2 focus:ring-[#336891]" />
+              <div class="absolute inset-y-0 right-3 flex items-center text-[#1f3242] font-semibold">$</div>
+            </div>
+            <div class="flex gap-2 justify-start">
+              <button id="topup-cancel" class="px-4 py-2 rounded border border-[#336891] text-[#336891] bg-white text-sm font-semibold">Cancel</button>
+              <button id="topup-confirm" class="px-4 py-2 rounded bg-[#336891] text-white text-sm font-semibold border border-[#336891]">Confirm</button>
+            </div>
+          </div>
+        `;
+
+        Swal.fire({
+          width: "280px",
+          padding: "16px",
+          showConfirmButton: false,
+          showDenyButton: false,
+          showCancelButton: false,
+          html: modalHtml,
+        });
+
+        setTimeout(() => {
+          const closeModal = () => Swal.close();
+          const cancelBtn = document.getElementById("topup-cancel");
+          const confirmBtn = document.getElementById("topup-confirm");
+          if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+          if (confirmBtn) {
+            confirmBtn.addEventListener("click", async () => {
+              const newCost = parseFloat(document.getElementById('topup-value')?.value) || 0;
+
+              const allowedStatuses = ['active', 'inactive', 'maintenance', 'fully_booked'];
+              const statusValue = allowedStatuses.includes((row.dataset.status || '').toLowerCase())
+                ? row.dataset.status.toLowerCase()
+                : 'active';
+
+              const safeCost = Math.max(newCost, 0.01);
+              const profitValue = parseFloat(row.dataset.profitPercent);
+              const safeProfit = Math.min(Math.max(isNaN(profitValue) ? 0 : profitValue, 0), 100);
+
+              const location = row.dataset.location || 'Unknown';
+              const hotelName = row.dataset.hotelName || 'Unknown';
+              const hotelCode = row.dataset.hotelCode || 'unknown';
+              
+              try {
+                const response = await fetch('/admin/cms/hotels/update', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    id: hotelId,
+                    hotel_id: hotelCode,
+                    hotel_name: hotelName,
+                    status: statusValue,
+                    cost: safeCost,
+                    profit_percent: safeProfit,
+                    location: location
+                  })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Top-up updated successfully',
+                    timer: 2000,
+                    showConfirmButton: false
+                  }).then(() => {
+                    window.location.reload();
+                  });
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.error || 'Failed to update top-up'
+                  });
+                }
+              } catch (error) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Network error occurred'
+                });
+              }
+            });
+          }
         }, 0);
       }
 
@@ -298,6 +539,11 @@ Free Wifi</textarea>
           event.preventDefault();
         }
 
+        // Get the row data
+        const row = event.target.closest('tr');
+        const hotelId = row?.dataset.hotelId;
+        const hotelName = row?.dataset.hotelName;
+
         const modalHtml = `
           <div class="flex flex-col items-center gap-4 text-[#1d1d1d] font-sans">
             <div class="w-12 h-12 rounded-full bg-[#fdeeed] flex items-center justify-center shadow-[0_8px_32px_0_#fbd3ce]">
@@ -308,13 +554,13 @@ Free Wifi</textarea>
               </svg>
             </div>
             <div class="text-center flex flex-col gap-1">
-              <div class="text-lg font-bold text-[#1f3242]">Delete Content</div>
-              <div class="text-sm text-[#1d1d1d]">Are you sure you want to delete Content25's service?<br/>This change cannot be undone</div>
+              <div class="text-lg font-bold text-[#1f3242]">Delete Hotel</div>
+              <div class="text-sm text-[#1d1d1d]">Are you sure you want to delete ${hotelName}?<br/>This change cannot be undone</div>
             </div>
 
             <div class="flex gap-3">
               <button class="min-w-[120px] px-4 py-2.5 rounded-lg border border-[#1f3242] text-[#1f3242] font-semibold text-sm bg-white" id="hotel-delete-cancel">Cancel</button>
-              <button class="min-w-[120px] px-4 py-2.5 rounded-lg border border-[#d24124] bg-[#d24124] text-white font-semibold text-sm" id="hotel-delete-confirm">Delete content</button>
+              <button class="min-w-[120px] px-4 py-2.5 rounded-lg border border-[#d24124] bg-[#d24124] text-white font-semibold text-sm" id="hotel-delete-confirm">Delete hotel</button>
             </div>
           </div>
         `;
@@ -333,7 +579,41 @@ Free Wifi</textarea>
           const confirmBtn = document.getElementById("hotel-delete-confirm");
           const closeModal = () => Swal.close();
           if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
-          if (confirmBtn) confirmBtn.addEventListener("click", closeModal);
+          if (confirmBtn) {
+            confirmBtn.addEventListener("click", async () => {
+              try {
+                const response = await fetch(`/admin/cms/hotels/delete?id=${hotelId}`, {
+                  method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted!',
+                    text: 'Hotel deleted successfully',
+                    timer: 2000,
+                    showConfirmButton: false
+                  }).then(() => {
+                    window.location.reload();
+                  });
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.error || 'Failed to delete hotel'
+                  });
+                }
+              } catch (error) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Network error occurred'
+                });
+              }
+            });
+          }
         }, 0);
       }
 
@@ -345,7 +625,7 @@ Free Wifi</textarea>
         const row = cell.parentElement;
         if (!row) return;
         const cellIndex = Array.from(row.children).indexOf(cell);
-        if (cellIndex !== 6) return; // action column is now at index 6 (0-indexed)
+        if (cellIndex !== 7) return; // action column is now at index 7 (0-indexed)
         const buttons = Array.from(cell.querySelectorAll("button"));
         const btnIndex = buttons.indexOf(btn);
         if (btnIndex === 0) {

@@ -41,6 +41,7 @@ func main() {
 	adminRepository := adminrepo.NewAdminRepository(dbConn.DB)
 	passwordResetRepository := adminrepo.NewPasswordResetRepository(dbConn.DB)
 	notificationPrefsRepository := adminrepo.NewNotificationPreferencesRepository(dbConn.DB)
+	loginAttemptRepository := adminrepo.NewLoginAttemptRepository(dbConn.DB)
 	superAdminRepository := superadminrepo.NewSystemConfigRepository(dbConn.DB)
 	carBookingRepository := apprepo.NewCarBookingRepository(dbConn.DB)
 	flightBookingRepository := apprepo.NewFlightBookingRepository(dbConn.DB)
@@ -70,7 +71,7 @@ func main() {
 
 	// Initialize handlers
 	appHandler := apphandlers.NewAppHandler(appRepository)
-	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, passwordResetRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, supportTicketRepository, paymentRepository, flightRepository, carRepository, hotelRepository, bannerRepository, travelRepository, popularRepository, predefinedAnswerRepository, cfg.JWTSecret, chatHub, notifyHub)
+	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, passwordResetRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, supportTicketRepository, paymentRepository, flightRepository, carRepository, hotelRepository, bannerRepository, travelRepository, popularRepository, predefinedAnswerRepository, loginAttemptRepository, cfg.JWTSecret, chatHub, notifyHub)
 	superAdminHandler := superadminhandlers.NewSuperAdminHandler(superAdminRepository, predefinedAnswerRepository)
 
 	// Initialize Fiber app

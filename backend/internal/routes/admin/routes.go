@@ -56,6 +56,7 @@ func SetupRoutes(router fiber.Router, handler *admin.AdminHandler, jwtSecret str
 	protected.Get("/view-booking", handler.ViewBooking)
 	protected.Get("/view-booking-frag", handler.GetViewBookingFragment)
 	protected.Post("/update-booking-email", handler.UpdateBookingEmail)
+	protected.Post("/update-booking-refund", handler.UpdateBookingRefund)
 	protected.Get("/payments", handler.GetPayments)
 	protected.Get("/payments-frag", handler.GetPaymentsFragment)
 	protected.Get("/reports", handler.GetReports)
@@ -76,6 +77,9 @@ func SetupRoutes(router fiber.Router, handler *admin.AdminHandler, jwtSecret str
 	protected.Get("/cms/cars-frag", handler.GetCMSCarsFragment)
 	protected.Get("/cms/hotels", handler.CMSHotels)
 	protected.Get("/cms/hotels-frag", handler.GetCMSHotelsFragment)
+	protected.Post("/cms/hotels/upload", handler.UploadHotelImage)
+	protected.Post("/cms/hotels/update", handler.UpdateHotel)
+	protected.Delete("/cms/hotels/delete", handler.DeleteHotel)
 	protected.Get("/cms/homepage/travel", handler.CMSTravelExperience)
 	protected.Get("/cms/homepage/travel-frag", handler.GetCMSTravelExperienceFragment)
 	// CMS travel upload/save endpoints
@@ -106,6 +110,8 @@ func SetupRoutes(router fiber.Router, handler *admin.AdminHandler, jwtSecret str
 	protected.Get("/view-service-frag", handler.GetViewServiceFragment)
 	protected.Post("/update-service-profit", handler.UpdateServiceProviderProfitPercent)
 	protected.Patch("/toggle-freeze-provider", handler.ToggleFreezeProvider)
+	protected.Patch("/toggle-archive-provider", handler.ToggleArchiveProvider)
+	protected.Patch("/toggle-activate-provider", handler.ToggleActivateProvider)
 
 	// Support ticket routes
 	protected.Get("/support/tickets", handler.GetAllTickets)

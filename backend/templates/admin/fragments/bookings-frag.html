@@ -210,7 +210,8 @@
             <!-- Table body populated from all booking collections -->
             <tbody>
               {{range .Bookings}}
-              <tr
+              <tr onclick="if(!event.target.closest('a,button')) window.location.href='/admin/view-booking?id={{.RefID}}';"
+                class="cursor-pointer hover:bg-[#eef5fa] transition-colors"
                 style="
                   border-bottom: 1px solid;
                   border-image-source: linear-gradient(
@@ -253,77 +254,77 @@
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <mask id="path-1-inside-1_332_3767" fill="white">
+                    <mask id="path-1-inside-1_332_3767-{{.RefID}}" fill="white">
                       <path d="M19.1147 8.91572H14.7947V3.87281C14.7942 1.73334 13.0614 0.00046875 10.9219 0H4.88458C2.74511 0.00046875 1.01223 1.73334 1.01172 3.87281V24H2.74652V3.87281C2.74698 3.27984 2.98464 2.75081 3.37291 2.36114C3.76262 1.97283 4.29161 1.73522 4.88458 1.7347H10.9219C11.5149 1.73517 12.0439 1.97283 12.4336 2.36114C12.8218 2.75081 13.0595 3.27984 13.06 3.87281V24H14.7947V10.6505H19.1147C19.7077 10.6509 20.2367 10.8886 20.6264 11.2769C21.0147 11.6666 21.2523 12.1956 21.2528 12.7886V24H22.9876V12.7885C22.987 10.6491 21.2542 8.91619 19.1147 8.91572Z" />
                     </mask>
                     <path
                       d="M19.1147 8.91572L19.1154 5.91572H19.1147V8.91572ZM14.7947 8.91572H11.7947V11.9157H14.7947V8.91572ZM14.7947 3.87281L17.7947 3.87281V3.87216L14.7947 3.87281ZM10.9219 0L10.9225 -3H10.9219V0ZM4.88458 0V-3H4.88392L4.88458 0ZM1.01172 3.87281L-1.98828 3.87209V3.87281H1.01172ZM1.01172 24H-1.98828V27H1.01172V24ZM2.74652 24V27H5.74652V24H2.74652ZM2.74652 3.87281L-0.253484 3.87044V3.87281H2.74652ZM3.37291 2.36114L1.25541 0.235976L1.24775 0.243658L3.37291 2.36114ZM4.88458 1.7347V-1.2653L4.88197 -1.2653L4.88458 1.7347ZM10.9219 1.7347L10.9243 -1.2653H10.9219V1.7347ZM12.4336 2.36114L14.5587 0.243645L14.5512 0.236117L12.4336 2.36114ZM13.06 3.87281L16.06 3.87281L16.06 3.87044L13.06 3.87281ZM13.06 24H10.06V27H13.06V24ZM14.7947 24V27H17.7947V24H14.7947ZM14.7947 10.6505V7.65047H11.7947V10.6505H14.7947ZM19.1147 10.6505L19.1171 7.65047H19.1147V10.6505ZM20.6264 11.2769L22.7514 9.15928L22.744 9.15188L20.6264 11.2769ZM21.2528 12.7886H24.2528L24.2528 12.786L21.2528 12.7886ZM21.2528 24H18.2528V27H21.2528V24ZM22.9876 24V27H25.9876V24H22.9876ZM22.9876 12.7885L25.9876 12.7885V12.7878L22.9876 12.7885ZM19.1147 8.91572V5.91572H14.7947V8.91572V11.9157H19.1147V8.91572ZM14.7947 8.91572H17.7947V3.87281H14.7947H11.7947V8.91572H14.7947ZM14.7947 3.87281L17.7947 3.87216C17.7939 0.0763462 14.7184 -2.99917 10.9225 -3L10.9219 0L10.9212 3C11.4044 3.00011 11.7946 3.39034 11.7947 3.87347L14.7947 3.87281ZM10.9219 0V-3H4.88458V0V3H10.9219V0ZM4.88458 0L4.88392 -3C1.0881 -2.99917 -1.98737 0.0763441 -1.98828 3.87209L1.01172 3.87281L4.01172 3.87354C4.01184 3.39034 4.40212 3.00011 4.88524 3L4.88458 0ZM1.01172 3.87281H-1.98828V24H1.01172H4.01172V3.87281H1.01172ZM1.01172 24V27H2.74652V24V21H1.01172V24ZM2.74652 24H5.74652V3.87281H2.74652H-0.253484V24H2.74652ZM2.74652 3.87281L5.74651 3.87518C5.74633 4.11084 5.64378 4.33237 5.49806 4.47862L3.37291 2.36114L1.24775 0.243658C0.325501 1.16925 -0.25236 2.44884 -0.253484 3.87044L2.74652 3.87281ZM3.37291 2.36114L5.49039 4.48629C5.34415 4.63201 5.12263 4.7345 4.88719 4.7347L4.88458 1.7347L4.88197 -1.2653C3.46059 -1.26406 2.1811 -0.686351 1.25542 0.23599L3.37291 2.36114ZM4.88458 1.7347V4.7347H10.9219V1.7347V-1.2653H4.88458V1.7347ZM10.9219 1.7347L10.9195 4.7347C10.6838 4.73452 10.4622 4.63195 10.316 4.48616L12.4336 2.36114L14.5512 0.236117C13.6255 -0.686293 12.3459 -1.26417 10.9243 -1.2653L10.9219 1.7347ZM12.4336 2.36114L10.3084 4.47862C10.1627 4.33237 10.0601 4.11085 10.06 3.87518L13.06 3.87281L16.06 3.87044C16.0588 2.44884 15.481 1.16925 14.5587 0.243658L12.4336 2.36114ZM13.06 3.87281H10.06V24H13.06H16.06V3.87281H13.06ZM13.06 24V27H14.7947V24V21H13.06V24ZM14.7947 24H17.7947V10.6505H14.7947H11.7947V24H14.7947ZM14.7947 10.6505V13.6505H19.1147V10.6505V7.65047H14.7947V10.6505ZM19.1147 10.6505L19.1123 13.6505C18.8767 13.6503 18.6551 13.5477 18.5088 13.4019L20.6264 11.2769L22.744 9.15188C21.8183 8.22947 20.5387 7.65159 19.1171 7.65047L19.1147 10.6505ZM20.6264 11.2769L18.5014 13.3945C18.3554 13.2481 18.253 13.0265 18.2528 12.7912L21.2528 12.7886L24.2528 12.786C24.2516 11.3647 23.6739 10.0851 22.7514 9.1593L20.6264 11.2769ZM21.2528 12.7886H18.2528V24H21.2528H24.2528V12.7886H21.2528ZM21.2528 24V27H22.9876V24V21H21.2528V24ZM22.9876 24H25.9876V12.7885H22.9876H19.9876V24H22.9876ZM22.9876 12.7885L25.9876 12.7878C25.9866 8.99206 22.9112 5.91655 19.1154 5.91572L19.1147 8.91572L19.114 11.9157C19.5972 11.9158 19.9874 12.3061 19.9876 12.7893L22.9876 12.7885Z"
                       fill="black"
-                      mask="url(#path-1-inside-1_332_3767)"
+                      mask="url(#path-1-inside-1_332_3767-{{.RefID}})"
                     />
-                    <mask id="path-3-inside-2_332_3767" fill="white">
+                    <mask id="path-3-inside-2_332_3767-{{.RefID}}" fill="white">
                       <path d="M6.70877 6.16846H5.21777V8.69858H6.70877V6.16846Z" />
                     </mask>
                     <path
                       d="M5.21777 6.16846V4.16846H3.21777V6.16846H5.21777ZM6.70877 6.16846H8.70877V4.16846H6.70877V6.16846ZM6.70877 8.69858V10.6986H8.70877V8.69858H6.70877ZM5.21777 8.69858H3.21777V10.6986H5.21777V8.69858ZM5.21777 6.16846V8.16846H6.70877V6.16846V4.16846H5.21777V6.16846ZM6.70877 6.16846H4.70877V8.69858H6.70877H8.70877V6.16846H6.70877ZM6.70877 8.69858V6.69858H5.21777V8.69858V10.6986H6.70877V8.69858ZM5.21777 8.69858H7.21777V6.16846H5.21777H3.21777V8.69858H5.21777Z"
                       fill="black"
-                      mask="url(#path-3-inside-2_332_3767)"
+                      mask="url(#path-3-inside-2_332_3767-{{.RefID}})"
                     />
-                    <mask id="path-5-inside-3_332_3767" fill="white">
+                    <mask id="path-5-inside-3_332_3767-{{.RefID}}" fill="white">
                       <path d="M10.3953 6.16846H8.9043V8.69858H10.3953V6.16846Z" />
                     </mask>
                     <path
                       d="M8.9043 6.16846V4.16846H6.9043V6.16846H8.9043ZM10.3953 6.16846H12.3953V4.16846H10.3953V6.16846ZM10.3953 8.69858V10.6986H12.3953V8.69858H10.3953ZM8.9043 8.69858H6.9043V10.6986H8.9043V8.69858ZM8.9043 6.16846V8.16846H10.3953V6.16846V4.16846H8.9043V6.16846ZM10.3953 6.16846H8.3953V8.69858H10.3953H12.3953V6.16846H10.3953ZM10.3953 8.69858V6.69858H8.9043V8.69858V10.6986H10.3953V8.69858ZM8.9043 8.69858H10.9043V6.16846H8.9043H6.9043V8.69858H8.9043Z"
                       fill="black"
-                      mask="url(#path-5-inside-3_332_3767)"
+                      mask="url(#path-5-inside-3_332_3767-{{.RefID}})"
                     />
-                    <mask id="path-7-inside-4_332_3767" fill="white">
+                    <mask id="path-7-inside-4_332_3767-{{.RefID}}" fill="white">
                       <path d="M6.70877 11.9517H5.21777V14.4818H6.70877V11.9517Z" />
                     </mask>
                     <path
                       d="M5.21777 11.9517V9.95166H3.21777V11.9517H5.21777ZM6.70877 11.9517H8.70877V9.95166H6.70877V11.9517ZM6.70877 14.4818V16.4818H8.70877V14.4818H6.70877ZM5.21777 14.4818H3.21777V16.4818H5.21777V14.4818ZM5.21777 11.9517V13.9517H6.70877V11.9517V9.95166H5.21777V11.9517ZM6.70877 11.9517H4.70877V14.4818H6.70877H8.70877V11.9517H6.70877ZM6.70877 14.4818V12.4818H5.21777V14.4818V16.4818H6.70877V14.4818ZM5.21777 14.4818H7.21777V11.9517H5.21777H3.21777V14.4818H5.21777Z"
                       fill="black"
-                      mask="url(#path-7-inside-4_332_3767)"
+                      mask="url(#path-7-inside-4_332_3767-{{.RefID}})"
                     />
-                    <mask id="path-9-inside-5_332_3767" fill="white">
+                    <mask id="path-9-inside-5_332_3767-{{.RefID}}" fill="white">
                       <path d="M10.3953 11.9517H8.9043V14.4818H10.3953V11.9517Z" />
                     </mask>
                     <path
                       d="M8.9043 11.9517V9.95166H6.9043V11.9517H8.9043ZM10.3953 11.9517H12.3953V9.95166H10.3953V11.9517ZM10.3953 14.4818V16.4818H12.3953V14.4818H10.3953ZM8.9043 14.4818H6.9043V16.4818H8.9043V14.4818ZM8.9043 11.9517V13.9517H10.3953V11.9517V9.95166H8.9043V11.9517ZM10.3953 11.9517H8.3953V14.4818H10.3953H12.3953V11.9517H10.3953ZM10.3953 14.4818V12.4818H8.9043V14.4818V16.4818H10.3953V14.4818ZM8.9043 14.4818H10.9043V11.9517H8.9043H6.9043V14.4818H8.9043Z"
                       fill="black"
-                      mask="url(#path-9-inside-5_332_3767)"
+                      mask="url(#path-9-inside-5_332_3767-{{.RefID}})"
                     />
-                    <mask id="path-11-inside-6_332_3767" fill="white">
+                    <mask id="path-11-inside-6_332_3767-{{.RefID}}" fill="white">
                       <path d="M6.70877 17.7349H5.21777V20.265H6.70877V17.7349Z" />
                     </mask>
                     <path
                       d="M5.21777 17.7349V15.7349H3.21777V17.7349H5.21777ZM6.70877 17.7349H8.70877V15.7349H6.70877V17.7349ZM6.70877 20.265V22.265H8.70877V20.265H6.70877ZM5.21777 20.265H3.21777V22.265H5.21777V20.265ZM5.21777 17.7349V19.7349H6.70877V17.7349V15.7349H5.21777V17.7349ZM6.70877 17.7349H4.70877V20.265H6.70877H8.70877V17.7349H6.70877ZM6.70877 20.265V18.265H5.21777V20.265V22.265H6.70877V20.265ZM5.21777 20.265H7.21777V17.7349H5.21777H3.21777V20.265H5.21777Z"
                       fill="black"
-                      mask="url(#path-11-inside-6_332_3767)"
+                      mask="url(#path-11-inside-6_332_3767-{{.RefID}})"
                     />
-                    <mask id="path-13-inside-7_332_3767" fill="white">
+                    <mask id="path-13-inside-7_332_3767-{{.RefID}}" fill="white">
                       <path d="M10.3953 17.7349H8.9043V20.265H10.3953V17.7349Z" />
                     </mask>
                     <path
                       d="M8.9043 17.7349V15.7349H6.9043V17.7349H8.9043ZM10.3953 17.7349H12.3953V15.7349H10.3953V17.7349ZM10.3953 20.265V22.265H12.3953V20.265H10.3953ZM8.9043 20.265H6.9043V22.265H8.9043V20.265ZM8.9043 17.7349V19.7349H10.3953V17.7349V15.7349H8.9043V17.7349ZM10.3953 17.7349H8.3953V20.265H10.3953H12.3953V17.7349H10.3953ZM10.3953 20.265V18.265H8.9043V20.265V22.265H10.3953V20.265ZM8.9043 20.265H10.9043V17.7349H8.9043H6.9043V20.265H8.9043Z"
                       fill="black"
-                      mask="url(#path-13-inside-7_332_3767)"
+                      mask="url(#path-13-inside-7_332_3767-{{.RefID}})"
                     />
-                    <mask id="path-15-inside-8_332_3767" fill="white">
+                    <mask id="path-15-inside-8_332_3767-{{.RefID}}" fill="white">
                       <path d="M18.5281 13.5781H17.0371V16.1082H18.5281V13.5781Z" />
                     </mask>
                     <path
                       d="M17.0371 13.5781V11.5781H15.0371V13.5781H17.0371ZM18.5281 13.5781H20.5281V11.5781H18.5281V13.5781ZM18.5281 16.1082V18.1082H20.5281V16.1082H18.5281ZM17.0371 16.1082H15.0371V18.1082H17.0371V16.1082ZM17.0371 13.5781V15.5781H18.5281V13.5781V11.5781H17.0371V13.5781ZM18.5281 13.5781H16.5281V16.1082H18.5281H20.5281V13.5781H18.5281ZM18.5281 16.1082V14.1082H17.0371V16.1082V18.1082H18.5281V16.1082ZM17.0371 16.1082H19.0371V13.5781H17.0371H15.0371V16.1082H17.0371Z"
                       fill="black"
-                      mask="url(#path-15-inside-8_332_3767)"
+                      mask="url(#path-15-inside-8_332_3767-{{.RefID}})"
                     />
-                    <mask id="path-17-inside-9_332_3767" fill="white">
+                    <mask id="path-17-inside-9_332_3767-{{.RefID}}" fill="white">
                       <path d="M18.5281 19.1206H17.0371V21.6507H18.5281V19.1206Z" />
                     </mask>
                     <path
                       d="M17.0371 19.1206V17.1206H15.0371V19.1206H17.0371ZM18.5281 19.1206H20.5281V17.1206H18.5281V19.1206ZM18.5281 21.6507V23.6507H20.5281V21.6507H18.5281ZM17.0371 21.6507H15.0371V23.6507H17.0371V21.6507ZM17.0371 19.1206V21.1206H18.5281V19.1206V17.1206H17.0371V19.1206ZM18.5281 19.1206H16.5281V21.6507H18.5281H20.5281V19.1206H18.5281ZM18.5281 21.6507V19.6507H17.0371V21.6507V23.6507H18.5281V21.6507ZM17.0371 21.6507H19.0371V19.1206H17.0371H15.0371V21.6507H17.0371Z"
                       fill="black"
-                      mask="url(#path-17-inside-9_332_3767)"
+                      mask="url(#path-17-inside-9_332_3767-{{.RefID}})"
                     />
                   </svg>
                   {{else}}
@@ -398,6 +399,65 @@
         </div>
       </div>
       <!-- END TABLE -->
+      <!-- Pagination controls (Tailwind) -->
+      <div id="bookings-pagination" class="fixed bottom-5 left-[55%] transform -translate-x-1/2 z-50 flex gap-2 p-1 pointer-events-auto"></div>
+
+      <script>
+        (function(){
+          window.initBookingsPagination = function(perPage){
+            perPage = perPage || 7;
+            const tbody = document.querySelector('#bookings-fragment table tbody');
+            if(!tbody) return;
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            // if no rows or only the "No bookings found" row, don't paginate
+            if(!rows.length) return;
+
+            // if the template includes a single 'no bookings' row with colspan, detect it
+            if(rows.length === 1 && rows[0].querySelector('td') && rows[0].querySelector('td').getAttribute('colspan')=='10'){
+              // nothing to paginate
+              return;
+            }
+
+            const total = rows.length;
+            const pages = Math.max(1, Math.ceil(total / perPage));
+            const container = document.getElementById('bookings-pagination');
+            container.innerHTML = '';
+
+            function showPage(page){
+              const start = (page-1)*perPage;
+              const end = start + perPage;
+              rows.forEach((r,i)=>{
+                r.style.display = (i>=start && i<end) ? '' : 'none';
+              });
+              // update buttons (toggle Tailwind active classes)
+              Array.from(container.children).forEach(btn=>{
+                const isActive = parseInt(btn.dataset.page,10)===page;
+                btn.classList.toggle('bg-[#336891]', isActive);
+                btn.classList.toggle('text-white', isActive);
+                btn.classList.toggle('border-[#336891]', isActive);
+                btn.setAttribute('aria-current', isActive ? 'page' : 'false');
+              });
+            }
+
+            for(let p=1;p<=pages;p++){
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'inline-flex items-center justify-center w-8 h-8 rounded-md border border-gray-200 bg-white text-gray-900 hover:bg-gray-100';
+              btn.dataset.page = String(p);
+              btn.textContent = String(p);
+              btn.addEventListener('click', () => { showPage(p); });
+              container.appendChild(btn);
+            }
+
+            // show first page
+            showPage(1);
+          };
+
+          // auto-init when fragment loads
+          if (window.requestAnimationFrame) requestAnimationFrame(()=>window.initBookingsPagination(7));
+          else window.initBookingsPagination(7);
+        })();
+      </script>
     </div>
   </main>
 </div>
@@ -475,14 +535,7 @@
             </p></div>
           <div><p class="text-xs">Phone Number</p><p class="font-semibold">+1 (555) 91844 0192</p></div>
           <div><p class="text-xs">Reference ID</p><p class="font-semibold">123456</p></div>
-        </div>function() {
-    initBookingDetailButtons();
-    initDatePicker();
-  });
-  document.addEventListener("htmx:afterSwap", function() {
-    initBookingDetailButtons();
-    initDatePicker();
-  }
+        </div>
         <div class="mt-4 flex items-center justify-center gap-3">
           <div class="relative flex items-center">
             <label class="absolute -top-2 left-3 px-1 text-[11px] font-medium text-[#336891] bg-[#eef5fa]">Refund Amount</label>

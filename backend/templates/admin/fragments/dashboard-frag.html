@@ -2,37 +2,6 @@
   <main class="">
     <div hx-get="/admin/header?title=Dashboard&subtitle=Here's what's happening today!" hx-trigger="load" hx-swap="innerHTML"></div>
 
-    <!-- inputs -->
-    <div class="p-4 flex justify-between">
-      <input
-        id="date"
-        name="date"
-        type="date"
-        placeholder="Select Date"
-        onblur="if(!this.value){this.type='text'}"
-        class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
-      />
-      <div>
-        <select
-          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
-          name="bookings"
-          id="bookings"
-        >
-          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
-            All Bookings
-          </option>
-        </select>
-        <select
-          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
-          name="status"
-          id="status"
-        >
-          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
-            All Statuses
-          </option>
-        </select>
-      </div>
-    </div>
 
     <!-- cards -->
     <div class="flex items-center justify-center gap-5 flex-wrap">
@@ -45,7 +14,7 @@
           <div class="flex justify-between">
             <p class="text-xl font-bold">{{.TotalUsers}}</p>
             <p class="flex items-center gap-1">
-              <span>+11.01%</span>
+              <span>{{.NewUsersMonthPercent}}</span>
               <svg
                 class="w-4 h-4"
                 xmlns="http://www.w3.org/2000/svg"
@@ -66,7 +35,7 @@
           <div class="flex justify-between">
             <p>today: {{.NewUsersToday}}</p>
             <p class="text-[#009316] flex items-center gap-1">
-              <span>+11.01%</span>
+              <span>{{.NewUsersTodayPercent}}</span>
               <svg
                 class="w-4 h-4"
                 xmlns="http://www.w3.org/2000/svg"
@@ -96,7 +65,7 @@
           <div class="flex justify-between">
             <p class="text-xl font-bold">{{.ActiveUsers}}</p>
             <p class="text-[#009316] flex items-center gap-1">
-              <span>+11.01%</span>
+              <span>{{.ActiveUsersMonthPercent}}</span>
               <svg
                 class="w-4 h-4"
                 xmlns="http://www.w3.org/2000/svg"
@@ -115,9 +84,9 @@
             </p>
           </div>
           <div class="flex justify-between">
-            <p>today: {{.NewUsersToday}}</p>
+            <p>today: {{.ActiveUsersToday}}</p>
             <p class="text-[#009316] flex items-center gap-1">
-              <span>+11.01%</span>
+              <span>{{.ActiveUsersTodayPercent}}</span>
               <svg
                 class="w-4 h-4"
                 xmlns="http://www.w3.org/2000/svg"
@@ -147,7 +116,7 @@
           <div class="flex justify-between">
             <p class="text-xl font-bold">{{.UnactiveUsers}}</p>
             <p class="text-[#009316] flex items-center gap-1">
-              <span>+11.01%</span>
+              <span>{{.UnactiveUsersMonthPercent}}</span>
               <svg
                 class="w-4 h-4"
                 xmlns="http://www.w3.org/2000/svg"
@@ -166,9 +135,9 @@
             </p>
           </div>
           <div class="flex justify-between">
-            <p>today: 0</p>
+            <p>today: {{.UnactiveUsersToday}}</p>
             <p class="text-[#009316] flex items-center gap-1">
-              <span>+11.01%</span>
+              <span>{{.UnactiveUsersTodayPercent}}</span>
               <svg
                 class="w-4 h-4"
                 xmlns="http://www.w3.org/2000/svg"
@@ -198,7 +167,7 @@
           <div class="flex justify-between">
             <p class="text-xl font-bold">{{.Visits}}</p>
             <p class="text-[#D24124] flex items-center gap-1">
-              <span>-11.01%</span>
+              <span>{{.VisitsPercent}}</span>
               <svg
                 class="w-4 h-4"
                 xmlns="http://www.w3.org/2000/svg"
@@ -295,6 +264,118 @@
 
       
     </div>
+
+    <!-- Chart.js for dashboard charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+      (function(){
+        window.initActiveBookingChart = function() {
+          const canvas = document.getElementById('activeBookingChart');
+          if (!canvas || typeof Chart === 'undefined') return;
+
+          const labels = {{if .ActiveBookingLabelsJSON}}{{.ActiveBookingLabelsJSON}}{{else}}[]{{end}};
+          const dataThis = {{if .ActiveBookingThisYearDataJSON}}{{.ActiveBookingThisYearDataJSON}}{{else}}[]{{end}};
+          const dataLast = {{if .ActiveBookingLastYearDataJSON}}{{.ActiveBookingLastYearDataJSON}}{{else}}[]{{end}};
+
+          const ctx = canvas.getContext('2d');
+          if (canvas.activeBookingChartInstance) {
+            canvas.activeBookingChartInstance.destroy();
+          }
+
+          canvas.activeBookingChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: 'Last year',
+                  data: dataLast,
+                  borderColor: '#000000',
+                  backgroundColor: 'rgba(0,0,0,0.06)',
+                  fill: true,
+                  tension: 0.4,
+                  pointRadius: 3,
+                },
+                {
+                  label: 'This year',
+                  data: dataThis,
+                  borderColor: '#336891',
+                  backgroundColor: 'rgba(51,104,145,0.12)',
+                  fill: true,
+                  tension: 0.4,
+                  pointRadius: 3,
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: { beginAtZero: true }
+              },
+              plugins: { legend: { display: false } }
+            }
+          });
+        };
+      })();
+    </script>
+
+    <script>
+      (function(){
+        window.initFlightsChart = function() {
+          const canvas = document.getElementById('flightsChart');
+          if (!canvas || typeof Chart === 'undefined') return;
+
+          const labels = {{if .ActiveBookingLabelsJSON}}{{.ActiveBookingLabelsJSON}}{{else}}[]{{end}};
+          const dataThis = {{if .FlightsThisYearDataJSON}}{{.FlightsThisYearDataJSON}}{{else}}[]{{end}};
+          const dataLast = {{if .FlightsLastYearDataJSON}}{{.FlightsLastYearDataJSON}}{{else}}[]{{end}};
+
+          const ctx = canvas.getContext('2d');
+          if (canvas.flightsChartInstance) {
+            canvas.flightsChartInstance.destroy();
+          }
+
+          canvas.flightsChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: 'Last year',
+                  data: dataLast,
+                  borderColor: '#000000',
+                  backgroundColor: 'rgba(0,0,0,0.06)',
+                  fill: true,
+                  tension: 0.4,
+                  pointRadius: 3,
+                },
+                {
+                  label: 'This year',
+                  data: dataThis,
+                  borderColor: '#336891',
+                  backgroundColor: 'rgba(51,104,145,0.12)',
+                  fill: true,
+                  tension: 0.4,
+                  pointRadius: 3,
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: { beginAtZero: true }
+              },
+              plugins: { legend: { display: false } }
+            }
+          });
+        };
+
+        // Initialize charts after both functions are defined
+        if (window.initActiveBookingChart) window.initActiveBookingChart();
+        if (window.initFlightsChart) window.initFlightsChart();
+      })();
+    </script>
 
 
     <!-- bars -->

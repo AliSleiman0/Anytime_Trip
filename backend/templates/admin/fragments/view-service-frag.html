@@ -58,7 +58,13 @@
         />
 
         <div class="flex flex-col justify-center text-left gap-y-2 ml-6">
-          <h3 class="text-2xl font-semibold">{{.Name}}</h3>
+          
+            <h3 class="text-2xl font-semibold">
+              {{.Name}}
+              <span id="freezeIcon" class="{{if or .IsFreezed (or (eq .Status "Freezed") (eq .Status "Frozen"))}}inline-block ml-2{{else}}hidden{{end}}">
+                <svg width="18px" height="18px" class="mt-1" viewBox="0 0 24 24" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"><defs><style>.cls-1{fill:none;stroke:#2697ed;stroke-miterlimit:10;stroke-width:1.92px;}</style></defs><polyline class="cls-1" points="12 23.5 12 17.75 12 14.88"/><line class="cls-1" x1="12" y1="9.13" x2="12" y2="0.5"/><polyline class="cls-1" points="15.35 2.9 12 6.25 8.65 2.9"/><polyline class="cls-1" points="12 23.5 12 17.75 12 14.88"/><line class="cls-1" x1="12" y1="9.13" x2="12" y2="0.5"/><polyline class="cls-1" points="8.65 21.1 12 17.75 15.35 21.1"/><polyline class="cls-1" points="21.96 17.75 16.98 14.88 14.49 13.44"/><line class="cls-1" x1="9.51" y1="10.56" x2="2.04" y2="6.25"/><polyline class="cls-1" points="5.79 4.54 7.02 9.13 2.44 10.35"/><polyline class="cls-1" points="21.96 17.75 16.98 14.88 14.49 13.44"/><line class="cls-1" x1="9.51" y1="10.56" x2="2.04" y2="6.25"/><polyline class="cls-1" points="18.21 19.46 16.98 14.88 21.56 13.65"/><line class="cls-1" x1="9.51" y1="13.44" x2="2.04" y2="17.75"/><polyline class="cls-1" points="14.49 10.56 16.98 9.13 21.96 6.25"/><polyline class="cls-1" points="18.21 4.54 16.98 9.13 21.56 10.35"/><line class="cls-1" x1="9.51" y1="13.44" x2="2.04" y2="17.75"/><polyline class="cls-1" points="14.49 10.56 16.98 9.13 21.96 6.25"/><polyline class="cls-1" points="5.79 19.46 7.02 14.88 2.44 13.65"/><path class="cls-1" d="M14.88,12a2.89,2.89,0,1,1-.39-1.44A2.9,2.9,0,0,1,14.88,12Z"/></svg>
+              </span>
+            </h3>
           <p class="text-[#4A5565]">{{.Email}}</p>
           <p class="text-xs rounded-full text-center px-3 py-1 {{.StatusClass}}">
             {{.Status}}
@@ -290,6 +296,17 @@
         const freezeBtn = document.getElementById('freezeBtn');
         if (freezeBtn) {
           freezeBtn.textContent = isFreezed ? 'Unfreeze Account' : 'Freeze Account';
+        }
+        // update the freeze icon visibility without a full reload
+        const freezeIcon = document.getElementById('freezeIcon');
+        if (freezeIcon) {
+          if (isFreezed) {
+            freezeIcon.classList.remove('hidden');
+            freezeIcon.classList.add('inline-block', 'ml-2');
+          } else {
+            freezeIcon.classList.add('hidden');
+            freezeIcon.classList.remove('inline-block', 'ml-2');
+          }
         }
         Swal.fire({icon: 'success', title: 'Updated', text: isFreezed ? 'Account frozen' : 'Account unfrozen', timer: 1500, showConfirmButton: false});
       } else {

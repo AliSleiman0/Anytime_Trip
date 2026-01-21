@@ -26,16 +26,20 @@ type Flight struct {
 	DepartureLocation string       `json:"departure_location" bson:"departure_location"`
 	ArrivalLocation   string       `json:"arrival_location" bson:"arrival_location"`
 	// Provider metadata for admin service-provider table
-	ProviderName  string    `json:"provider_name" bson:"provider_name"`
-	ProviderType  string    `json:"type" bson:"type"` // e.g., "Airline"
-	Location      string    `json:"location" bson:"location"`
-	ContactEmail  string    `json:"contact_email" bson:"contact_email"`
-	Rating        float64   `json:"rating" bson:"rating"`
-	TotalBookings int64     `json:"total_bookings" bson:"total_bookings"`
-	Revenue       float64   `json:"revenue" bson:"revenue"`
-	Profit        float64   `json:"profit" bson:"profit"`
-	ProfitPercent float64   `json:"profit_percent" bson:"profit_percent"`
-	CreatedAt     time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at" bson:"updated_at"`
-	IsFreezed     bool      `json:"is_freezed" bson:"is_freezed"`
+	ProviderName    string    `json:"provider_name" bson:"provider_name"`
+	ProviderType    string    `json:"type" bson:"type"` // e.g., "Airline"
+	Location        string    `json:"location" bson:"location"`
+	ContactEmail    string    `json:"contact_email" bson:"contact_email"`
+	Rating          float64   `json:"rating" bson:"rating"`
+	TotalBookings   int64     `json:"total_bookings" bson:"total_bookings"`
+	Revenue         float64   `json:"revenue" bson:"revenue"`
+	Profit          float64   `json:"profit" bson:"profit"`
+	ProfitPercent   float64   `json:"profit_percent" bson:"profit_percent"`
+	CreatedAt       time.Time `json:"created_at" bson:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at" bson:"updated_at"`
+	IsFreezed       bool      `json:"is_freezed" bson:"is_freezed"`
+	Refundable      bool      `json:"refundable" bson:"refundable"`
+	AllowChanges    bool      `json:"allow_changes" bson:"allow_changes"`
+	AllowSeatChoice bool      `json:"allow_seat_choice" bson:"allow_seat_choice"`
+	AllowCarryOn    bool      `json:"allow_carry_on" bson:"allow_carry_on"`
 }

@@ -66,15 +66,68 @@ func (h *AdminHandler) HandleLogin(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	// Check whether this IP or email is currently blocked due to repeated failures
+	ipKey := "ip:" + c.IP()
+	emailKey := "email:" + email
+	if h.loginAttemptRepo != nil {
+		if blocked, until, err := h.loginAttemptRepo.IsBlocked(ctx, ipKey); err == nil && blocked {
+			log.Printf("[LOGIN] Blocked IP %s until %v", c.IP(), until)
+			return c.Status(fiber.StatusTooManyRequests).SendString("Too many login attempts. Please try again later.")
+		}
+		if email != "" {
+			if blocked, until, err := h.loginAttemptRepo.IsBlocked(ctx, emailKey); err == nil && blocked {
+				log.Printf("[LOGIN] Blocked email %s until %v", email, until)
+				return c.Status(fiber.StatusTooManyRequests).SendString("Too many login attempts. Please try again later.")
+			}
+		}
+	}
+
 	adminUser, err := h.adminRepo.FindByEmail(ctx, email)
 	if err != nil {
 		log.Printf("[LOGIN] User not found for email %s: %v", email, err)
+		// Record failed attempt and potentially block
+		if h.loginAttemptRepo != nil {
+			_ = h.loginAttemptRepo.RecordAttempt(ctx, ipKey)
+			if email != "" {
+				_ = h.loginAttemptRepo.RecordAttempt(ctx, emailKey)
+			}
+			// Count recent attempts within 1 minute
+			since := time.Now().Add(-1 * time.Minute)
+			if cnt, err := h.loginAttemptRepo.CountAttemptsSince(ctx, ipKey, since); err == nil && cnt >= 3 {
+				_ = h.loginAttemptRepo.CreateBlock(ctx, ipKey, time.Now().Add(5*time.Minute))
+				log.Printf("[LOGIN] Created block for IP %s due to %d attempts", c.IP(), cnt)
+			}
+			if email != "" {
+				if cnt, err := h.loginAttemptRepo.CountAttemptsSince(ctx, emailKey, since); err == nil && cnt >= 3 {
+					_ = h.loginAttemptRepo.CreateBlock(ctx, emailKey, time.Now().Add(5*time.Minute))
+					log.Printf("[LOGIN] Created block for email %s due to %d attempts", email, cnt)
+				}
+			}
+		}
 		return c.Status(fiber.StatusUnauthorized).SendString("Invalid credentials")
 	}
 
 	log.Printf("[LOGIN] Found user, checking password...")
 	if !utils.CheckPasswordHash(password, adminUser.Password) {
 		log.Printf("[LOGIN] Password check failed")
+		// Record failed attempt and potentially block
+		if h.loginAttemptRepo != nil {
+			_ = h.loginAttemptRepo.RecordAttempt(ctx, ipKey)
+			if email != "" {
+				_ = h.loginAttemptRepo.RecordAttempt(ctx, emailKey)
+			}
+			since := time.Now().Add(-1 * time.Minute)
+			if cnt, err := h.loginAttemptRepo.CountAttemptsSince(ctx, ipKey, since); err == nil && cnt >= 3 {
+				_ = h.loginAttemptRepo.CreateBlock(ctx, ipKey, time.Now().Add(5*time.Minute))
+				log.Printf("[LOGIN] Created block for IP %s due to %d attempts", c.IP(), cnt)
+			}
+			if email != "" {
+				if cnt, err := h.loginAttemptRepo.CountAttemptsSince(ctx, emailKey, since); err == nil && cnt >= 3 {
+					_ = h.loginAttemptRepo.CreateBlock(ctx, emailKey, time.Now().Add(5*time.Minute))
+					log.Printf("[LOGIN] Created block for email %s due to %d attempts", email, cnt)
+				}
+			}
+		}
 		return c.Status(fiber.StatusUnauthorized).SendString("Invalid credentials")
 	}
 

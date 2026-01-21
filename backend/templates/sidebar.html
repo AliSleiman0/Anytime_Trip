@@ -459,7 +459,7 @@
     // Dynamic active link highlighting
     (function() {
       const currentPath = window.location.pathname;
-      const links = document.querySelectorAll('aside nav a');
+      const links = document.querySelectorAll('aside nav a, aside .px-2 a');
       const activeColor = '#336891';
       
       links.forEach(link => {
@@ -467,8 +467,8 @@
         
         // Check if this link matches the current path
         if (href === currentPath) {
-          // Add active classes
-          link.classList.remove('text-gray-800');
+          // Add active classes (remove both gray-700 and gray-800 for submenu and main links)
+          link.classList.remove('text-gray-800', 'text-gray-700');
           link.classList.add('text-[#336891]', 'border-r-2', 'border-[#336891]');
           
           // Update all SVG strokes to active color

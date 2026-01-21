@@ -93,6 +93,46 @@ func (h *AdminHandler) GetPaymentsFragment(c *fiber.Ctx) error {
 		}
 	}
 
+	// compute percentage changes by comparing current period to previous 30 days
+	now := time.Now()
+	thirtyDaysAgo := now.AddDate(0, 0, -30)
+	sixtyDaysAgo := now.AddDate(0, 0, -60)
+
+	var prevOverall float64
+	var prevPaymentsCount int
+	var prevRefunds int
+	var prevCancellations int
+
+	for _, p := range allPayments {
+		if p.BookingDate.After(sixtyDaysAgo) && p.BookingDate.Before(thirtyDaysAgo) {
+			prevOverall += p.Amount
+			prevPaymentsCount++
+			switch p.PaymentStatus {
+			case "Refunded", "Refund":
+				prevRefunds++
+			case "Cancelled", "Canceled":
+				prevCancellations++
+			}
+		}
+	}
+
+	// calculate percentage changes
+	calcPercentage := func(current, previous float64) (float64, bool) {
+		if previous == 0 {
+			if current > 0 {
+				return 100.0, true
+			}
+			return 0, true
+		}
+		change := ((current - previous) / previous) * 100
+		return change, change >= 0
+	}
+
+	revenuePercent, revenuePositive := calcPercentage(overall, prevOverall)
+	paymentsPercent, paymentsPositive := calcPercentage(float64(len(payments)), float64(prevPaymentsCount))
+	refundsPercent, refundsPositive := calcPercentage(float64(refunds), float64(prevRefunds))
+	cancellationsPercent, cancellationsPositive := calcPercentage(float64(cancellations), float64(prevCancellations))
+
 	// build dynamic filter lists from the full (unfiltered) payments
 	methodSet := make(map[string]struct{})
 	typeSet := make(map[string]struct{})
@@ -126,15 +166,23 @@ func (h *AdminHandler) GetPaymentsFragment(c *fiber.Ctx) error {
 	sort.Strings(paymentStatuses)
 
 	data := fiber.Map{
-		"OverallRevenue":     formatCurrency("$", overall),
-		"PaymentsCount":      len(payments),
-		"RefundsCount":       refunds,
-		"CancellationsCount": cancellations,
-		"Payments":           payments,
-		"PaymentMethods":     paymentMethods,
-		"BookingTypes":       bookingTypes,
-		"PaymentStatuses":    paymentStatuses,
-		"Filters":            map[string]string{"Date": dateFilter, "Method": methodFilter, "Type": typeFilter, "Status": statusFilter},
+		"OverallRevenue":         formatCurrency("$", overall),
+		"OverallRevenuePercent":  fmt.Sprintf("%.2f", revenuePercent),
+		"OverallRevenuePositive": revenuePositive,
+		"PaymentsCount":          len(payments),
+		"PaymentsPercent":        fmt.Sprintf("%.2f", paymentsPercent),
+		"PaymentsPositive":       paymentsPositive,
+		"RefundsCount":           refunds,
+		"RefundsPercent":         fmt.Sprintf("%.2f", refundsPercent),
+		"RefundsPositive":        refundsPositive,
+		"CancellationsCount":     cancellations,
+		"CancellationsPercent":   fmt.Sprintf("%.2f", cancellationsPercent),
+		"CancellationsPositive":  cancellationsPositive,
+		"Payments":               payments,
+		"PaymentMethods":         paymentMethods,
+		"BookingTypes":           bookingTypes,
+		"PaymentStatuses":        paymentStatuses,
+		"Filters":                map[string]string{"Date": dateFilter, "Method": methodFilter, "Type": typeFilter, "Status": statusFilter},
 	}
 
 	tmpl, err := template.ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "payments-frag.html")))

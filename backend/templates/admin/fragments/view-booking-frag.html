@@ -94,13 +94,15 @@
           <div class="relative flex items-center">
             <label class="absolute -top-2 left-3 px-1 text-[11px] font-medium text-[#336891] bg-[#eef5fa]">Refund Amount</label>
             <input
+              id="refundAmountInput"
               type="text"
-              value="50.00 $"
+              value="{{printf "%.2f" .RefundAmount}}"
+              data-original="{{printf "%.2f" .RefundAmount}}"
               class="h-10 border border-[#336891] rounded px-3 w-36 text-sm bg-[#eef5fa] focus:outline-none focus:ring-2 focus:ring-[#336891]/40"
             />
           </div>
-          <button class="h-10 px-4 border border-gray-300 rounded text-sm">Cancel</button>
-          <button class="h-10 px-4 bg-[#336891] text-white rounded text-sm">Confirm</button>
+          <button onclick="resetRefund()" type="button" class="h-10 px-4 border border-gray-300 rounded text-sm">Cancel</button>
+          <button onclick="saveRefund()" type="button" class="h-10 px-4 bg-[#336891] text-white rounded text-sm">Confirm</button>
         </div>
   </div>
 </div>
@@ -226,4 +228,64 @@
       closeEmailModal();
     }
   });
+
+  // Refund amount helpers
+  function resetRefund() {
+    const input = document.getElementById('refundAmountInput');
+    if (!input) return;
+    const original = input.getAttribute('data-original') || '';
+    input.value = original;
+    showToast('Refund amount reset');
+  }
+
+  function saveRefund() {
+    const input = document.getElementById('refundAmountInput');
+    if (!input) return showToast('Refund input not found', 'error');
+
+    // parse numeric value, allow commas/dollar signs
+    const raw = input.value || '';
+    const cleaned = raw.replace(/[^0-9.\-]/g, '');
+    const amount = parseFloat(cleaned);
+    if (isNaN(amount) || amount < 0) {
+      return showToast('Please enter a valid refund amount', 'error');
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookingId = urlParams.get('id');
+    if (!bookingId) return showToast('Booking ID not found', 'error');
+
+    fetch('/admin/update-booking-refund', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ booking_id: bookingId, refund_amount: amount })
+    })
+    .then(response => {
+      // If server returns an error status, read text and throw so it's shown to the user
+      if (!response.ok) {
+        return response.text().then(text => { throw new Error(text || response.statusText); });
+      }
+      // Try to parse JSON, but if it's not valid JSON, return the raw text as an error
+      return response.text().then(text => {
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          throw new Error(text || 'Invalid JSON response from server');
+        }
+      });
+    })
+    .then(data => {
+      if (data && data.success) {
+        input.setAttribute('data-original', amount.toFixed(2));
+        input.value = amount.toFixed(2);
+        showToast('Refund amount updated');
+      } else {
+        showToast((data && data.message) || 'Failed to update refund', 'error');
+      }
+    })
+    .catch(err => {
+      console.error('Refund save error', err);
+      // Show server error text when available (e.g. "Cannot POST /admin/update-booking-refund")
+      showToast(err.message || 'Failed to update refund', 'error');
+    });
+  }
 </script>

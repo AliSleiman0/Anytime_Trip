@@ -45,10 +45,10 @@
       </button>
       
       <div class="flex items-center gap-6">
-        <button onclick="showSettingsSection('admin')" class="settings-nav-btn active-nav text-[#336891] font-semibold text-sm border-b-2 border-[#336891] pb-2">
+        <button data-section="admin" onclick="showSettingsSection('admin', event)" class="settings-nav-btn active-nav text-[#336891] font-semibold text-sm border-b-2 border-[#336891] pb-2">
           Admin Settings
         </button>
-        <button onclick="showSettingsSection('notifications')" class="settings-nav-btn text-gray-600 font-semibold text-sm pb-2 hover:text-[#336891]">
+        <button data-section="notifications" onclick="showSettingsSection('notifications', event)" class="settings-nav-btn text-gray-600 font-semibold text-sm pb-2 hover:text-[#336891]">
           Notifications
         </button>
       </div>
@@ -455,30 +455,58 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    function showSettingsSection(section) {
+    function showSettingsSection(section, ev) {
       // Hide all sections
       document.querySelectorAll('.settings-section').forEach(el => {
         el.classList.add('hidden');
       });
-      
+
       // Remove active class from all nav buttons
       document.querySelectorAll('.settings-nav-btn').forEach(btn => {
         btn.classList.remove('active-nav', 'text-[#336891]', 'border-b-2', 'border-[#336891]');
         btn.classList.add('text-gray-600');
       });
-      
+
       // Show selected section
-      document.getElementById(section + '-section').classList.remove('hidden');
-      
-      // Add active class to clicked button
-      event.target.classList.remove('text-gray-600');
-      event.target.classList.add('active-nav', 'text-[#336891]', 'border-b-2', 'border-[#336891]');
-      
+      const sectionEl = document.getElementById(section + '-section');
+      if (sectionEl) sectionEl.classList.remove('hidden');
+
+      // Determine button element: use event currentTarget if available, otherwise find by data-section
+      let btnEl = null;
+      if (ev && ev.currentTarget) {
+        btnEl = ev.currentTarget;
+      } else {
+        btnEl = document.querySelector('.settings-nav-btn[data-section="' + section + '"]');
+      }
+
+      if (btnEl) {
+        btnEl.classList.remove('text-gray-600');
+        btnEl.classList.add('active-nav', 'text-[#336891]', 'border-b-2', 'border-[#336891]');
+      }
+
       // Load notification preferences when switching to notifications section
       if (section === 'notifications') {
         loadNotificationPreferences();
       }
     }
+
+    // Auto-open section from URL query param, e.g., ?tab=notifications
+    (function() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
+        if (tab) {
+          // Allow DOM to settle
+          setTimeout(() => {
+            // Only open known sections
+            const allowed = ['admin', 'notifications'];
+            if (allowed.includes(tab)) showSettingsSection(tab);
+          }, 50);
+        }
+      } catch (err) {
+        // ignore
+      }
+    })();
     
     // Load notification preferences from API
     function loadNotificationPreferences() {
