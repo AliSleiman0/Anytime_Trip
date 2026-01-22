@@ -4,14 +4,14 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.17.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
   
   # State Management & Navigation
-  get: ^4.6.0
+  get: ^4.6.6
   
   # Network
   dio: ^5.4.0
@@ -28,9 +28,49 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  flutter_native_splash: ^2.4.7
+  flutter_launcher_icons: ^0.13.1
+
+dependency_overrides:
+  win32: ^5.5.0
+  ffi: ^2.1.0
 
 flutter:
   uses-material-design: true
   
   assets:
     - assets/images/
+
+flutter_native_splash:
+  # Splash screen configuration for all platforms
+  # Run after changes: dart run flutter_native_splash:create
+  
+  # General settings for all platforms (except Android 12+)
+  color: "#336891"
+  color_dark: "#336891"
+  
+  # Splash image - centered on the screen
+  image: assets/images/main-logo.png
+  image_dark: assets/images/main-logo.png
+  
+  # Make it fullscreen (hides status bar on Android)
+  fullscreen: true
+  
+  # Android 12+ configuration (uses different splash screen system)
+  android_12:
+    # Center logo for Android 12+
+    image: assets/images/main-logo.png
+    image_dark: assets/images/main-logo.png
+    
+    # Icon background color
+    color: "#336891"
+    color_dark: "#336891"
+    icon_background_color: "#336891"
+    icon_background_color_dark: "#336891"
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/main-logo.png"
+  adaptive_icon_background: "#336891"
+  adaptive_icon_foreground: "assets/images/main-logo.png"

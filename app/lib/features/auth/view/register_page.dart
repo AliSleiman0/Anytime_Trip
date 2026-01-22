@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import '../controller/auth_controller.dart';
+import '../../../app/routes/app_routes.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -348,7 +349,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     child: ElevatedButton(
                       onPressed: () {
-                        // Handle sign up
+                        Get.toNamed(AppRoutes.FORGOT_PASSWORD);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1e5a8e),

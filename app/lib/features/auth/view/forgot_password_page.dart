@@ -126,14 +126,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       return;
     }
 
-    // Navigate to OTP confirmation page
-    Get.toNamed(
-      AppRoutes.OTP_CONFIRMATION,
-      arguments: {
-        'emailOtp': emailOtp,
-        'phoneOtp': phoneOtp,
-      },
-    );
+    // Sign up complete - navigate to login
+    Get.snackbar('Success', 'Signup completed successfully');
+    Get.offAllNamed(AppRoutes.LOGIN);
   }
 
   @override
@@ -508,7 +503,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                       ),
                       child: Text(
-                        'sent_otp'.tr,
+                        'Verify',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

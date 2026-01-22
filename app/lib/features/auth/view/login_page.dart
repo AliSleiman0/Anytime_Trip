@@ -228,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
                       onTap: () {
-                        Get.toNamed(AppRoutes.FORGOT_PASSWORD);
+                        Get.toNamed(AppRoutes.SET_NEW_PASSWORD);
                       },
                       child: Text(
                         'forgot_password'.tr,
@@ -248,7 +248,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(30),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.15),
@@ -266,7 +266,7 @@ class _LoginPageState extends State<LoginPage> {
                         backgroundColor: const Color(0xFF1e5a8e),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
+                          borderRadius: BorderRadius.circular(30),
                         ),
                       ),
                       child: Text(
@@ -391,7 +391,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => Get.toNamed(AppRoutes.REGISTER),
+                      onTap: () => Get.toNamed(AppRoutes.FORGOT_PASSWORD),
                       child: Text(
                         'signup'.tr,
                         style: const TextStyle(

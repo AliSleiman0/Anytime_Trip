@@ -1,0 +1,105 @@
+# Flutter Native Splash Configuration
+# Complete documentation: https://pub.dev/packages/flutter_native_splash
+# 
+# Usage:
+# - After making changes, run: dart run flutter_native_splash:create
+# - To remove splash screen: dart run flutter_native_splash:remove
+# - To clean and refresh: flutter clean ; flutter pub get ; dart run flutter_native_splash:create
+
+flutter_native_splash:
+  # ============================================================================
+  # GENERAL SETTINGS (For all platforms except Android 12+)
+  # ============================================================================
+  
+  # Background color (applies to all platforms)
+  color: "#336891"
+  
+  # Dark mode background color
+  color_dark: "#336891"
+  
+  # Splash screen image - centered
+  # Must be PNG format, sized for 4x pixel density
+  # Recommended dimensions: 1152×1152 px (fit within circle 768px diameter)
+  image: assets/images/main-logo.png
+  
+  # Dark mode splash image
+  image_dark: assets/images/main-logo.png
+  
+  # Image positioning (default: center)
+  # android_gravity options: center, bottom, top, fill, fill_horizontal, fill_vertical, etc.
+  android_gravity: center
+  
+  # iOS image content mode
+  # options: scaleToFill, scaleAspectFit, scaleAspectFill, center, top, bottom, left, right
+  ios_content_mode: center
+  
+  # Web image display mode
+  # options: center, contain, stretch, cover
+  web_image_mode: center
+  
+  # Hide status bar/notification bar
+  fullscreen: true
+  
+  # ============================================================================
+  # ANDROID 12+ SPECIFIC CONFIGURATION
+  # Android 12 changed splash screen handling - requires separate configuration
+  # Read more: https://developer.android.com/guide/topics/ui/splash-screen
+  # ============================================================================
+  
+  android_12:
+    # Center logo displayed on splash screen
+    # Should be 960×960 px (with background) or 1152×1152 px (without background)
+    image: assets/images/main-logo.png
+    image_dark: assets/images/main-logo.png
+    
+    # Background color for Android 12+
+    color: "#336891"
+    color_dark: "#336891"
+    
+    # Icon background color - provides contrast between icon and window background
+    icon_background_color: "#336891"
+    icon_background_color_dark: "#336891"
+  
+  # ============================================================================
+  # PLATFORM-SPECIFIC CONFIGURATION (Optional)
+  # Uncomment if you need different settings for specific platforms
+  # ============================================================================
+  
+  # iOS specific settings
+  #color_ios: "#FFFFFF"
+  #color_dark_ios: "#1a1a1a"
+  #image_ios: assets/images/main-logo.png
+  #image_dark_ios: assets/images/main-logo.png
+  #info_plist_files:
+  #  - 'ios/Runner/Info-Debug.plist'
+  #  - 'ios/Runner/Info-Release.plist'
+  
+  # Android specific settings
+  #color_android: "#FFFFFF"
+  #color_dark_android: "#1a1a1a"
+  #image_android: assets/images/main-logo.png
+  #image_dark_android: assets/images/main-logo.png
+  #android_screen_orientation: sensorPortrait  # sensorPortrait, sensorLandscape, portrait, landscape
+  
+  # Web specific settings
+  #color_web: "#FFFFFF"
+  #color_dark_web: "#1a1a1a"
+  #image_web: assets/images/main-logo.png
+  #image_dark_web: assets/images/main-logo.png
+  
+  # ============================================================================
+  # BRANDING (Optional - for logo/brand display below main image)
+  # ============================================================================
+  #branding: assets/images/branding.png
+  #branding_dark: assets/images/branding-dark.png
+  #branding_mode: bottom              # bottom, bottomRight, bottomLeft
+  #branding_bottom_padding: 24        # padding in pixels
+  
+  # ============================================================================
+  # NOTES
+  # ============================================================================
+  # - If you encounter issues, try: flutter clean ; flutter pub get
+  # - Ensure your image is PNG format and properly sized
+  # - For Android 12+, one-third of the foreground is masked
+  # - Splash screen may not appear when launching from Android Studio
+  # - Different launchers (non-Google) may display differently

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../core/widgets/custom_button.dart';
@@ -258,11 +259,25 @@ class _SplashPageState extends State<SplashPage> {
                           ),
                         ],
                       ),
-                      child: CustomButton(
-                        text: 'login'.tr,
-                        onPressed: () => Get.toNamed(AppRoutes.LOGIN),
-                        backgroundColor: const Color(0xFF1e5a8e),
-                        textColor: Colors.white,
+                      child: InkWell(
+                        onTap: () => Get.toNamed(AppRoutes.LOGIN),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1e5a8e),
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Text(
+                            'login'.tr,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
 
