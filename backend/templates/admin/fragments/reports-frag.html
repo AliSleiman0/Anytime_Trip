@@ -8,8 +8,8 @@
 
     <div class="p-4">
       <!-- Filters -->
-      <div class="flex flex-wrap gap-3 mb-6">
-        <input
+      <div class="flex flex-wrap justify-between gap-3 mb-6">
+        <div><input
           type="date"
           class="w-44 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           placeholder="From Date"
@@ -18,8 +18,10 @@
           type="date"
           class="w-44 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           placeholder="To Date"
-        />
-        <select
+        /> 
+
+        </div>
+        <!-- <select
           class="w-52 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
         >
           <option disabled selected hidden>Report Type</option>
@@ -28,7 +30,7 @@
           <option>Users</option>
           <option>Services</option>
           <option>Transactions</option>
-        </select>
+        </select> -->
         <button
           onclick="generateReportPDF()"
           class="px-6 h-11 bg-[#336891] text-white font-semibold rounded-lg hover:bg-[#1f3242]"
