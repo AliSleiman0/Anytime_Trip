@@ -435,3 +435,54 @@ func (h *AdminHandler) UpdateBookingEmail(c *fiber.Ctx) error {
 		"message": "Booking not found",
 	})
 }
+
+// UpdateBookingRefund updates the refund amount for a booking (flight/car/hotel)
+func (h *AdminHandler) UpdateBookingRefund(c *fiber.Ctx) error {
+	ctx := c.Context()
+
+	type UpdateRefundRequest struct {
+		BookingID    string  `json:"booking_id"`
+		RefundAmount float64 `json:"refund_amount"`
+	}
+
+	var req UpdateRefundRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"message": "Invalid request body",
+		})
+	}
+
+	if req.BookingID == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"message": "Booking ID is required",
+		})
+	}
+
+	// Try to update in flight bookings
+	if fb, err := h.flightBookingRepo.FindByID(ctx, req.BookingID); err == nil && fb != nil {
+		if err := h.flightBookingRepo.UpdateRefundAmount(ctx, req.BookingID, req.RefundAmount); err != nil {
+			return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update refund"})
+		}
+		return c.JSON(fiber.Map{"success": true, "message": "Refund updated successfully"})
+	}
+
+	// Try car bookings
+	if cb, err := h.carBookingRepo.FindByID(ctx, req.BookingID); err == nil && cb != nil {
+		if err := h.carBookingRepo.UpdateRefundAmount(ctx, req.BookingID, req.RefundAmount); err != nil {
+			return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update refund"})
+		}
+		return c.JSON(fiber.Map{"success": true, "message": "Refund updated successfully"})
+	}
+
+	// Try hotel bookings
+	if hb, err := h.hotelBookingRepo.FindByID(ctx, req.BookingID); err == nil && hb != nil {
+		if err := h.hotelBookingRepo.UpdateRefundAmount(ctx, req.BookingID, req.RefundAmount); err != nil {
+			return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update refund"})
+		}
+		return c.JSON(fiber.Map{"success": true, "message": "Refund updated successfully"})
+	}
+
+	return c.Status(404).JSON(fiber.Map{"success": false, "message": "Booking not found"})
+}

@@ -53,8 +53,20 @@ func (r *UserRepository) Delete(ctx context.Context, id string) error {
 
 // UpdateLastLogin sets the last_login timestamp for a user
 func (r *UserRepository) UpdateLastLogin(ctx context.Context, id string, at time.Time) error {
-	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"last_login": at}})
+	// Update last_login and ensure the user is marked active on login
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"last_login": at, "is_active": true}})
 	return err
+}
+
+// DeactivateStaleUsers sets `is_active` to false for users whose last_login
+// is older than the specified number of days.
+func (r *UserRepository) DeactivateStaleUsers(ctx context.Context, days int) (int64, error) {
+	cutoff := time.Now().AddDate(0, 0, -days)
+	res, err := r.collection.UpdateMany(ctx, bson.M{"last_login": bson.M{"$lt": cutoff}, "is_active": true}, bson.M{"$set": bson.M{"is_active": false}})
+	if err != nil {
+		return 0, err
+	}
+	return res.ModifiedCount, nil
 }
 
 // CountTotalUsers returns the total number of users
@@ -72,6 +84,17 @@ func (r *UserRepository) CountNewUsersToday(ctx context.Context) (int64, error) 
 		"created_at": bson.M{
 			"$gte": startOfDay,
 			"$lt":  endOfDay,
+		},
+	})
+	return count, err
+}
+
+// CountNewUsersBetween returns the number of users created between start (inclusive) and end (exclusive).
+func (r *UserRepository) CountNewUsersBetween(ctx context.Context, start time.Time, end time.Time) (int64, error) {
+	count, err := r.collection.CountDocuments(ctx, bson.M{
+		"created_at": bson.M{
+			"$gte": start,
+			"$lt":  end,
 		},
 	})
 	return count, err

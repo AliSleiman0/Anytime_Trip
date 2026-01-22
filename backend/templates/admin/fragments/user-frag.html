@@ -89,7 +89,14 @@
                     <span class="w-8 h-8 rounded-full bg-[#336891] text-white flex items-center justify-center text-sm font-semibold">
                       {{.Initials}}
                     </span>
-                    <span class="font-semibold text-sm">{{.Name}}</span>
+                    <span class="font-semibold text-sm flex items-center gap-2">
+                      <span>{{.Name}}</span>
+                      {{if or .IsFreezed (or (eq .Status "Freezed") (eq .Status "Frozen"))}}
+                        <span class="inline-flex items-center text-[#336891]" title="Account frozen">
+                          <svg width="18px" height="18px" viewBox="0 0 24 24" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"><defs><style>.cls-1{fill:none;stroke:#2697ed;stroke-miterlimit:10;stroke-width:1.92px;}</style></defs><polyline class="cls-1" points="12 23.5 12 17.75 12 14.88"/><line class="cls-1" x1="12" y1="9.13" x2="12" y2="0.5"/><polyline class="cls-1" points="15.35 2.9 12 6.25 8.65 2.9"/><polyline class="cls-1" points="12 23.5 12 17.75 12 14.88"/><line class="cls-1" x1="12" y1="9.13" x2="12" y2="0.5"/><polyline class="cls-1" points="8.65 21.1 12 17.75 15.35 21.1"/><polyline class="cls-1" points="21.96 17.75 16.98 14.88 14.49 13.44"/><line class="cls-1" x1="9.51" y1="10.56" x2="2.04" y2="6.25"/><polyline class="cls-1" points="5.79 4.54 7.02 9.13 2.44 10.35"/><polyline class="cls-1" points="21.96 17.75 16.98 14.88 14.49 13.44"/><line class="cls-1" x1="9.51" y1="10.56" x2="2.04" y2="6.25"/><polyline class="cls-1" points="18.21 19.46 16.98 14.88 21.56 13.65"/><line class="cls-1" x1="9.51" y1="13.44" x2="2.04" y2="17.75"/><polyline class="cls-1" points="14.49 10.56 16.98 9.13 21.96 6.25"/><polyline class="cls-1" points="18.21 4.54 16.98 9.13 21.56 10.35"/><line class="cls-1" x1="9.51" y1="13.44" x2="2.04" y2="17.75"/><polyline class="cls-1" points="14.49 10.56 16.98 9.13 21.96 6.25"/><polyline class="cls-1" points="5.79 19.46 7.02 14.88 2.44 13.65"/><path class="cls-1" d="M14.88,12a2.89,2.89,0,1,1-.39-1.44A2.9,2.9,0,0,1,14.88,12Z"/></svg>
+                        </span>
+                      {{end}}
+                    </span>
                   </span>
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 12.5%;">{{.Email}}</td>
@@ -129,6 +136,8 @@
           </table>
         </div>
       </div>
+      <!-- Pagination controls (Tailwind) -->
+      <div id="users-pagination" class="fixed bottom-5 left-[55%] transform -translate-x-1/2 z-50 flex gap-2 p-1 pointer-events-auto"></div>
     </div>
   </main>
 </div>
@@ -187,6 +196,55 @@
   if (document.readyState !== 'loading') {
     initDatePicker();
   }
+</script>
+
+<!-- Users pagination script -->
+<script>
+  (function(){
+    window.initUsersPagination = function(perPage){
+      perPage = perPage || 7;
+      const tbody = document.querySelector('main table tbody');
+      if(!tbody) return;
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      if(!rows.length) return;
+      if(rows.length === 1 && rows[0].querySelector('td') && rows[0].querySelector('td').getAttribute('colspan')){
+        return;
+      }
+
+      const total = rows.length;
+      const pages = Math.max(1, Math.ceil(total / perPage));
+      const container = document.getElementById('users-pagination');
+      container.innerHTML = '';
+
+      function showPage(page){
+        const start = (page-1)*perPage;
+        const end = start + perPage;
+        rows.forEach((r,i)=>{ r.style.display = (i>=start && i<end) ? '' : 'none'; });
+        Array.from(container.children).forEach(btn=>{
+          const isActive = parseInt(btn.dataset.page,10)===page;
+          btn.classList.toggle('bg-[#336891]', isActive);
+          btn.classList.toggle('text-white', isActive);
+          btn.classList.toggle('border-[#336891]', isActive);
+          btn.setAttribute('aria-current', isActive ? 'page' : 'false');
+        });
+      }
+
+      for(let p=1;p<=pages;p++){
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'inline-flex items-center justify-center w-8 h-8 rounded-md border border-gray-200 bg-white text-gray-900 hover:bg-gray-100';
+        btn.dataset.page = String(p);
+        btn.textContent = String(p);
+        btn.addEventListener('click', () => { showPage(p); });
+        container.appendChild(btn);
+      }
+
+      showPage(1);
+    };
+
+    if (window.requestAnimationFrame) requestAnimationFrame(()=>window.initUsersPagination(7));
+    else window.initUsersPagination(7);
+  })();
 </script>
 
 <style>

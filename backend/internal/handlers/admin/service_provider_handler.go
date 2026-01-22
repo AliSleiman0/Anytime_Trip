@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	modelsAdmin "Anytime_Travel/backend/internal/models/admin"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -47,6 +49,7 @@ func (h *AdminHandler) GetServiceProvidersFragment(c *fiber.Ctx) error {
 			TotalBookings: f.TotalBookings,
 			Revenue:       f.Revenue,
 			ProviderType:  "flight",
+			IsFreezed:     f.IsFreezed,
 		})
 	}
 
@@ -62,6 +65,7 @@ func (h *AdminHandler) GetServiceProvidersFragment(c *fiber.Ctx) error {
 			TotalBookings: car.TotalBookings,
 			Revenue:       car.Revenue,
 			ProviderType:  "car",
+			IsFreezed:     car.IsFreezed,
 		})
 	}
 
@@ -77,6 +81,7 @@ func (h *AdminHandler) GetServiceProvidersFragment(c *fiber.Ctx) error {
 			TotalBookings: htl.TotalBookings,
 			Revenue:       htl.Revenue,
 			ProviderType:  "hotel",
+			IsFreezed:     htl.IsFreezed,
 		})
 	}
 
@@ -400,6 +405,145 @@ func (h *AdminHandler) ToggleFreezeProvider(c *fiber.Ctx) error {
 			return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update provider state"})
 		}
 		return c.JSON(fiber.Map{"success": true, "is_freezed": newState})
+	default:
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "Invalid provider type"})
+	}
+}
+
+// ToggleArchiveProvider toggles archived state for a service provider by updating its status to "archived" or "active"
+func (h *AdminHandler) ToggleArchiveProvider(c *fiber.Ctx) error {
+	ctx := c.Context()
+
+	type Req struct {
+		ProviderID   string `json:"provider_id"`
+		ProviderType string `json:"provider_type"`
+	}
+
+	var req Req
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "Invalid request"})
+	}
+
+	if req.ProviderID == "" || req.ProviderType == "" {
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "Provider ID and type are required"})
+	}
+
+	switch strings.ToLower(req.ProviderType) {
+	case "flight":
+		flight, err := h.flightRepo.FindByID(ctx, req.ProviderID)
+		if err != nil || flight == nil {
+			return c.Status(404).JSON(fiber.Map{"success": false, "message": "Flight provider not found"})
+		}
+		// toggle between archived and active
+		var newStatus string
+		if strings.EqualFold(string(flight.Status), "archived") {
+			newStatus = "active"
+		} else {
+			newStatus = "archived"
+		}
+		if err := h.flightRepo.UpdateStatus(ctx, req.ProviderID, modelsAdmin.FlightStatus(newStatus)); err != nil {
+			return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update provider status"})
+		}
+		return c.JSON(fiber.Map{"success": true, "status": newStatus})
+	case "car":
+		car, err := h.carRepo.FindByID(ctx, req.ProviderID)
+		if err != nil || car == nil {
+			return c.Status(404).JSON(fiber.Map{"success": false, "message": "Car provider not found"})
+		}
+		var newStatus string
+		if strings.EqualFold(string(car.Status), "archived") {
+			newStatus = "active"
+		} else {
+			newStatus = "archived"
+		}
+		if err := h.carRepo.UpdateStatus(ctx, req.ProviderID, modelsAdmin.CarStatus(newStatus)); err != nil {
+			return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update provider status"})
+		}
+		return c.JSON(fiber.Map{"success": true, "status": newStatus})
+	case "hotel":
+		hotel, err := h.hotelRepo.FindByID(ctx, req.ProviderID)
+		if err != nil || hotel == nil {
+			return c.Status(404).JSON(fiber.Map{"success": false, "message": "Hotel provider not found"})
+		}
+		var newStatus string
+		if strings.EqualFold(string(hotel.Status), "archived") {
+			newStatus = "active"
+		} else {
+			newStatus = "archived"
+		}
+		if err := h.hotelRepo.UpdateStatus(ctx, req.ProviderID, modelsAdmin.HotelStatus(newStatus)); err != nil {
+			return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update provider status"})
+		}
+		return c.JSON(fiber.Map{"success": true, "status": newStatus})
+	default:
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "Invalid provider type"})
+	}
+}
+
+// ToggleActivateProvider toggles between active and inactive status for a service provider
+func (h *AdminHandler) ToggleActivateProvider(c *fiber.Ctx) error {
+	ctx := c.Context()
+
+	type Req struct {
+		ProviderID   string `json:"provider_id"`
+		ProviderType string `json:"provider_type"`
+	}
+
+	var req Req
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "Invalid request"})
+	}
+
+	if req.ProviderID == "" || req.ProviderType == "" {
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "Provider ID and type are required"})
+	}
+
+	switch strings.ToLower(req.ProviderType) {
+	case "flight":
+		flight, err := h.flightRepo.FindByID(ctx, req.ProviderID)
+		if err != nil || flight == nil {
+			return c.Status(404).JSON(fiber.Map{"success": false, "message": "Flight provider not found"})
+		}
+		var newStatus string
+		if strings.EqualFold(string(flight.Status), "inactive") {
+			newStatus = "active"
+		} else {
+			newStatus = "inactive"
+		}
+		if err := h.flightRepo.UpdateStatus(ctx, req.ProviderID, modelsAdmin.FlightStatus(newStatus)); err != nil {
+			return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update provider status"})
+		}
+		return c.JSON(fiber.Map{"success": true, "status": newStatus})
+	case "car":
+		car, err := h.carRepo.FindByID(ctx, req.ProviderID)
+		if err != nil || car == nil {
+			return c.Status(404).JSON(fiber.Map{"success": false, "message": "Car provider not found"})
+		}
+		var newStatus string
+		if strings.EqualFold(string(car.Status), "inactive") {
+			newStatus = "active"
+		} else {
+			newStatus = "inactive"
+		}
+		if err := h.carRepo.UpdateStatus(ctx, req.ProviderID, modelsAdmin.CarStatus(newStatus)); err != nil {
+			return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update provider status"})
+		}
+		return c.JSON(fiber.Map{"success": true, "status": newStatus})
+	case "hotel":
+		hotel, err := h.hotelRepo.FindByID(ctx, req.ProviderID)
+		if err != nil || hotel == nil {
+			return c.Status(404).JSON(fiber.Map{"success": false, "message": "Hotel provider not found"})
+		}
+		var newStatus string
+		if strings.EqualFold(string(hotel.Status), "inactive") {
+			newStatus = "active"
+		} else {
+			newStatus = "inactive"
+		}
+		if err := h.hotelRepo.UpdateStatus(ctx, req.ProviderID, modelsAdmin.HotelStatus(newStatus)); err != nil {
+			return c.Status(500).JSON(fiber.Map{"success": false, "message": "Failed to update provider status"})
+		}
+		return c.JSON(fiber.Map{"success": true, "status": newStatus})
 	default:
 		return c.Status(400).JSON(fiber.Map{"success": false, "message": "Invalid provider type"})
 	}

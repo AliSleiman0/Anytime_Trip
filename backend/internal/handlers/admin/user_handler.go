@@ -20,6 +20,7 @@ type UserRow struct {
 	Phone         string
 	Status        string
 	StatusClass   string
+	IsFreezed     bool
 	TotalBookings string
 	LastBooking   string
 	CreatedOn     string
@@ -181,6 +182,7 @@ func (h *AdminHandler) GetUsersFragment(c *fiber.Ctx) error {
 			Phone:         u.PhoneNumber,
 			Status:        status,
 			StatusClass:   statusClass,
+			IsFreezed:     u.IsFreezed,
 			TotalBookings: totalBookingsStr,
 			LastBooking:   lastBookingStr,
 			CreatedOn:     formatDate(u.CreatedAt),

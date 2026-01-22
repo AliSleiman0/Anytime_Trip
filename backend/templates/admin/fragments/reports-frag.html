@@ -8,8 +8,8 @@
 
     <div class="p-4">
       <!-- Filters -->
-      <div class="flex flex-wrap gap-3 mb-6">
-        <input
+      <div class="flex flex-wrap justify-between gap-3 mb-6">
+        <div><input
           type="date"
           class="w-44 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           placeholder="From Date"
@@ -18,8 +18,10 @@
           type="date"
           class="w-44 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           placeholder="To Date"
-        />
-        <select
+        /> 
+
+        </div>
+        <!-- <select
           class="w-52 h-11 rounded-lg border border-[#6FA4CD] px-3 text-sm text-gray-800 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
         >
           <option disabled selected hidden>Report Type</option>
@@ -28,8 +30,9 @@
           <option>Users</option>
           <option>Services</option>
           <option>Transactions</option>
-        </select>
+        </select> -->
         <button
+          onclick="generateReportPDF()"
           class="px-6 h-11 bg-[#336891] text-white font-semibold rounded-lg hover:bg-[#1f3242]"
         >
           Generate Report
@@ -43,26 +46,22 @@
             Overall Revenue
           </div>
           <div class="flex items-end justify-between">
-            <div class="text-2xl font-bold text-[#1f3242]">71,000</div>
-            <div
-              class="flex items-center gap-1 text-[#26CE00] text-xs font-semibold"
-            >
-              <span>+11.01%</span>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z"
-                  fill="#009316"
-                />
+            <div class="text-2xl font-bold text-[#1f3242]">{{.OverallRevenue}}</div>
+            {{if .OverallRevenuePositive}}
+            <div class="flex items-center gap-1 text-[#26CE00] text-xs font-semibold">
+              <span>+{{.OverallRevenuePercent}}%</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z" fill="#009316"/>
               </svg>
             </div>
+            {{else}}
+            <div class="flex items-center gap-1 text-[#D24124] text-xs font-semibold">
+              <span>{{.OverallRevenuePercent}}%</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699" stroke="#D24124" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            {{end}}
           </div>
         </div>
 
@@ -71,27 +70,22 @@
             Users Booking Hotels
           </div>
           <div class="flex items-end justify-between">
-            <div class="text-2xl font-bold text-[#1f3242]">71,000</div>
-            <div
-              class="flex items-center gap-1 text-[#D24124] text-xs font-semibold"
-            >
-              <span>-11.01%</span>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699"
-                  stroke="#D24124"
-                  stroke-width="3"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+            <div class="text-2xl font-bold text-[#1f3242]">{{.HotelBookingsCount}}</div>
+            {{if .HotelBookingsPositive}}
+            <div class="flex items-center gap-1 text-[#26CE00] text-xs font-semibold">
+              <span>+{{.HotelBookingsPercent}}%</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z" fill="#009316"/>
               </svg>
             </div>
+            {{else}}
+            <div class="flex items-center gap-1 text-[#D24124] text-xs font-semibold">
+              <span>{{.HotelBookingsPercent}}%</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699" stroke="#D24124" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            {{end}}
           </div>
         </div>
 
@@ -100,27 +94,22 @@
             Users Renting Cars
           </div>
           <div class="flex items-end justify-between">
-            <div class="text-2xl font-bold text-[#1f3242]">71,000</div>
-            <div
-              class="flex items-center gap-1 text-[#D24124] text-xs font-semibold"
-            >
-              <span>+11.01%</span>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699"
-                  stroke="#D24124"
-                  stroke-width="3"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+            <div class="text-2xl font-bold text-[#1f3242]">{{.CarBookingsCount}}</div>
+            {{if .CarBookingsPositive}}
+            <div class="flex items-center gap-1 text-[#26CE00] text-xs font-semibold">
+              <span>+{{.CarBookingsPercent}}%</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z" fill="#009316"/>
               </svg>
             </div>
+            {{else}}
+            <div class="flex items-center gap-1 text-[#D24124] text-xs font-semibold">
+              <span>{{.CarBookingsPercent}}%</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699" stroke="#D24124" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            {{end}}
           </div>
         </div>
 
@@ -129,27 +118,22 @@
             Users Booking Flights
           </div>
           <div class="flex items-end justify-between">
-            <div class="text-2xl font-bold text-[#1f3242]">71,000</div>
-            <div
-              class="flex items-center gap-1 text-[#D24124] text-xs font-semibold"
-            >
-              <span>+11.01%</span>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699"
-                  stroke="#D24124"
-                  stroke-width="3"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
+            <div class="text-2xl font-bold text-[#1f3242]">{{.FlightBookingsCount}}</div>
+            {{if .FlightBookingsPositive}}
+            <div class="flex items-center gap-1 text-[#26CE00] text-xs font-semibold">
+              <span>+{{.FlightBookingsPercent}}%</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z" fill="#009316"/>
               </svg>
             </div>
+            {{else}}
+            <div class="flex items-center gap-1 text-[#D24124] text-xs font-semibold">
+              <span>{{.FlightBookingsPercent}}%</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699" stroke="#D24124" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            {{end}}
           </div>
         </div>
       </div>
@@ -165,29 +149,25 @@
               alt="Hotel Image"
             />
             <div>
-              <h4 class="text-lg font-semibold">Hotel Name</h4>
-              <p class="text-xs font-light mb-20">Location</p>
-              <p class="text-lg font-semibold text-[#009316]">71,000</p>
+              <h4 class="text-lg font-semibold">{{.TopHotelName}}</h4>
+              <p class="text-xs font-light mb-20">{{.TopHotelLocation}}</p>
+              <p class="text-lg font-semibold text-[#009316]">{{.TopHotelBookings}}</p>
               <p class="text-lg font-semibold text-[#009316]">Bookings/Year</p>
-              <div
-                class="flex gap-1 justify-end text-[#009316] text-xs text-end font-semibold"
-              >
-                <span>+11.01%</span>
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z"
-                    fill="#009316"
-                  />
+              {{if .TopHotelPositive}}
+              <div class="flex gap-1 justify-end text-[#009316] text-xs text-end font-semibold">
+                <span>+{{.TopHotelPercent}}%</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z" fill="#009316"/>
                 </svg>
               </div>
+              {{else}}
+              <div class="flex gap-1 justify-end text-[#D24124] text-xs text-end font-semibold">
+                <span>{{.TopHotelPercent}}%</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699" stroke="#D24124" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              {{end}}
             </div>
           </div>
         </div>
@@ -200,29 +180,25 @@
               alt="Car Image"
             />
             <div>
-              <h4 class="text-lg font-semibold">Car Type</h4>
-              <p class="text-xs font-light mb-20">Location</p>
-              <p class="text-lg font-semibold text-[#009316]">71,000</p>
+              <h4 class="text-lg font-semibold">{{.TopCarName}}</h4>
+              <p class="text-xs font-light mb-20">{{.TopCarLocation}}</p>
+              <p class="text-lg font-semibold text-[#009316]">{{.TopCarBookings}}</p>
               <p class="text-lg font-semibold text-[#009316]">Rents/Year</p>
-              <div
-                class="flex gap-1 justify-end text-[#009316] text-xs text-end font-semibold"
-              >
-                <span>+11.01%</span>
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z"
-                    fill="#009316"
-                  />
+              {{if .TopCarPositive}}
+              <div class="flex gap-1 justify-end text-[#009316] text-xs text-end font-semibold">
+                <span>+{{.TopCarPercent}}%</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z" fill="#009316"/>
                 </svg>
               </div>
+              {{else}}
+              <div class="flex gap-1 justify-end text-[#D24124] text-xs text-end font-semibold">
+                <span>{{.TopCarPercent}}%</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699" stroke="#D24124" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              {{end}}
             </div>
           </div>
         </div>
@@ -235,29 +211,25 @@
               alt="City Image"
             />
             <div>
-              <h4 class="text-lg font-semibold">Flight Destination</h4>
-              <p class="text-xs font-light mb-20">Location</p>
-              <p class="text-lg font-semibold text-[#009316]">71,000</p>
+              <h4 class="text-lg font-semibold">{{.TopFlightDest}}</h4>
+              <p class="text-xs font-light mb-20">{{.TopFlightLocation}}</p>
+              <p class="text-lg font-semibold text-[#009316]">{{.TopFlightBookings}}</p>
               <p class="text-lg font-semibold text-[#009316]">Flights/Year</p>
-              <div
-                class="flex gap-1 justify-end text-[#009316] text-xs text-end font-semibold"
-              >
-                <span>+11.01%</span>
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z"
-                    fill="#009316"
-                  />
+              {{if .TopFlightPositive}}
+              <div class="flex gap-1 justify-end text-[#009316] text-xs text-end font-semibold">
+                <span>+{{.TopFlightPercent}}%</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M8.45488 5.60777L14 4L12.6198 9.6061L10.898 7.9532L8.12069 10.8463C8.02641 10.9445 7.89615 11 7.76 11C7.62385 11 7.49359 10.9445 7.39931 10.8463L5.36 8.72199L2.36069 11.8463C2.16946 12.0455 1.85294 12.0519 1.65373 11.8607C1.45453 11.6695 1.44807 11.3529 1.63931 11.1537L4.99931 7.65373C5.09359 7.55552 5.22385 7.5 5.36 7.5C5.49615 7.5 5.62641 7.55552 5.72069 7.65373L7.76 9.77801L10.1766 7.26067L8.45488 5.60777Z" fill="#009316"/>
                 </svg>
               </div>
+              {{else}}
+              <div class="flex gap-1 justify-end text-[#D24124] text-xs text-end font-semibold">
+                <span>{{.TopFlightPercent}}%</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4.66699 4.66699L11.3337 11.3337M11.3337 11.3337V4.66699M11.3337 11.3337H4.66699" stroke="#D24124" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              {{end}}
             </div>
           </div>
         </div>
@@ -265,3 +237,179 @@
     </div>
   </main>
 </div>
+
+<script>
+function generateReportPDF() {
+  // Check if jsPDF is loaded
+  let jsPDFLib = null;
+  
+  if (window.jspdf && window.jspdf.jsPDF) {
+    jsPDFLib = window.jspdf.jsPDF;
+  } else if (typeof jsPDF !== 'undefined') {
+    jsPDFLib = jsPDF;
+  } else if (window.jsPDF) {
+    jsPDFLib = window.jsPDF;
+  }
+
+  if (!jsPDFLib) {
+    alert('PDF library failed to load. Please refresh the page.');
+    return;
+  }
+
+  try {
+    const doc = new jsPDFLib({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    // Add title
+    doc.setFontSize(18);
+    doc.setFont(undefined, 'bold');
+    doc.text('Reports and Analytics', 105, 20, { align: 'center' });
+    
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text('Generated on: ' + new Date().toLocaleString(), 105, 27, { align: 'center' });
+
+    let yPosition = 40;
+
+    // Extract data from the stats cards
+    const statsData = [];
+    
+    // Overall Revenue
+    const overallRevenue = document.querySelectorAll('.grid.grid-cols-4 .bg-white')[0];
+    if (overallRevenue) {
+      const value = overallRevenue.querySelector('.text-2xl')?.innerText || 'N/A';
+      const percent = overallRevenue.querySelector('.text-xs.font-semibold span')?.innerText || 'N/A';
+      statsData.push(['Overall Revenue', value, percent]);
+    }
+
+    // Users Booking Hotels
+    const hotelBookings = document.querySelectorAll('.grid.grid-cols-4 .bg-white')[1];
+    if (hotelBookings) {
+      const value = hotelBookings.querySelector('.text-2xl')?.innerText || 'N/A';
+      const percent = hotelBookings.querySelector('.text-xs.font-semibold span')?.innerText || 'N/A';
+      statsData.push(['Users Booking Hotels', value, percent]);
+    }
+
+    // Users Renting Cars
+    const carBookings = document.querySelectorAll('.grid.grid-cols-4 .bg-white')[2];
+    if (carBookings) {
+      const value = carBookings.querySelector('.text-2xl')?.innerText || 'N/A';
+      const percent = carBookings.querySelector('.text-xs.font-semibold span')?.innerText || 'N/A';
+      statsData.push(['Users Renting Cars', value, percent]);
+    }
+
+    // Users Booking Flights
+    const flightBookings = document.querySelectorAll('.grid.grid-cols-4 .bg-white')[3];
+    if (flightBookings) {
+      const value = flightBookings.querySelector('.text-2xl')?.innerText || 'N/A';
+      const percent = flightBookings.querySelector('.text-xs.font-semibold span')?.innerText || 'N/A';
+      statsData.push(['Users Booking Flights', value, percent]);
+    }
+
+    // Add statistics table
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text('Key Metrics', 14, yPosition);
+    yPosition += 7;
+
+    doc.autoTable({
+      startY: yPosition,
+      head: [['Metric', 'Value', 'Change']],
+      body: statsData,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [51, 104, 145],
+        textColor: 255,
+        fontStyle: 'bold',
+        fontSize: 11
+      },
+      bodyStyles: {
+        fontSize: 10
+      },
+      margin: { left: 14, right: 14 },
+      columnStyles: {
+        0: { cellWidth: 70 },
+        1: { cellWidth: 60, halign: 'right' },
+        2: { cellWidth: 40, halign: 'center' }
+      }
+    });
+
+    yPosition = doc.lastAutoTable.finalY + 15;
+
+    // Top performers data
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text('Top Performers', 14, yPosition);
+    yPosition += 7;
+
+    const topPerformersData = [];
+
+    // #1 Hotel Booked
+    const topHotelSection = document.querySelectorAll('.grid.grid-cols-2 .bg-white')[0];
+    if (topHotelSection) {
+      const name = topHotelSection.querySelector('h4.text-lg')?.innerText || 'N/A';
+      const location = topHotelSection.querySelector('p.text-xs')?.innerText || 'N/A';
+      const bookings = topHotelSection.querySelectorAll('p.text-lg.font-semibold')[0]?.innerText || 'N/A';
+      const percent = topHotelSection.querySelector('.flex.gap-1 span')?.innerText || 'N/A';
+      topPerformersData.push(['#1 Hotel', name, location, bookings, percent]);
+    }
+
+    // #1 Car Rented
+    const topCarSection = document.querySelectorAll('.grid.grid-cols-2 .bg-white')[1];
+    if (topCarSection) {
+      const name = topCarSection.querySelector('h4.text-lg')?.innerText || 'N/A';
+      const location = topCarSection.querySelector('p.text-xs')?.innerText || 'N/A';
+      const bookings = topCarSection.querySelectorAll('p.text-lg.font-semibold')[0]?.innerText || 'N/A';
+      const percent = topCarSection.querySelector('.flex.gap-1 span')?.innerText || 'N/A';
+      topPerformersData.push(['#1 Car', name, location, bookings, percent]);
+    }
+
+    // #1 Flight Destination
+    const topFlightSection = document.querySelectorAll('.grid.grid-cols-2 .bg-white')[2];
+    if (topFlightSection) {
+      const name = topFlightSection.querySelector('h4.text-lg')?.innerText || 'N/A';
+      const location = topFlightSection.querySelector('p.text-xs')?.innerText || 'N/A';
+      const bookings = topFlightSection.querySelectorAll('p.text-lg.font-semibold')[0]?.innerText || 'N/A';
+      const percent = topFlightSection.querySelector('.flex.gap-1 span')?.innerText || 'N/A';
+      topPerformersData.push(['#1 Destination', name, location, bookings, percent]);
+    }
+
+    // Add top performers table
+    doc.autoTable({
+      startY: yPosition,
+      head: [['Category', 'Name', 'Location', 'Count/Year', 'Change']],
+      body: topPerformersData,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [51, 104, 145],
+        textColor: 255,
+        fontStyle: 'bold',
+        fontSize: 11
+      },
+      bodyStyles: {
+        fontSize: 10
+      },
+      margin: { left: 14, right: 14 },
+      columnStyles: {
+        0: { cellWidth: 35 },
+        1: { cellWidth: 50 },
+        2: { cellWidth: 45 },
+        3: { cellWidth: 35, halign: 'right' },
+        4: { cellWidth: 25, halign: 'center' }
+      }
+    });
+
+    // Save the PDF
+    const fileName = 'Anytime_Trip_Report_' + new Date().toISOString().split('T')[0] + '.pdf';
+    doc.save(fileName);
+    
+    alert('Report generated successfully!');
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    alert('Error generating PDF: ' + error.message);
+  }
+}
+</script>

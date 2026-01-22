@@ -167,6 +167,10 @@ func (h *AdminHandler) UpdateFlight(c *fiber.Ctx) error {
 	flight.ProfitPercent = req.ProfitPercent
 	flight.DepartureLocation = req.DepartureLocation
 	flight.ArrivalLocation = req.ArrivalLocation
+	flight.Refundable = req.Refundable
+	flight.AllowChanges = req.AllowChanges
+	flight.AllowSeatChoice = req.AllowSeatChoice
+	flight.AllowCarryOn = req.AllowCarryOn
 
 	// Parse and update departure/arrival times if provided
 	if !parsedDeparture.IsZero() {

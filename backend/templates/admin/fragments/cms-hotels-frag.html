@@ -58,10 +58,13 @@
           class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           name="status"
           id="status"
+          onchange="filterHotels()"
         >
-          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
-            All Statuses
-          </option>
+          <option class="text-[#9B9B9B]" value="all">All Statuses</option>
+          <option class="text-[#9B9B9B]" value="active">Active</option>
+          <option class="text-[#9B9B9B]" value="inactive">Inactive</option>
+          <option class="text-[#9B9B9B]" value="maintenance">Maintenance</option>
+          <option class="text-[#9B9B9B]" value="fully_booked">Fully Booked</option>
         </select>
       </div>
     </div>
@@ -74,22 +77,23 @@
             <thead class="bg-[#336891] text-white sticky top-0 z-10">
               <tr>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Name</th>
-                <th class="px-4 py-3 text-center font-semibold" style="width: 14%;">Type</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 14%;">Provider</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Status</th>
-                <th class="px-4 py-3 text-center font-semibold" style="width: 15%;">Number of Travelers</th>
-                <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Dates</th>
-                <th class="px-4 py-3 text-center font-semibold" style="width: 15%;">Details</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 15%;">Location</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Cost</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Number of Travelers</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 15%;">Property Details</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 6%;">Action</th>
               </tr>
             </thead>
             <tbody class="bg-white text-gray-900">
               {{range .Hotels}}
-              <tr class="border-b border-gray-200">
+              <tr class="border-b border-gray-200" data-hotel-id="{{.ID}}" data-hotel-code="{{.HotelID}}" data-hotel-name="{{.HotelName}}" data-status="{{.Status}}" data-cost="{{.Cost}}" data-profit-percent="{{.ProfitPercent}}" data-location="{{.Location}}" data-property-details="{{.PropertyDetails}}" data-image-path="{{.ImagePath}}" data-travelers="{{.Travelers}}" data-room-type="{{.RoomType}}" data-check-in="{{.CheckIn}}" data-check-out="{{.CheckOut}}">
                 <td class="px-4 py-3 text-center text-sm font-semibold" style="width: 12%;">
-                  {{.ProviderName}}
+                  {{.HotelName}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 14%;">
-                  Deluxe Room,<br/>1 King Bed
+                  {{.ProviderName}}
                 </td>
                 <td class="px-4 py-3 text-center" style="width: 8%;">
                   {{if eq .Status "active"}}
@@ -101,13 +105,35 @@
                   {{end}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 15%;">
-                  1 Adult, 2 Children<br/>1 Room
+                  {{.Location}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 12%;">
-                  7 Nov 22<br/>-<br/>13 Nov 22
+                  <div class="flex items-center justify-center gap-2">
+                    <span>{{printf "%.0f" .Cost}}$</span>
+                    <button
+                      class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center topup-btn"
+                      onclick="openTopUpModal(event)"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z"
+                          fill="white"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </td>
-                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 15%;">
-                  Indoor Pool<br/>Free WIFI<br/>Valet Parking
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 12%;">
+                  {{if .Travelers}}{{.Travelers}}{{else}}2-4{{end}} Travelers
+                </td>
+                <td class="px-4 py-3 text-center text-xs text-gray-800" style="width: 15%;">
+                  {{.PropertyDetails}}
                 </td>
                 <td class="px-4 py-3 text-center" style="width: 6%;">
                   <div class="flex justify-center gap-2">
@@ -152,36 +178,111 @@
       }
     </style>
     <script>
+      // Filter hotels by status
+      function filterHotels() {
+        const statusFilter = document.getElementById('status').value;
+        const rows = document.querySelectorAll('tbody tr');
+        
+        rows.forEach(row => {
+          const rowStatus = row.dataset.status;
+          
+          if (statusFilter === 'all' || rowStatus === statusFilter) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      }
+
+      // Store current hotel data for editing
+      let currentHotelData = null;
+
       function openHotelModal(event) {
         if (event) {
           event.stopPropagation();
           event.preventDefault();
         }
 
+        // Get the row data
+        const row = event.target.closest('tr');
+        if (row) {
+          currentHotelData = {
+            id: row.dataset.hotelId,
+            hotelCode: row.dataset.hotelCode,
+            hotelName: row.dataset.hotelName,
+            status: row.dataset.status,
+            cost: parseFloat(row.dataset.cost) || 0,
+            profitPercent: parseFloat(row.dataset.profitPercent) || 0,
+            location: row.dataset.location || '',
+            propertyDetails: row.dataset.propertyDetails || '',
+            imagePath: row.dataset.imagePath || '',
+            travelers: row.dataset.travelers || '2-4',
+            roomType: row.dataset.roomType || 'Standard',
+            checkIn: row.dataset.checkIn || '',
+            checkOut: row.dataset.checkOut || ''
+          };
+        }
+
         const modalHtml = `
           <div class="flex flex-col gap-4 text-[#1d1d1d] font-sans">
             <div class="text-center">
-              <div class="text-lg font-bold text-[#1f3242]">Beirut Hotel</div>
-              <div class="text-xs text-[#5b7282] mt-1">1DLRT190/GMARSAN-SMITH</div>
+              <div class="text-lg font-bold text-[#1f3242]">${currentHotelData?.hotelName || 'Hotel'}</div>
+              <div class="text-xs text-[#5b7282] mt-1 flex items-center justify-center gap-1">
+                ${currentHotelData?.hotelCode || ''}
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="#336891"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-xs font-semibold text-[#5b7282]">Location</label>
+              <input id="hotel-location" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" placeholder="e.g., Beirut, Lebanon" value="${currentHotelData?.location || ''}" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="flex flex-col gap-2">
+                <label class="text-xs font-semibold text-[#5b7282]">Number of Travelers</label>
+                <input id="hotel-travelers" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" placeholder="e.g., 2-4" value="${currentHotelData?.travelers || '2-4'}" />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label class="text-xs font-semibold text-[#5b7282]">Room Type</label>
+                <input id="hotel-room-type" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" placeholder="e.g., Standard, Deluxe" value="${currentHotelData?.roomType || 'Standard'}" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="flex flex-col gap-2">
+                <label class="text-xs font-semibold text-[#5b7282]">Check-in Date</label>
+                <input id="hotel-check-in" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="date" value="${currentHotelData?.checkIn || ''}" />
+              </div>
+              <div class="flex flex-col gap-2">
+                <label class="text-xs font-semibold text-[#5b7282]">Check-out Date</label>
+                <input id="hotel-check-out" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="date" value="${currentHotelData?.checkOut || ''}" />
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-xs font-semibold text-[#5b7282]">Total Commission</label>
+              <div class="grid grid-cols-[1fr_auto] gap-2">
+                <input id="commission-percent" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="number" step="0.1" placeholder="10%" value="${currentHotelData?.profitPercent || 0}" />
+                <div class="h-10 px-3 rounded-md border border-[#8aaecd] bg-[#f7fafc] text-sm font-semibold flex items-center justify-center text-[#1d1d1d]">~ $ ${((currentHotelData?.cost || 0) * (currentHotelData?.profitPercent || 0) / 100).toFixed(2)}</div>
+              </div>
             </div>
 
             <div class="flex flex-col gap-2">
               <label class="text-xs font-semibold text-[#5b7282]">Property Details</label>
               <div class="relative">
-                <textarea class="w-full h-40 rounded-md border border-[#8aaecd] px-3 py-2 text-sm text-[#1d1d1d] placeholder-[#93a7b5] resize-none" placeholder="">Indoor Pool
-Valet Parking Available
-American Restaurant
-Vegetarian Breakfast
-Dogs And Cats Allowed
-Free Wifi</textarea>
-                <div class="absolute bottom-2 right-3 text-xs text-[#5b7282]">481/3000</div>
+                <textarea id="property-details" class="w-full h-40 rounded-md border border-[#8aaecd] px-3 py-2 text-sm text-[#1d1d1d] placeholder-[#93a7b5] resize-none" placeholder="Indoor Pool, Valet Parking, Free WiFi, etc." maxlength="3000">${currentHotelData?.propertyDetails || ''}</textarea>
+                <div class="absolute bottom-2 right-3 text-xs text-[#5b7282]" id="char-count">${(currentHotelData?.propertyDetails || '').length}/3000</div>
               </div>
             </div>
 
             <div class="flex flex-col gap-2">
-              
+              <label class="text-xs font-semibold text-[#5b7282]">Hotel Image</label>
 
-              <div class="w-full border-2 border-dashed border-[#8aaecd] rounded-md bg-[#f9fcff] py-8 px-4 flex flex-col items-center justify-center text-center text-sm text-[#1d1d1d]">
+              <input type="file" id="hotel-image-upload" accept="image/png,image/jpeg,image/jpg,image/webp" style="display: none;" />
+              <div id="upload-area" class="w-full border-2 border-dashed border-[#8aaecd] rounded-md bg-[#f9fcff] py-8 px-4 flex-col items-center justify-center text-center text-sm text-[#1d1d1d] cursor-pointer hover:bg-[#f0f7ff] transition-colors" style="display: ${currentHotelData?.imagePath ? 'none' : 'flex'};">
                 <svg width="112" height="112" viewBox="0 0 112 112" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M80.5744 47.672C85.5496 47.7213 90.3072 49.7196 93.8254 53.2378C97.3437 56.7559 99.342 61.5134 99.3915 66.4887C99.4547 71.4004 97.4126 76.0942 94.0911 79.5806C90.5078 83.3417 85.6702 85.2401 80.5744 85.3057C73.1148 85.4015 73.1058 96.978 80.5744 96.882C97.2709 96.6672 110.753 83.1851 110.968 66.4886C111.183 49.7909 96.9473 36.3059 80.5744 36.0956C73.1058 35.9995 73.1148 47.5761 80.5744 47.672ZM31.2005 85.2365C26.2252 85.1872 21.4677 83.1889 17.9494 79.6707C14.4311 76.1524 12.4328 71.3949 12.3834 66.4195C12.3203 61.5076 14.362 56.8139 17.6839 53.3268C21.2669 49.5658 26.1044 47.6681 31.2004 47.6025C38.6598 47.5065 38.669 35.9298 31.2004 36.026C14.5037 36.2406 1.02168 49.7225 0.807083 66.4195C0.592489 83.1171 14.8274 96.6026 31.2005 96.8129C38.6691 96.9087 38.6599 85.3323 31.2005 85.2365Z" fill="#4A5699"/>
 <path d="M37.1522 42.0224C37.2013 37.0471 39.1995 32.2895 42.7177 28.7713C46.2359 25.2531 50.9935 23.2549 55.9687 23.2057C60.8805 23.1426 65.5742 25.1845 69.0607 28.5062C72.8219 32.0893 74.7201 36.9265 74.7857 42.0224C74.8816 49.4816 86.4582 49.4909 86.3623 42.0224C86.1475 25.3259 72.6651 11.8439 55.9687 11.6293C39.2711 11.4148 25.7862 25.6493 25.5758 42.0224C25.4795 49.4909 37.0562 49.4816 37.1522 42.0224Z" fill="#C45FA0"/>
@@ -191,8 +292,24 @@ Free Wifi</textarea>
 </svg>
                 <div class="w-16 h-16 mb-4 flex items-center justify-center"></div>
                 <div class="font-semibold">Drag & Drop or Upload Photo</div>
-                <div class="text-xs text-[#5b7282] mt-1">Accepted formats: PNG, JPG, or SVG</div>
-                <div class="text-xs text-[#5b7282]">Maximum file size: 2MB</div>
+                <div class="text-xs text-[#5b7282] mt-1">Accepted formats: PNG, JPG, WEBP</div>
+                <div class="text-xs text-[#5b7282]">Maximum file size: 5MB</div>
+              </div>
+              <div id="image-preview-container" style="display: ${currentHotelData?.imagePath ? 'block' : 'none'};" class="mt-2 relative group cursor-pointer" onclick="document.getElementById('hotel-image-upload').click()">
+                <img id="image-preview" src="${currentHotelData?.imagePath ? '/static/' + currentHotelData.imagePath : ''}" class="w-full h-48 object-cover rounded-md border border-[#8aaecd]" />
+                <div class="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md">
+                  <span class="text-white text-sm font-semibold">Click to change image</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid gap-2">
+              <div class="text-sm font-bold text-[#1f3242]">Change Status</div>
+              <div class="grid grid-cols-4 gap-3 text-sm font-medium text-[#1d1d1d]">
+                <label class="flex items-center gap-2"><input type="radio" name="status" value="active" class="h-4 w-4" ${currentHotelData?.status === 'active' ? 'checked' : ''} /> Active</label>
+                <label class="flex items-center gap-2"><input type="radio" name="status" value="inactive" class="h-4 w-4" ${currentHotelData?.status === 'inactive' ? 'checked' : ''} /> Inactive</label>
+                <label class="flex items-center gap-2"><input type="radio" name="status" value="maintenance" class="h-4 w-4" ${currentHotelData?.status === 'maintenance' ? 'checked' : ''} /> Maintenance</label>
+                <label class="flex items-center gap-2"><input type="radio" name="status" value="fully_booked" class="h-4 w-4" ${currentHotelData?.status === 'fully_booked' ? 'checked' : ''} /> Full</label>
               </div>
             </div>
 
@@ -217,7 +334,265 @@ Free Wifi</textarea>
           const cancelBtn = document.getElementById("hotel-modal-cancel");
           const saveBtn = document.getElementById("hotel-modal-save");
           if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
-          if (saveBtn) saveBtn.addEventListener("click", closeModal);
+          if (saveBtn) saveBtn.addEventListener("click", saveHotelData);
+
+          // Image upload handling
+          const uploadArea = document.getElementById('upload-area');
+          const fileInput = document.getElementById('hotel-image-upload');
+          const imagePreview = document.getElementById('image-preview');
+          const imagePreviewContainer = document.getElementById('image-preview-container');
+
+          if (uploadArea && fileInput) {
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            fileInput.addEventListener('change', async (e) => {
+              const file = e.target.files[0];
+              if (!file) return;
+
+              // Validate file type
+              const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+              if (!allowedTypes.includes(file.type)) {
+                alert('Invalid file type. Only PNG, JPG, and WEBP images are allowed');
+                return;
+              }
+
+              // Validate file size (5MB)
+              if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                return;
+              }
+
+              // Show preview
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                if (imagePreview && imagePreviewContainer) {
+                  imagePreview.src = e.target.result;
+                  imagePreviewContainer.style.display = 'block';
+                  uploadArea.style.display = 'none';
+                }
+              };
+              reader.readAsDataURL(file);
+
+              // Upload image
+              const formData = new FormData();
+              formData.append('image', file);
+
+              try {
+                const response = await fetch('/admin/cms/hotels/upload', {
+                  method: 'POST',
+                  body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                  // Store the image path for later use
+                  currentHotelData.imagePath = result.path;
+                  alert('Image uploaded successfully');
+                } else {
+                  alert(result.error || 'Failed to upload image');
+                  // Reset preview on error
+                  if (imagePreviewContainer && uploadArea) {
+                    imagePreviewContainer.style.display = 'none';
+                    uploadArea.style.display = 'flex';
+                  }
+                }
+              } catch (error) {
+                alert('Network error occurred while uploading image');
+                // Reset preview on error
+                if (imagePreviewContainer && uploadArea) {
+                  imagePreviewContainer.style.display = 'none';
+                  uploadArea.style.display = 'flex';
+                }
+              }
+            });
+          }
+
+          // Add event listener to update commission calculation
+          const commissionInput = document.getElementById("commission-percent");
+          if (commissionInput) {
+            commissionInput.addEventListener("input", () => {
+              const percent = parseFloat(commissionInput.value) || 0;
+              const calculated = ((currentHotelData?.cost || 0) * percent / 100).toFixed(2);
+              document.querySelector('[id*="commission"]').closest('.grid').querySelector('div:last-child').textContent = `~ $ ${calculated}`;
+            });
+          }
+
+          // Add event listener to update character count
+          const propertyDetails = document.getElementById("property-details");
+          if (propertyDetails) {
+            propertyDetails.addEventListener("input", () => {
+              const charCount = document.getElementById('char-count');
+              if (charCount) {
+                charCount.textContent = `${propertyDetails.value.length}/3000`;
+              }
+            });
+          }
+        }, 0);
+      }
+
+      async function saveHotelData() {
+        const location = document.getElementById('hotel-location')?.value;
+        const propertyDetails = document.getElementById('property-details')?.value;
+        const travelers = document.getElementById('hotel-travelers')?.value;
+        const roomType = document.getElementById('hotel-room-type')?.value;
+        const checkIn = document.getElementById('hotel-check-in')?.value;
+        const checkOut = document.getElementById('hotel-check-out')?.value;
+        
+        const data = {
+          id: currentHotelData?.id,
+          hotel_id: currentHotelData?.hotelCode,
+          hotel_name: currentHotelData?.hotelName,
+          status: document.querySelector('input[name="status"]:checked')?.value,
+          cost: parseFloat(currentHotelData?.cost) || 0,
+          profit_percent: parseFloat(document.getElementById('commission-percent')?.value) || 0,
+          location: location || '',
+          property_details: propertyDetails || '',
+          image_path: currentHotelData?.imagePath || '',
+          travelers: travelers || '2-4',
+          room_type: roomType || 'Standard',
+          check_in: checkIn || '',
+          check_out: checkOut || ''
+        };
+
+        try {
+          const response = await fetch('/admin/cms/hotels/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: 'Hotel updated successfully',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: result.error || 'Failed to update hotel'
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Network error occurred'
+          });
+        }
+      }
+
+      function openTopUpModal(event) {
+        if (event) {
+          event.stopPropagation();
+          event.preventDefault();
+        }
+
+        // Get the row data
+        const row = event.target.closest('tr');
+        const hotelId = row?.dataset.hotelId;
+        const currentCost = parseFloat(row?.dataset.cost) || 0;
+
+        const modalHtml = `
+          <div class="flex flex-col gap-3 text-[#1d1d1d] font-sans">
+            <div class="text-center text-sm font-semibold text-[#1f3242]">Top Up</div>
+            <div class="relative">
+              <input type="number" id="topup-value" value="${currentCost}" step="0.01" class="w-full h-11 rounded border border-[#9bb6c9] px-3 pr-10 text-sm text-[#1d1d1d] placeholder-[#9bb6c9] focus:outline-none focus:ring-2 focus:ring-[#336891]" />
+              <div class="absolute inset-y-0 right-3 flex items-center text-[#1f3242] font-semibold">$</div>
+            </div>
+            <div class="flex gap-2 justify-start">
+              <button id="topup-cancel" class="px-4 py-2 rounded border border-[#336891] text-[#336891] bg-white text-sm font-semibold">Cancel</button>
+              <button id="topup-confirm" class="px-4 py-2 rounded bg-[#336891] text-white text-sm font-semibold border border-[#336891]">Confirm</button>
+            </div>
+          </div>
+        `;
+
+        Swal.fire({
+          width: "280px",
+          padding: "16px",
+          showConfirmButton: false,
+          showDenyButton: false,
+          showCancelButton: false,
+          html: modalHtml,
+        });
+
+        setTimeout(() => {
+          const closeModal = () => Swal.close();
+          const cancelBtn = document.getElementById("topup-cancel");
+          const confirmBtn = document.getElementById("topup-confirm");
+          if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+          if (confirmBtn) {
+            confirmBtn.addEventListener("click", async () => {
+              const newCost = parseFloat(document.getElementById('topup-value')?.value) || 0;
+
+              const allowedStatuses = ['active', 'inactive', 'maintenance', 'fully_booked'];
+              const statusValue = allowedStatuses.includes((row.dataset.status || '').toLowerCase())
+                ? row.dataset.status.toLowerCase()
+                : 'active';
+
+              const safeCost = Math.max(newCost, 0.01);
+              const profitValue = parseFloat(row.dataset.profitPercent);
+              const safeProfit = Math.min(Math.max(isNaN(profitValue) ? 0 : profitValue, 0), 100);
+
+              const location = row.dataset.location || 'Unknown';
+              const hotelName = row.dataset.hotelName || 'Unknown';
+              const hotelCode = row.dataset.hotelCode || 'unknown';
+              
+              try {
+                const response = await fetch('/admin/cms/hotels/update', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    id: hotelId,
+                    hotel_id: hotelCode,
+                    hotel_name: hotelName,
+                    status: statusValue,
+                    cost: safeCost,
+                    profit_percent: safeProfit,
+                    location: location
+                  })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Top-up updated successfully',
+                    timer: 2000,
+                    showConfirmButton: false
+                  }).then(() => {
+                    window.location.reload();
+                  });
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.error || 'Failed to update top-up'
+                  });
+                }
+              } catch (error) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Network error occurred'
+                });
+              }
+            });
+          }
         }, 0);
       }
 
@@ -298,6 +673,11 @@ Free Wifi</textarea>
           event.preventDefault();
         }
 
+        // Get the row data
+        const row = event.target.closest('tr');
+        const hotelId = row?.dataset.hotelId;
+        const hotelName = row?.dataset.hotelName;
+
         const modalHtml = `
           <div class="flex flex-col items-center gap-4 text-[#1d1d1d] font-sans">
             <div class="w-12 h-12 rounded-full bg-[#fdeeed] flex items-center justify-center shadow-[0_8px_32px_0_#fbd3ce]">
@@ -308,13 +688,13 @@ Free Wifi</textarea>
               </svg>
             </div>
             <div class="text-center flex flex-col gap-1">
-              <div class="text-lg font-bold text-[#1f3242]">Delete Content</div>
-              <div class="text-sm text-[#1d1d1d]">Are you sure you want to delete Content25's service?<br/>This change cannot be undone</div>
+              <div class="text-lg font-bold text-[#1f3242]">Delete Hotel</div>
+              <div class="text-sm text-[#1d1d1d]">Are you sure you want to delete ${hotelName}?<br/>This change cannot be undone</div>
             </div>
 
             <div class="flex gap-3">
               <button class="min-w-[120px] px-4 py-2.5 rounded-lg border border-[#1f3242] text-[#1f3242] font-semibold text-sm bg-white" id="hotel-delete-cancel">Cancel</button>
-              <button class="min-w-[120px] px-4 py-2.5 rounded-lg border border-[#d24124] bg-[#d24124] text-white font-semibold text-sm" id="hotel-delete-confirm">Delete content</button>
+              <button class="min-w-[120px] px-4 py-2.5 rounded-lg border border-[#d24124] bg-[#d24124] text-white font-semibold text-sm" id="hotel-delete-confirm">Delete hotel</button>
             </div>
           </div>
         `;
@@ -333,7 +713,41 @@ Free Wifi</textarea>
           const confirmBtn = document.getElementById("hotel-delete-confirm");
           const closeModal = () => Swal.close();
           if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
-          if (confirmBtn) confirmBtn.addEventListener("click", closeModal);
+          if (confirmBtn) {
+            confirmBtn.addEventListener("click", async () => {
+              try {
+                const response = await fetch(`/admin/cms/hotels/delete?id=${hotelId}`, {
+                  method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted!',
+                    text: 'Hotel deleted successfully',
+                    timer: 2000,
+                    showConfirmButton: false
+                  }).then(() => {
+                    window.location.reload();
+                  });
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.error || 'Failed to delete hotel'
+                  });
+                }
+              } catch (error) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Network error occurred'
+                });
+              }
+            });
+          }
         }, 0);
       }
 
@@ -345,7 +759,7 @@ Free Wifi</textarea>
         const row = cell.parentElement;
         if (!row) return;
         const cellIndex = Array.from(row.children).indexOf(cell);
-        if (cellIndex !== 6) return; // action column is now at index 6 (0-indexed)
+        if (cellIndex !== 7) return; // action column is now at index 7 (0-indexed)
         const buttons = Array.from(cell.querySelectorAll("button"));
         const btnIndex = buttons.indexOf(btn);
         if (btnIndex === 0) {

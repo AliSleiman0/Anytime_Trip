@@ -188,12 +188,30 @@ func (r *FlightBookingRepository) CountByStatus(ctx context.Context, status app.
 	return r.collection.CountDocuments(ctx, bson.M{"status": status})
 }
 
+// CountBetween returns the number of flight bookings created between start (inclusive) and end (exclusive).
+func (r *FlightBookingRepository) CountBetween(ctx context.Context, start, end time.Time) (int64, error) {
+	filter := bson.M{"created_at": bson.M{"$gte": start, "$lt": end}}
+	return r.collection.CountDocuments(ctx, filter)
+}
+
 // UpdateCustomerEmail updates the customer email for a flight booking
 func (r *FlightBookingRepository) UpdateCustomerEmail(ctx context.Context, id string, email string) error {
 	update := bson.M{
 		"$set": bson.M{
 			"customer.email": email,
 			"updated_at":     time.Now(),
+		},
+	}
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	return err
+}
+
+// UpdateRefundAmount updates the refund amount for a flight booking
+func (r *FlightBookingRepository) UpdateRefundAmount(ctx context.Context, id string, amount float64) error {
+	update := bson.M{
+		"$set": bson.M{
+			"refund_amount": amount,
+			"updated_at":    time.Now(),
 		},
 	}
 	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)

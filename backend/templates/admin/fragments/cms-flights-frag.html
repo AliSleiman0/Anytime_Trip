@@ -62,10 +62,13 @@
           class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           name="status"
           id="status"
+          onchange="filterFlights()"
         >
-          <option class="text-[#9B9B9B]" value="" disabled selected hidden>
-            All Statuses
-          </option>
+          <option class="text-[#9B9B9B]" value="all">All Statuses</option>
+          <option class="text-[#9B9B9B]" value="active">Active</option>
+          <option class="text-[#9B9B9B]" value="inactive">Inactive</option>
+          <option class="text-[#9B9B9B]" value="cancelled">Cancelled</option>
+          <option class="text-[#9B9B9B]" value="delayed">Delayed</option>
         </select>
       </div>
     </div>
@@ -84,14 +87,14 @@
                 <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Arrival</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Top up</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Cabin</th>
-                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Baggage</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Details</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Seat Number</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 6%;">Action</th>
               </tr>
             </thead>
             <tbody class="bg-white text-gray-900">
               {{range .Flights}}
-              <tr class="border-b border-gray-200" data-flight-id="{{.ID}}" data-flight-number="{{.FlightNumber}}" data-flight-code="{{.FlightID}}" data-status="{{.Status}}" data-cost="{{.Cost}}" data-profit-percent="{{.ProfitPercent}}" data-departure-time="{{formatDateTime .DepartureTime}}" data-arrival-time="{{formatDateTime .ArrivalTime}}" data-departure-location="{{.DepartureLocation}}" data-arrival-location="{{.ArrivalLocation}}">
+              <tr class="border-b border-gray-200" data-flight-id="{{.ID}}" data-flight-number="{{.FlightNumber}}" data-flight-code="{{.FlightID}}" data-status="{{.Status}}" data-cost="{{.Cost}}" data-profit-percent="{{.ProfitPercent}}" data-departure-time="{{formatDateTime .DepartureTime}}" data-arrival-time="{{formatDateTime .ArrivalTime}}" data-departure-location="{{.DepartureLocation}}" data-arrival-location="{{.ArrivalLocation}}" data-refundable="{{.Refundable}}" data-allow-changes="{{.AllowChanges}}" data-allow-seat="{{.AllowSeatChoice}}" data-allow-carryon="{{.AllowCarryOn}}">
                 <td class="px-4 py-3 text-center" style="width: 8%;">
                   <div class="text-sm font-semibold">{{.FlightNumber}}</div>
                   <div class="text-xs text-gray-500">{{.FlightID}}</div>
@@ -139,8 +142,11 @@
                 <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 8%;">
                   Economy
                 </td>
-                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
-                  1PC - 25 KG
+                <td class="px-4 py-3 text-center text-xs text-gray-800" style="width: 10%;">
+                  {{if .Refundable}}<div>Refundable</div>{{end}}
+                  {{if .AllowChanges}}<div>Changes Allowed</div>{{end}}
+                  {{if .AllowCarryOn}}<div>Carry On Bag Allowed</div>{{end}}
+                  {{if .AllowSeatChoice}}<div>Seat Choice Allowed</div>{{end}}
                 </td>
                 <td class="px-4 py-3 text-center text-sm font-semibold" style="width: 8%;">
                   28A
@@ -189,6 +195,22 @@
       }
     </style>
     <script>
+      // Filter flights by status
+      function filterFlights() {
+        const statusFilter = document.getElementById('status').value;
+        const rows = document.querySelectorAll('tbody tr');
+        
+        rows.forEach(row => {
+          const rowStatus = row.dataset.status;
+          
+          if (statusFilter === 'all' || rowStatus === statusFilter) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      }
+
       // Store current flight data for editing
       let currentFlightData = null;
 
@@ -211,7 +233,11 @@
             departureTime: row.dataset.departureTime || '',
             arrivalTime: row.dataset.arrivalTime || '',
             departureLocation: row.dataset.departureLocation || '',
-            arrivalLocation: row.dataset.arrivalLocation || ''
+            arrivalLocation: row.dataset.arrivalLocation || '',
+            refundable: row.dataset.refundable === 'true',
+            allowChanges: row.dataset.allowChanges === 'true',
+            allowSeat: row.dataset.allowSeat === 'true',
+            allowCarryon: row.dataset.allowCarryon === 'true'
           };
         }
 
@@ -271,12 +297,12 @@
 
               <div class="grid gap-2">
                 <div class="grid grid-cols-2 gap-3 text-sm font-medium text-[#1d1d1d]">
-                  <label class="flex items-center gap-2"><input type="checkbox" id="refundable" class="h-4 w-4" /> Refundable</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" id="allow-changes" class="h-4 w-4" checked /> Allow Changes</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="refundable" class="h-4 w-4" ${currentFlightData?.refundable ? 'checked' : ''} /> Refundable</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="allow-changes" class="h-4 w-4" ${currentFlightData?.allowChanges ? 'checked' : ''} /> Allow Changes</label>
                 </div>
                 <div class="grid grid-cols-2 gap-3 text-sm font-medium text-[#1d1d1d]">
-                  <label class="flex items-center gap-2"><input type="checkbox" id="allow-seat" class="h-4 w-4" checked /> Allow Seat Choice</label>
-                  <label class="flex items-center gap-2"><input type="checkbox" id="allow-carryon" class="h-4 w-4" /> Allow Carry-on Bag</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="allow-seat" class="h-4 w-4" ${currentFlightData?.allowSeat ? 'checked' : ''} /> Allow Seat Choice</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="allow-carryon" class="h-4 w-4" ${currentFlightData?.allowCarryon ? 'checked' : ''} /> Allow Carry-on Bag</label>
                 </div>
               </div>
 
