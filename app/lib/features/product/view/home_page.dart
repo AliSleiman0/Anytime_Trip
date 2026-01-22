@@ -5,6 +5,7 @@ import '../../../app/routes/app_routes.dart';
 import '../controller/product_controller.dart';
 import 'cars_tab.dart';
 import 'hotels_tab.dart';
+import 'transfers_tab.dart';
 import 'flight_search_results.dart';
 
 class HomePage extends StatefulWidget {
@@ -120,7 +121,7 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
       setState(() {});
     });
@@ -256,161 +257,22 @@ class _HomePageState extends State<HomePage>
           children: [
             SizedBox(height: size.height * 0.12),
 
-            // Tab Bar (custom pills)
+            // Tab Bar (custom pills) - horizontally scrollable
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: _tabController.index == 0
-                            ? const Color(0xFF1e5a8e)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                        border: _tabController.index != 0
-                            ? Border.all(
-                                color: Colors.grey[400]!,
-                                width: 1,
-                              )
-                            : null,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            _tabController.animateTo(0);
-                            setState(() {});
-                          },
-                          borderRadius: BorderRadius.circular(25),
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 12),
-                            child: Center(
-                              child: Text(
-                                'flights'.tr,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: _tabController.index == 0
-                                      ? Colors.white
-                                      : Colors.grey[700],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: _tabController.index == 1
-                            ? const Color(0xFF1e5a8e)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                        border: _tabController.index != 1
-                            ? Border.all(
-                                color: Colors.grey[400]!,
-                                width: 1,
-                              )
-                            : null,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            _tabController.animateTo(1);
-                            setState(() {});
-                          },
-                          borderRadius: BorderRadius.circular(25),
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 12),
-                            child: Center(
-                              child: Text(
-                                'cars'.tr,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: _tabController.index == 1
-                                      ? Colors.white
-                                      : Colors.grey[700],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: _tabController.index == 2
-                            ? const Color(0xFF1e5a8e)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                        border: _tabController.index != 2
-                            ? Border.all(
-                                color: Colors.grey[400]!,
-                                width: 1,
-                              )
-                            : null,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            _tabController.animateTo(2);
-                            setState(() {});
-                          },
-                          borderRadius: BorderRadius.circular(25),
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 12),
-                            child: Center(
-                              child: Text(
-                                'hotels'.tr,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: _tabController.index == 2
-                                      ? Colors.white
-                                      : Colors.grey[700],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildTabButton(0, 'flights'.tr),
+                    const SizedBox(width: 12),
+                    _buildTabButton(1, 'cars'.tr),
+                    const SizedBox(width: 12),
+                    _buildTabButton(2, 'hotels'.tr),
+                    const SizedBox(width: 12),
+                    _buildTabButton(3, 'Transfers'),
+                  ],
+                ),
               ),
             ),
 
@@ -433,16 +295,54 @@ class _HomePageState extends State<HomePage>
                       ),
                     ),
 
-                    // Cars Tab (centered card, no stretching)
+                    // Cars Tab
                     const CarsTab(),
 
-                    // Hotels Tab (centered card, no stretching)
+                    // Hotels Tab
                     const HotelsTab(),
+
+                    // Transfers Tab
+                    const TransfersTab(),
                   ],
                 ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabButton(int index, String label) {
+    final isSelected = _tabController.index == index;
+    return GestureDetector(
+      onTap: () {
+        _tabController.animateTo(index);
+        setState(() {});
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF1e5a8e) : Colors.white,
+          borderRadius: BorderRadius.circular(25),
+          border: !isSelected
+              ? Border.all(color: Colors.grey[400]!, width: 1)
+              : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: isSelected ? Colors.white : Colors.grey[700],
+          ),
         ),
       ),
     );

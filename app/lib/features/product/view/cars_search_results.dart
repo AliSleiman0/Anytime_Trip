@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'car_details.dart';
+import '../../../core/widgets/unified_ui_components.dart';
 
 class CarsSearchResults extends StatefulWidget {
   final String pickupLocation;
@@ -100,7 +101,7 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF1e5a8e), size: 24),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
@@ -109,8 +110,8 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
             Text(
               '${widget.pickupLocation} (1 traveler)',
               style: const TextStyle(
-                color: Colors.black,
-                fontSize: 14,
+                color: Color(0xFF1e5a8e),
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -125,8 +126,7 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.tune, color: Color(0xFFD32F2F)),
+          UnifiedFilterButton(
             onPressed: _showFilterBottomSheet,
           ),
         ],

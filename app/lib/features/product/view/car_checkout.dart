@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/widgets/unified_ui_components.dart';
 
 class CarCheckout extends StatefulWidget {
   final Map<String, dynamic> car;
@@ -49,34 +50,10 @@ class _CarCheckoutState extends State<CarCheckout> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              widget.car['category'] ?? 'Midsize SUV',
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Text(
-              _getFormattedDateRange(),
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 11,
-              ),
-            ),
-          ],
-        ),
-        centerTitle: true,
+      appBar: UnifiedAppBarWithSubtitle(
+        title: widget.car['category'] ?? 'Midsize SUV',
+        subtitle: _getFormattedDateRange(),
+        onBackPressed: () => Navigator.pop(context),
       ),
       body: Column(
         children: [
@@ -371,24 +348,20 @@ class _CarCheckoutState extends State<CarCheckout> {
   Widget _buildTextField(String hint, TextEditingController controller, {TextInputType? keyboardType}) {
     return SizedBox(
       height: 45,
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(6),
-            borderSide: BorderSide(color: Colors.grey.shade300),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(6),
-            borderSide: BorderSide(color: Colors.grey.shade300),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(6),
-            borderSide: const BorderSide(color: Color(0xFF1e5a8e)),
+      child: Container(
+        decoration: const BoxDecoration(
+          border: Border(left: BorderSide(color: Color(0xFFD32F2F), width: 4)),
+        ),
+        child: TextField(
+          controller: controller,
+          keyboardType: keyboardType,
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
           ),
         ),
       ),
@@ -399,9 +372,8 @@ class _CarCheckoutState extends State<CarCheckout> {
     return Container(
       height: 45,
       padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(6),
+      decoration: const BoxDecoration(
+        border: Border(left: BorderSide(color: Color(0xFFD32F2F), width: 4)),
       ),
       child: Row(
         children: [

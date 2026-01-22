@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'flight_departure_selection.dart';
+import 'flight_return_selection_screen.dart';
+import '../../../core/widgets/unified_ui_components.dart';
 
 class FlightSearchResults extends StatefulWidget {
   final String from;
@@ -138,8 +141,7 @@ class _FlightSearchResultsState extends State<FlightSearchResults> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list, color: Color(0xFFD32F2F)),
+          UnifiedFilterButton(
             onPressed: () {
               _showFilterBottomSheet(context);
             },
@@ -876,174 +878,234 @@ class _FlightSearchResultsState extends State<FlightSearchResults> {
   }
 
   Widget _buildFlightCard(Map<String, dynamic> flight) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Time and Price Row
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Time section
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Text(
-                            flight['departureTime'],
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+    // Determine trip type based on returnDate
+    String tripType = widget.returnDate != null ? 'roundtrip' : 'oneway';
+    
+    return GestureDetector(
+      onTap: () async {
+        if (tripType == 'roundtrip' || tripType == 'multicity') {
+          // Show departure selection first
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FlightDepartureSelection(
+                from: flight['from'],
+                to: flight['to'],
+                departureTime: flight['departureTime'],
+                arrivalTime: flight['arrivalTime'],
+                duration: flight['duration'],
+                stops: flight['stops'],
+                tripType: tripType,
+                price: flight['price'],
+                airline: flight['airline'],
+              ),
+            ),
+          );
+          // Always show return flight selection after departure for roundtrip/multicity
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FlightReturnSelectionScreen(
+                from: flight['to'],
+                to: flight['from'],
+                departureTime: '14:30', // Example, should be dynamic
+                arrivalTime: '18:45',   // Example, should be dynamic
+                duration: flight['duration'],
+                stops: flight['stops'],
+                price: flight['price'],
+                airline: flight['airline'],
+              ),
+            ),
+          );
+        } else {
+          // One-way: just show departure selection
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FlightDepartureSelection(
+                from: flight['from'],
+                to: flight['to'],
+                departureTime: flight['departureTime'],
+                arrivalTime: flight['arrivalTime'],
+                duration: flight['duration'],
+                stops: flight['stops'],
+                tripType: tripType,
+                price: flight['price'],
+                airline: flight['airline'],
+              ),
+            ),
+          );
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Time and Price Row
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Time section
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Text(
+                              flight['departureTime'],
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 4),
-                          const Text(
-                            '-----',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
+                            const SizedBox(width: 4),
+                            const Text(
+                              '-----',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
                             ),
-                          ),
-                          const Icon(Icons.flight, size: 14, color: Colors.grey),
-                          const Text(
-                            '-----',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
+                            const Icon(Icons.flight, size: 14, color: Colors.grey),
+                            const Text(
+                              '-----',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            flight['arrivalTime'],
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                            const SizedBox(width: 4),
+                            Text(
+                              flight['arrivalTime'],
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Price
-                    Text(
-                      '\$${flight['price'].toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black87,
+                      const SizedBox(width: 12),
+                      // Price
+                      Text(
+                        '\$${flight['price'].toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                
-                // Connection times (if any)
-                if (flight.containsKey('connectTime1'))
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2, left: 60),
-                    child: Text(
-                      '${flight['connectTime1']} --- ${flight['connectTime2']}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey,
-                      ),
-                    ),
+                    ],
                   ),
-                
-                const SizedBox(height: 8),
-                
-                // Route
-                Text(
-                  '${flight['from']} - ${flight['to']}',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFFD32F2F),
-                  ),
-                ),
-                
-                const SizedBox(height: 6),
-                
-                // Baggage Info
-                Text(
-                  'Checked: ${flight['checkedBag']} / Carry on: ${flight['carryOn']}',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey,
-                  ),
-                ),
-                
-                const SizedBox(height: 8),
-                
-                // Airline and Duration Row
-                Row(
-                  children: [
-                    Image.asset(
-                      'assets/images/middleeast.png',
-                      width: 14,
-                      height: 14,
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
+                  
+                  // Connection times (if any)
+                  if (flight.containsKey('connectTime1'))
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2, left: 60),
                       child: Text(
-                        flight['airline'],
+                        '${flight['connectTime1']} --- ${flight['connectTime2']}',
                         style: const TextStyle(
                           fontSize: 11,
-                          color: Color(0xFF1e5a8e),
+                          color: Colors.grey,
                         ),
                       ),
                     ),
-                    Text(
-                      '${flight['duration']} - ${flight['stops']}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey,
-                      ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  // Route
+                  Text(
+                    '${flight['from']} - ${flight['to']}',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFFD32F2F),
                     ),
-                  ],
+                  ),
+                  
+                  const SizedBox(height: 6),
+                  
+                  // Baggage Info
+                  Text(
+                    'Checked: ${flight['checkedBag']} / Carry on: ${flight['carryOn']}',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  // Airline and Duration Row
+                  Row(
+                    children: [
+                      Image.asset(
+                        'assets/images/middleeast.png',
+                        width: 14,
+                        height: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          flight['airline'],
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF1e5a8e),
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '${flight['duration']} - ${flight['stops']}',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            
+            // Flight Details Button
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: const BoxDecoration(
+                color: Color(0xFF2c5f8d),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(8),
+                  bottomRight: Radius.circular(8),
                 ),
-              ],
-            ),
-          ),
-          
-          // Flight Details Button
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            decoration: const BoxDecoration(
-              color: Color(0xFF2c5f8d),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(8),
-                bottomRight: Radius.circular(8),
+              ),
+              child: const Text(
+                'Flight Details',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-            child: const Text(
-              'Flight Details',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

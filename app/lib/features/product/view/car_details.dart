@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'car_checkout.dart';
+import '../../../core/widgets/unified_ui_components.dart';
 
 class CarDetails extends StatefulWidget {
   final Map<String, dynamic> car;
@@ -40,22 +41,9 @@ class _CarDetailsState extends State<CarDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          widget.car['category'] ?? 'Midsize SUV',
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
+      appBar: UnifiedAppBar(
+        title: widget.car['category'] ?? 'Midsize SUV',
+        onBackPressed: () => Navigator.pop(context),
       ),
       body: Column(
         children: [
