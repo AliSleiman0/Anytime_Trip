@@ -170,6 +170,7 @@
           <option value="car" {{if eq .Filters.Type "car"}}selected{{end}}>Car Bookings</option>
           <option value="flight" {{if eq .Filters.Type "flight"}}selected{{end}}>Flight Bookings</option>
           <option value="hotel" {{if eq .Filters.Type "hotel"}}selected{{end}}>Hotel Bookings</option>
+          <option value="transfer" {{if eq .Filters.Type "transfer"}}selected{{end}}>Transfer Bookings</option>
         </select>
         <select
           class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
@@ -198,9 +199,11 @@
                 <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Booking ID</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Type</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Customer</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Phone</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Service Provider</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Booking Date</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Travel Date</th>
-                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Details</th>
+                
                 <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Amount</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Payment</th>
                 <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Status</th>
@@ -327,6 +330,22 @@
                       mask="url(#path-17-inside-9_332_3767-{{.RefID}})"
                     />
                   </svg>
+                  {{else if eq .Type "Transfer"}}
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M9 2L3 8M3 8L9 14M3 8H19M15 22L21 16M21 16L15 10M21 16H5"
+                      stroke="black"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
                   {{else}}
                   <svg
                     width="24"
@@ -349,11 +368,15 @@
                   <p class="font-semibold text-gray-900">{{.CustomerName}}</p>
                   <p class="text-gray-500 text-xs">{{.CustomerEmail}}</p>
                 </td>
+                <td class="px-4 py-3 text-center" style="width: 10%;">
+                  <p class="text-gray-700">{{.CustomerPhone}}</p>
+                </td>
+                <td class="px-4 py-3 text-center" style="width: 10%;">
+                  <p class="text-gray-700">{{.ServiceProvider}}</p>
+                </td>
                 <td class="px-4 py-3 text-gray-700 text-center" style="width: 10%;">{{formatDate .BookingDate}}</td>
                 <td class="px-4 py-3 text-gray-700 text-center" style="width: 10%;">{{formatDate .TravelDate}}</td>
-                <td class="px-4 py-3 text-gray-700 text-center" style="width: 10%;">
-                  {{.Details}}
-                </td>
+                
                 <td class="px-4 py-3 font-semibold text-gray-900 text-center" style="width: 10%;">
                   {{.Amount}}
                 </td>
@@ -391,7 +414,7 @@
               </tr>
               {{else}}
               <tr>
-                <td colspan="10" class="px-4 py-6 text-center text-gray-500">No bookings found.</td>
+                <td colspan="12" class="px-4 py-6 text-center text-gray-500">No bookings found.</td>
               </tr>
               {{end}}
             </tbody>
@@ -405,7 +428,7 @@
       <script>
         (function(){
           window.initBookingsPagination = function(perPage){
-            perPage = perPage || 7;
+            perPage = perPage || 6;
             const tbody = document.querySelector('#bookings-fragment table tbody');
             if(!tbody) return;
             const rows = Array.from(tbody.querySelectorAll('tr'));
@@ -413,7 +436,7 @@
             if(!rows.length) return;
 
             // if the template includes a single 'no bookings' row with colspan, detect it
-            if(rows.length === 1 && rows[0].querySelector('td') && rows[0].querySelector('td').getAttribute('colspan')=='10'){
+            if(rows.length === 1 && rows[0].querySelector('td') && rows[0].querySelector('td').getAttribute('colspan')=='12'){
               // nothing to paginate
               return;
             }
@@ -442,7 +465,7 @@
             for(let p=1;p<=pages;p++){
               const btn = document.createElement('button');
               btn.type = 'button';
-              btn.className = 'inline-flex items-center justify-center w-8 h-8 rounded-md border border-gray-200 bg-white text-gray-900 hover:bg-gray-100';
+              btn.className = 'inline-flex items-center justify-center w-8 h-8 rounded-md border border-gray-200 bg-white text-gray-900 hover:bg-gray-100 hover:text-black';
               btn.dataset.page = String(p);
               btn.textContent = String(p);
               btn.addEventListener('click', () => { showPage(p); });
@@ -454,8 +477,8 @@
           };
 
           // auto-init when fragment loads
-          if (window.requestAnimationFrame) requestAnimationFrame(()=>window.initBookingsPagination(7));
-          else window.initBookingsPagination(7);
+          if (window.requestAnimationFrame) requestAnimationFrame(()=>window.initBookingsPagination(6));
+          else window.initBookingsPagination(6);
         })();
       </script>
     </div>

@@ -202,7 +202,7 @@
 <script>
   (function(){
     window.initUsersPagination = function(perPage){
-      perPage = perPage || 7;
+      perPage = perPage || 6;
       const tbody = document.querySelector('main table tbody');
       if(!tbody) return;
       const rows = Array.from(tbody.querySelectorAll('tr'));
@@ -232,7 +232,7 @@
       for(let p=1;p<=pages;p++){
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'inline-flex items-center justify-center w-8 h-8 rounded-md border border-gray-200 bg-white text-gray-900 hover:bg-gray-100';
+        btn.className = 'inline-flex items-center justify-center w-8 h-8 rounded-md border border-gray-200 bg-white text-gray-900 hover:bg-gray-100 hover:text-black';
         btn.dataset.page = String(p);
         btn.textContent = String(p);
         btn.addEventListener('click', () => { showPage(p); });
@@ -242,8 +242,8 @@
       showPage(1);
     };
 
-    if (window.requestAnimationFrame) requestAnimationFrame(()=>window.initUsersPagination(7));
-    else window.initUsersPagination(7);
+    if (window.requestAnimationFrame) requestAnimationFrame(()=>window.initUsersPagination(6));
+    else window.initUsersPagination(6);
   })();
 </script>
 

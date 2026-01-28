@@ -80,6 +80,10 @@ func SetupRoutes(router fiber.Router, handler *admin.AdminHandler, jwtSecret str
 	protected.Post("/cms/hotels/upload", handler.UploadHotelImage)
 	protected.Post("/cms/hotels/update", handler.UpdateHotel)
 	protected.Delete("/cms/hotels/delete", handler.DeleteHotel)
+	protected.Get("/cms/transfers", handler.CMSTransfers)
+	protected.Get("/cms/transfers-frag", handler.GetCMSTransfersFragment)
+	protected.Post("/cms/transfers/update", handler.UpdateTransfer)
+	protected.Delete("/cms/transfers/delete", handler.DeleteTransfer)
 	protected.Get("/cms/homepage/travel", handler.CMSTravelExperience)
 	protected.Get("/cms/homepage/travel-frag", handler.GetCMSTravelExperienceFragment)
 	// CMS travel upload/save endpoints
