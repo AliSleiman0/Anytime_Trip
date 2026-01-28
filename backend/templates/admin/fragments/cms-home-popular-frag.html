@@ -1,4 +1,4 @@
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+<div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto">
   <main>
     <div
       hx-get="/admin/header?title=Homepage Management&subtitle=Manage homepage content"
@@ -7,15 +7,15 @@
     ></div>
 
     <div class="px-4 pt-2 pb-6 bg-[#E6F0F9] min-h-screen">
-        <div class="flex justify-between">
-          <div class="flex gap-8 text-sm font-semibold text-[#336891] mb-6">
-          <a href="/admin/cms/homepage/travel" class="pb-2 hover:text-[#1f3242]"
+        <div class="flex flex-col md:flex-row md:justify-between gap-4 mb-6">
+          <div class="flex gap-4 md:gap-8 text-sm font-semibold text-[#336891] overflow-x-auto pb-2">
+          <a href="/admin/cms/homepage/travel" class="pb-2 hover:text-[#1f3242] whitespace-nowrap flex-shrink-0"
             >Travel Experience Section</a
           >
-          <a href="/admin/cms/homepage/banner" class="pb-2 hover:text-[#1f3242]"
+          <a href="/admin/cms/homepage/banner" class="pb-2 hover:text-[#1f3242] whitespace-nowrap flex-shrink-0"
             >Banner</a
           >
-          <a href="/admin/cms/homepage/popular" class="relative pb-2"
+          <a href="/admin/cms/homepage/popular" class="relative pb-2 whitespace-nowrap flex-shrink-0"
             >Popular Locations
             <span
               class="absolute left-0 right-0 -bottom-0.5 h-0.5 bg-[#336891]"
@@ -23,7 +23,7 @@
           </a>
         </div>
         
-        <div class="flex gap-2">
+        <div class="flex flex-col sm:flex-row gap-2">
           <button
             id="save-popular-btn"
             hx-post="/admin/cms/homepage/popular/save"
@@ -32,14 +32,14 @@
             hx-include="#popular-sections"
             hx-swap="none"
             hx-on="htmx:afterRequest: if (event.detail.xhr && event.detail.xhr.status === 200) { if (typeof Swal !== 'undefined') { Swal.fire({icon: 'success', title: 'Saved & Published', timer: 1500, showConfirmButton: false}); setTimeout(function() { window.location.reload(); }, 1500); } else { window.location.reload(); } } else { if (typeof Swal !== 'undefined') { Swal.fire({icon: 'error', title: 'Save failed'}); } else { alert('Save failed'); } }"
-            class="bg-[#336891] w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
+            class="bg-[#336891] w-full sm:w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
           >
             Save & Publish
           </button>
           <button
             id="add-popular-section-btn"
             type="button"
-            class="bg-[#336891] w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
+            class="bg-[#336891] w-full sm:w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
           >
             <svg
               width="24"

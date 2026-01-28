@@ -1,4 +1,4 @@
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+<div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto">
   <main>
     <div
       hx-get="/admin/header?title=Homepage Management&subtitle=Manage homepage content"
@@ -9,7 +9,7 @@
     <div class="px-4 pt-2 pb-6 bg-[#E6F0F9] min-h-screen">
       <!-- CMS Homepage Banner Fragment -->
       <!-- Server-rendered template: iterates saved banners and supports HTMX uploads/saves -->
-      <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+      <div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto">
         <main>
           <div
             hx-get="/admin/header?title=Homepage Management&subtitle=Manage homepage content"
@@ -19,18 +19,18 @@
 
           <div class="px-4 pt-2 pb-6 bg-[#E6F0F9] min-h-screen">
             <form id="banner-form">
-            <div class="flex justify-between">
-              <div class="flex gap-8 text-sm font-semibold text-[#336891] mb-6">
-                <a href="/admin/cms/homepage/travel" class="pb-2 hover:text-[#1f3242]">Travel Experience Section</a>
-                <a href="/admin/cms/homepage/banner" class="relative pb-2">Banner
+            <div class="flex flex-col md:flex-row md:justify-between gap-4 mb-6">
+              <div class="flex gap-4 md:gap-8 text-sm font-semibold text-[#336891] overflow-x-auto pb-2">
+                <a href="/admin/cms/homepage/travel" class="pb-2 hover:text-[#1f3242] whitespace-nowrap flex-shrink-0">Travel Experience Section</a>
+                <a href="/admin/cms/homepage/banner" class="relative pb-2 whitespace-nowrap flex-shrink-0">Banner
                   <span class="absolute left-0 right-0 -bottom-0.5 h-0.5 bg-[#336891]"></span>
                 </a>
-                <a href="/admin/cms/homepage/popular" class="pb-2 hover:text-[#1f3242]">Popular Locations</a>
+                <a href="/admin/cms/homepage/popular" class="pb-2 hover:text-[#1f3242] whitespace-nowrap flex-shrink-0">Popular Locations</a>
               </div>
 
               <div class="flex gap-2">
                 <button
-                  class="bg-[#336891] w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
+                  class="bg-[#336891] w-full md:w-64 h-12 text-white text-lg rounded-xl flex justify-center items-center p-2"
                   hx-post="/admin/cms/homepage/banner/save"
                   hx-encoding="multipart/form-data"
                   hx-include="#banner-form"

@@ -1,5 +1,24 @@
+<!-- Hamburger Menu Button (visible only on small screens) -->
+<button
+  id="sidebarToggle"
+  class="fixed top-4 left-4 z-50 md:hidden bg-white p-2 rounded-md shadow-lg border border-gray-200"
+  onclick="toggleSidebar()"
+>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 12H21M3 6H21M3 18H21" stroke="#1D1D1D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+<!-- Overlay for mobile (shows when sidebar is open) -->
+<div
+  id="sidebarOverlay"
+  class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden"
+  onclick="toggleSidebar()"
+></div>
+
 <aside
-  class="w-64 min-h-screen bg-white border-r border-gray-200 flex flex-col text-sm"
+  id="sidebar"
+  class="w-64 min-h-screen bg-white border-r border-gray-200 flex flex-col text-sm fixed md:static z-40 -translate-x-full md:translate-x-0 transition-transform duration-300"
 >
   <div class="border-b border-gray-200 px-6 pt-6 pb-4 flex items-center">
     <!-- Replace src with your provided logo path -->
@@ -437,6 +456,23 @@
   </div>
 
   <script>
+    // Sidebar toggle function for mobile
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const toggleBtn = document.getElementById('sidebarToggle');
+      
+      if (sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        toggleBtn.classList.add('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        toggleBtn.classList.remove('hidden');
+      }
+    }
+
     // CMS Dropdown toggle function
     function toggleCMSDropdown() {
       const submenu = document.getElementById('cmsSubmenu');

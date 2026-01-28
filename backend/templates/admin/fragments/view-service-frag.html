@@ -1,5 +1,5 @@
 {{- with .Provider }}
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+<div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto">
   <main>
     <div
       hx-get="/admin/header?title=View Service Provider&subtitle={{.Name}}"
@@ -29,32 +29,32 @@
       </div>
     </div>
 
-    <div class="flex justify-between bg-[#33689126] rounded-xl p-4 m-4">
-      <div class="flex">
+    <div class="flex flex-col lg:flex-row justify-between bg-[#33689126] rounded-xl p-4 m-4 gap-4">
+      <div class="flex flex-col sm:flex-row gap-4">
         <img
           src="/static/admin/images/pp1.jpg"
           alt="User Avatar"
-          class="w-24 h-24 rounded-full"
+          class="w-24 h-24 rounded-full mx-auto sm:mx-0"
         />
 
-        <div class="flex flex-col justify-center text-left gap-y-2 ml-6">
+        <div class="flex flex-col justify-center text-center sm:text-left gap-y-2">
           
-            <h3 class="text-2xl font-semibold">
+            <h3 class="text-2xl font-semibold flex items-center gap-2 justify-center sm:justify-start">
               {{.Name}}
               <span id="freezeIcon" class="{{if or .IsFreezed (or (eq .Status "Freezed") (eq .Status "Frozen"))}}inline-block ml-2{{else}}hidden{{end}}">
                 <svg width="18px" height="18px" class="mt-1" viewBox="0 0 24 24" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"><defs><style>.cls-1{fill:none;stroke:#2697ed;stroke-miterlimit:10;stroke-width:1.92px;}</style></defs><polyline class="cls-1" points="12 23.5 12 17.75 12 14.88"/><line class="cls-1" x1="12" y1="9.13" x2="12" y2="0.5"/><polyline class="cls-1" points="15.35 2.9 12 6.25 8.65 2.9"/><polyline class="cls-1" points="12 23.5 12 17.75 12 14.88"/><line class="cls-1" x1="12" y1="9.13" x2="12" y2="0.5"/><polyline class="cls-1" points="8.65 21.1 12 17.75 15.35 21.1"/><polyline class="cls-1" points="21.96 17.75 16.98 14.88 14.49 13.44"/><line class="cls-1" x1="9.51" y1="10.56" x2="2.04" y2="6.25"/><polyline class="cls-1" points="5.79 4.54 7.02 9.13 2.44 10.35"/><polyline class="cls-1" points="21.96 17.75 16.98 14.88 14.49 13.44"/><line class="cls-1" x1="9.51" y1="10.56" x2="2.04" y2="6.25"/><polyline class="cls-1" points="18.21 19.46 16.98 14.88 21.56 13.65"/><line class="cls-1" x1="9.51" y1="13.44" x2="2.04" y2="17.75"/><polyline class="cls-1" points="14.49 10.56 16.98 9.13 21.96 6.25"/><polyline class="cls-1" points="18.21 4.54 16.98 9.13 21.56 10.35"/><line class="cls-1" x1="9.51" y1="13.44" x2="2.04" y2="17.75"/><polyline class="cls-1" points="14.49 10.56 16.98 9.13 21.96 6.25"/><polyline class="cls-1" points="5.79 19.46 7.02 14.88 2.44 13.65"/><path class="cls-1" d="M14.88,12a2.89,2.89,0,1,1-.39-1.44A2.9,2.9,0,0,1,14.88,12Z"/></svg>
               </span>
             </h3>
           <p class="text-[#4A5565]">{{.Email}}</p>
-          <p class="text-xs rounded-full text-center px-3 py-1 {{.StatusClass}}">
+          <p class="text-xs rounded-full text-center px-3 py-1 {{.StatusClass}} mx-auto sm:mx-0 w-fit">
             {{.Status}}
           </p>
         </div>
       </div>
-      <div class="flex flex-col items-center justify-center gap-y-4">
+      <div class="flex flex-col items-center justify-center gap-y-4 w-full lg:w-auto">
         <button
           id="freezeBtn"
-          class="w-56 h-12 border bg-[#1C9BFF] text-white rounded-lg font-semibold text-lg hover:bg-blue-500 transition-colors"
+          class="w-full lg:w-56 h-12 border bg-[#1C9BFF] text-white rounded-lg font-semibold text-lg hover:bg-blue-500 transition-colors"
           onclick="showFreezeConfirmation()"
         >
           {{.FreezeActionText}}
@@ -62,9 +62,9 @@
       </div>
     </div>
 
-    <div class="m-10">
-      <h3 class="font-bold text-lg my-10">Service Provider Information</h3>
-      <div class="flex justify-between">
+    <div class="mx-4 md:mx-10 my-6 md:my-10">
+      <h3 class="font-bold text-lg mb-6 md:mb-10">Service Provider Information</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         <div class="flex flex-col gap-y-5">
           <div>
             <p class="text-sm text-[#6A7282]">Full Name</p>
@@ -127,9 +127,9 @@
       </div>
     </div>
 
-    <div class="m-10">
-      <h3 class="font-bold text-lg my-10">Service Provider Information</h3>
-      <div class="flex justify-between">
+    <div class="mx-4 md:mx-10 my-6 md:my-10">
+      <h3 class="font-bold text-lg mb-6 md:mb-10">Service Provider Information</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         <div class="flex flex-col gap-y-5">
           <div>
             <p class="text-sm text-[#6A7282]">Total Bookings</p>
@@ -185,23 +185,26 @@
         </div>
       </div>
     </div>
-    <div class="m-10">
+    <div class="mx-4 md:mx-10 my-6 md:my-10">
       <h3 class="font-bold text-lg mb-4">Booking Summary</h3>
       <div class="rounded-t-2xl overflow-hidden border border-gray-200">
-        <table class="w-full text-sm">
-          <thead class="bg-[#336891] text-white">
-            <tr>
-              <th class="px-2 py-3 text-center font-semibold">Customer</th>
-              <th class="px-2 py-3 text-center font-semibold">Type</th>
-              <th class="px-2 py-3 text-center font-semibold">Status</th>
-              <th class="px-2 py-3 text-center font-semibold">Destination</th>
-              <th class="px-2 py-3 text-center font-semibold">Date</th>
-              <th class="px-2 py-3 text-center font-semibold">Amount</th>
-            </tr>
-          </thead>
-        </table>
-        <div class="overflow-y-auto custom-scrollbar" style="max-height: 440px;">
-          <table class="w-full text-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm min-w-[640px]">
+            <thead class="bg-[#336891] text-white">
+              <tr>
+                <th class="px-2 py-3 text-center font-semibold">Customer</th>
+                <th class="px-2 py-3 text-center font-semibold">Type</th>
+                <th class="px-2 py-3 text-center font-semibold">Status</th>
+                <th class="px-2 py-3 text-center font-semibold">Destination</th>
+                <th class="px-2 py-3 text-center font-semibold">Date</th>
+                <th class="px-2 py-3 text-center font-semibold">Amount</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <div class="overflow-x-auto">
+          <div class="overflow-y-auto custom-scrollbar" style="max-height: 440px;">
+            <table class="w-full text-sm min-w-[640px]">
             <tbody class="bg-white text-gray-900">
               {{range .Bookings}}
               <tr class="border-b border-gray-200">
@@ -237,6 +240,7 @@
               {{end}}
             </tbody>
           </table>
+        </div>
         </div>
       </div>
     </div>

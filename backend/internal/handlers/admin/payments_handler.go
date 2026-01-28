@@ -20,7 +20,10 @@ func (h *AdminHandler) GetPayments(c *fiber.Ctx) error {
 		return c.Status(500).SendString("Error loading template")
 	}
 
-	data := fiber.Map{"Title": "Payments and Transactions"}
+	data := fiber.Map{
+		"Title":            "Payments and Transactions",
+		"ShowExportButton": true,
+	}
 	c.Set("Content-Type", "text/html")
 	return tmpl.Execute(c, data)
 }

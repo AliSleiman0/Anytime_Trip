@@ -47,7 +47,8 @@ func (h *AdminHandler) ManageUsers(c *fiber.Ctx) error {
 	}
 
 	data := fiber.Map{
-		"Title": "Users",
+		"Title":            "Users",
+		"ShowExportButton": true,
 	}
 
 	c.Set("Content-Type", "text/html")

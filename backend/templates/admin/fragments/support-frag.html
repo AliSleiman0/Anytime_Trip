@@ -7,7 +7,7 @@
   - Conversation panel for detailed chat interactions
   - Real-time WebSocket connections for live updates
 -->
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+<div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto">
   <!-- Main content area -->
   <main>
     <!-- Page header with title and subtitle -->
@@ -18,9 +18,9 @@
     ></div>
 
     <!-- Filters section for ticket categorization -->
-    <div class="flex justify-end p-4">
-      <div class="flex items-center gap-4">
-        <p class="flex items-center gap-2">
+    <div class="flex flex-col md:flex-row md:justify-end p-4 gap-4">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-4">
+        <p class="flex items-center gap-2 whitespace-nowrap">
           <svg
             width="24"
             height="24"
@@ -40,7 +40,7 @@
         </p>
         <select
           id="filter-category"
-          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          class="w-full sm:w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           name="category"
         >
           <option class="text-[#9B9B9B]" value="">All Categories</option>
@@ -51,7 +51,7 @@
         </select>
         <select
           id="filter-status"
-          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          class="w-full sm:w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           name="status"
         >
           <option class="text-[#9B9B9B]" value="">All Statuses</option>
@@ -61,7 +61,7 @@
         </select>
         <select
           id="filter-priority"
-          class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          class="w-full sm:w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
           name="priority"
         >
           <option class="text-[#9B9B9B]" value="">All Priorities</option>
@@ -74,7 +74,7 @@
 
     <!-- Support ticket cards grid -->
     <div class="p-4">
-      <div class="grid grid-cols-3 gap-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         <!-- Support Ticket Detail Card -->
         {{range .Tickets}}
         <div
@@ -172,14 +172,14 @@
       </div>
     </div>
     <!-- Floating Messages Button -->
-    <div id="messages-fab" class="fixed bottom-0 right-20 z-50">
+    <div id="messages-fab" class="fixed bottom-0 right-0 sm:right-20 z-50">
       <button
         onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
         class="flex items-center gap-3 bg-[#336891] text-white px-4 py-2 rounded-t shadow-lg hover:opacity-95"
       >
         <span class="font-semibold">Messages</span>
         <span class="text-sm">(<span id="messages-count">0</span>)</span>
-        <div class="ml-44">
+        <div class="ml-4 sm:ml-44">
           <svg
             width="12"
             height="10"
@@ -195,11 +195,11 @@
     <!-- Chat panel (frontend only) -->
     <div
       id="chat-panel"
-      class="fixed bottom-0 right-20 z-50 hidden"
+      class="fixed bottom-0 right-0 sm:right-20 z-50 hidden"
       aria-hidden="true"
     >
       <div
-        class="w-[360px] h-[620px] bg-[#EBF5FE] rounded-t shadow-lg overflow-hidden flex flex-col"
+        class="w-full sm:w-[360px] h-[500px] sm:h-[620px] bg-[#EBF5FE] rounded-t shadow-lg overflow-hidden flex flex-col"
       >
         <div
           id="chat-header"
@@ -276,11 +276,11 @@
     <!-- Conversation panel (appears to the left of the chat panel) -->
     <div
       id="conversation-panel"
-      class="fixed bottom-0 right-[450px] z-50 hidden"
+      class="fixed bottom-0 right-0 sm:right-[450px] z-50 hidden"
       aria-hidden="true"
     >
       <div
-        class="w-[400px] h-[620px] bg-white rounded-t shadow-lg overflow-hidden flex flex-col"
+        class="w-full sm:w-[400px] h-[500px] sm:h-[620px] bg-white rounded-t shadow-lg overflow-hidden flex flex-col"
       >
         <div class="p-3 border-b flex items-center gap-3 bg-[#336891]">
           <div class="relative w-10 h-10 flex-shrink-0">

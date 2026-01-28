@@ -1,4 +1,4 @@
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+
   <style>
     .custom-scrollbar::-webkit-scrollbar {
       width: 8px;
@@ -16,54 +16,55 @@
     }
   </style>
 
-  <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+  <div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto">
     <main class="">
       <!-- header -->
       <div
         hx-get="/admin/header?title=Service Management"
         hx-trigger="load"
         hx-swap="innerHTML"
+        class="mt-10"
       ></div>
 
       <!-- inputs -->
-      <div class="p-4 flex justify-between">
+      <div class="p-4 flex flex-col md:flex-row md:justify-between gap-4">
         <!-- filters -->
-        <div class="flex gap-8">
+        <div class="flex gap-4 md:gap-8 overflow-x-auto pb-2 overflow-x-hidden">
           <button
             data-provider-filter="all"
-            class="text-[#336891] border-b-4 border-[#336891] w-20 h-8"
+            class="text-[#336891] border-b-4 border-[#336891] w-20 h-8 whitespace-nowrap flex-shrink-0"
           >
             All
           </button>
           <button
             data-provider-filter="flight"
-            class="text-[#336891] border-b-4 border-transparent w-20 h-8"
+            class="text-[#336891] border-b-4 border-transparent w-20 h-8 whitespace-nowrap flex-shrink-0"
           >
             Flights
           </button>
           <button
             data-provider-filter="car"
-            class="text-[#336891] border-b-4 border-transparent w-20 h-8"
+            class="text-[#336891] border-b-4 border-transparent w-20 h-8 whitespace-nowrap flex-shrink-0"
           >
             Cars
           </button>
           <button
             data-provider-filter="hotel"
-            class="text-[#336891] border-b-4 border-transparent w-20 h-8"
+            class="text-[#336891] border-b-4 border-transparent w-20 h-8 whitespace-nowrap flex-shrink-0"
           >
             Hotels
           </button>
           <button
             data-provider-filter="transfer"
-            class="text-[#336891] border-b-4 border-transparent w-20 h-8"
+            class="text-[#336891] border-b-4 border-transparent w-20 h-8 whitespace-nowrap flex-shrink-0"
           >
             Transfers
           </button>
         </div>
 
-        <div class="flex gap-4">
+        <div class="flex flex-col sm:flex-row gap-4">
           <select
-            class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+            class="w-full sm:w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
             name="status"
             id="status"
           >
@@ -74,13 +75,11 @@
             <option value="inactive">Inactive</option>
             <option value="archived">Archived</option>
           </select>
-        </div>
 
         <!-- create new button -->
-        <div>
           <button
             id="create-provider-btn"
-            class="bg-[#336891] w-64 h-12 text-white text-lg rounded-xl flex justify-between items-center p-2"
+            class="bg-[#336891] w-full sm:w-64 h-12 text-white text-lg rounded-xl flex justify-between items-center p-2"
           >
             <span
               id="create-provider-icon"
@@ -107,7 +106,8 @@
       <!-- service provider table -->
       <div class="px-4">
         <div class="rounded-t-2xl overflow-hidden border border-gray-200">
-          <table class="w-full text-sm table-fixed">
+          <div class="overflow-x-auto md:overflow-x-visible">
+          <table class="w-full text-sm table-fixed min-w-[1000px] md:min-w-0">
             <colgroup>
               <col class="w-[18%]" />
               <col class="w-[10%]" />
@@ -139,7 +139,7 @@
             class="overflow-y-auto custom-scrollbar"
             style="max-height: 560px"
           >
-            <table class="w-full text-sm table-fixed">
+            <table class="w-full text-sm table-fixed min-w-[1000px] md:min-w-0">
               <colgroup>
                 <col class="w-[18%]" />
                 <col class="w-[10%]" />
@@ -513,6 +513,7 @@
                 {{- end }}
               </tbody>
             </table>
+          </div>
           </div>
         </div>
       </div>

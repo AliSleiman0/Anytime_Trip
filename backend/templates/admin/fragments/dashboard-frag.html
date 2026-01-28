@@ -1,4 +1,4 @@
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+<div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto">
   <main class="">
     <div hx-get="/admin/header?title=Dashboard&subtitle=Here's what's happening today!" hx-trigger="load" hx-swap="innerHTML"></div>
 
@@ -211,9 +211,9 @@
     </div>
 
     <!-- Charts -->
-    <div class="flex items-center justify-center gap-5">
+    <div class="flex items-center justify-center gap-5 flex-wrap">
       <!-- Active Booking Chart -->
-      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2">
+      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-full md:w-1/2">
         <div class="flex items-center justify-between mb-2">
           <h2 class="text-lg font-semibold">Active Booking</h2>
           <div class="flex items-center gap-4 text-sm">
@@ -238,7 +238,7 @@
       </div>
 
       <!-- Flights Chart -->
-      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2">
+      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-full md:w-1/2">
         <div class="flex items-center justify-between mb-2">
           <h2 class="text-lg font-semibold">Flights</h2>
           <div class="flex items-center gap-4 text-sm">
@@ -379,9 +379,9 @@
 
 
     <!-- bars -->
-     <div class="flex justify-center items-center gap-5">
+     <div class="flex justify-center items-center gap-5 flex-wrap">
       <!-- Car Rental Chart -->
-      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2">
+      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-full md:w-1/2">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold">Car Rental</h2>
           <button class="text-gray-400 hover:text-gray-600">
@@ -396,7 +396,7 @@
       </div>
 
       <!-- Hotels Bookings Chart -->
-      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2">
+      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-full md:w-1/2">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold">Hotels Bookings</h2>
           <button class="text-gray-400 hover:text-gray-600">

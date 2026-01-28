@@ -52,7 +52,8 @@ func (h *AdminHandler) GetBookings(c *fiber.Ctx) error {
 	}
 
 	data := fiber.Map{
-		"Title": "Bookings",
+		"Title":            "Bookings",
+		"ShowExportButton": true,
 	}
 
 	c.Set("Content-Type", "text/html")
@@ -460,6 +461,35 @@ func (h *AdminHandler) GetViewBookingFragment(c *fiber.Ctx) error {
 		return tmpl.Execute(c, data)
 	}
 
+	// Try to find in transfer bookings
+	transferBooking, err := h.transferBookingRepo.FindByID(ctx, bookingID)
+	if err == nil && transferBooking != nil {
+		tmpl, err := template.New("view-booking-frag.html").Funcs(funcMap).ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "view-booking-frag.html")))
+		if err != nil {
+			return c.Status(500).SendString("Error loading template: " + err.Error())
+		}
+
+		data := fiber.Map{
+			"BookingID":     transferBooking.BookingID,
+			"FlightName":    "Transfer Booking",
+			"Type":          "Transfer",
+			"Details":       transferBooking.Details,
+			"Amount":        transferBooking.Amount,
+			"Currency":      transferBooking.Currency,
+			"PaymentStatus": string(transferBooking.PaymentStatus),
+			"Email":         transferBooking.Customer.Email,
+			"Phone":         "-",
+			"Seat":          "-",
+			"DepartureDate": transferBooking.BookingDate.Format("01/02/2006"),
+			"ArrivalDate":   transferBooking.BookingDate.Format("01/02/2006"),
+			"ReferenceID":   transferBooking.ID,
+			"RefundAmount":  0.0,
+		}
+
+		c.Set("Content-Type", "text/html")
+		return tmpl.Execute(c, data)
+	}
+
 	return c.Status(404).SendString("Booking not found")
 }
 
@@ -521,6 +551,21 @@ func (h *AdminHandler) UpdateBookingEmail(c *fiber.Ctx) error {
 	hotelBooking, err := h.hotelBookingRepo.FindByID(ctx, req.BookingID)
 	if err == nil && hotelBooking != nil {
 		if err := h.hotelBookingRepo.UpdateCustomerEmail(ctx, req.BookingID, req.Email); err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"success": false,
+				"message": "Failed to update email",
+			})
+		}
+		return c.JSON(fiber.Map{
+			"success": true,
+			"message": "Email updated successfully",
+		})
+	}
+
+	// Try to update in transfer bookings
+	transferBooking, err := h.transferBookingRepo.FindByID(ctx, req.BookingID)
+	if err == nil && transferBooking != nil {
+		if err := h.transferBookingRepo.UpdateCustomerEmail(ctx, req.BookingID, req.Email); err != nil {
 			return c.Status(500).JSON(fiber.Map{
 				"success": false,
 				"message": "Failed to update email",

@@ -21,7 +21,8 @@ func (h *AdminHandler) ManageServiceProviders(c *fiber.Ctx) error {
 	}
 
 	data := fiber.Map{
-		"Title": "Service Providers",
+		"Title":            "Service Providers",
+		"ShowExportButton": true,
 	}
 
 	c.Set("Content-Type", "text/html")

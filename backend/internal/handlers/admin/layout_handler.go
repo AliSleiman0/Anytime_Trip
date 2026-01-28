@@ -3,6 +3,7 @@ package admin
 import (
 	"html/template"
 	"path/filepath"
+	"strings"
 
 	"Anytime_Travel/backend/internal/middleware"
 
@@ -40,9 +41,18 @@ func (h *AdminHandler) GetHeader(c *fiber.Ctx) error {
 	title := c.Query("title", "Dashboard")
 	subtitle := c.Query("subtitle", "Here's what's happening today!")
 
+	// Only show export on specific admin pages
+	titleKey := strings.ToLower(strings.TrimSpace(title))
+	showExport := false
+	switch titleKey {
+	case "bookings", "user management", "service management", "payments and transactions":
+		showExport = true
+	}
+
 	data := fiber.Map{
-		"Title":    title,
-		"Subtitle": subtitle,
+		"Title":            title,
+		"Subtitle":         subtitle,
+		"ShowExportButton": showExport,
 	}
 
 	c.Set("Content-Type", "text/html")

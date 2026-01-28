@@ -1,4 +1,4 @@
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+<div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto">
   <main class="">
     <style>
       .custom-scrollbar::-webkit-scrollbar {
@@ -42,16 +42,16 @@
 
     <!-- User Info Section -->
     <!-- Profile -->
-    <div class="flex justify-between bg-[#33689126] rounded-xl p-4 m-4">
-      <div class="flex">
+    <div class="flex flex-col lg:flex-row justify-between bg-[#33689126] rounded-xl p-4 m-4 gap-4">
+      <div class="flex flex-col sm:flex-row gap-4">
         <img
           src="/static/admin/images/pp1.jpg"
           alt="User Avatar"
-          class="w-24 h-24 rounded-full"
+          class="w-24 h-24 rounded-full mx-auto sm:mx-0"
         />
 
-        <div class="flex flex-col justify-center text-left gap-y-2 ml-6">
-          <h3 class="text-2xl font-semibold flex items-center gap-2">
+        <div class="flex flex-col justify-center text-center sm:text-left gap-y-2">
+          <h3 class="text-2xl font-semibold flex items-center gap-2 justify-center sm:justify-start">
             <span>{{.Name}}</span>
             {{if or .IsFreezed (or (eq .Status "Freezed") (eq .Status "Frozen"))}}
               <span class="inline-flex items-center" title="Account frozen">
@@ -61,21 +61,21 @@
           </h3>
           <p class="text-[#4A5565]">{{.Email}}</p>
           <span
-            class="{{.StatusClass}} text-center w-20 h-6 flex items-center justify-center"
+            class="{{.StatusClass}} text-center w-20 h-6 flex items-center justify-center mx-auto sm:mx-0"
             >{{.Status}}</span
           >
         </div>
       </div>
-      <div class="flex flex-col items-center justify-center gap-y-4">
+      <div class="flex flex-col items-center justify-center gap-y-4 w-full lg:w-auto">
         <button
-          class="w-56 h-12 bg-[#D24124] text-white rounded-lg hover:bg-red-700 transition-colors"
+          class="w-full lg:w-56 h-12 bg-[#D24124] text-white rounded-lg hover:bg-red-700 transition-colors"
           onclick="showDeleteConfirmation()"
         >
           Delete Account
         </button>
         <button
           id="freezeBtn"
-          class="w-56 h-12 border border-[#1C9BFF] text-[#1C9BFF] rounded-lg font-semibold text-lg hover:bg-blue-50 transition-colors"
+          class="w-full lg:w-56 h-12 border border-[#1C9BFF] text-[#1C9BFF] rounded-lg font-semibold text-lg hover:bg-blue-50 transition-colors"
           onclick="showFreezeConfirmation()"
         >
           {{.FreezeActionText}}
@@ -227,9 +227,9 @@
     </script>
 
     <!-- User Details -->
-    <div class="m-10">
-      <h3 class="font-bold text-lg my-10">User Information</h3>
-      <div class="flex justify-between">
+    <div class="mx-4 md:mx-10 my-6 md:my-10">
+      <h3 class="font-bold text-lg mb-6 md:mb-10">User Information</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         <div class="flex flex-col gap-y-5">
           <div>
             <p class="text-sm text-[#6A7282]">Full Name</p>
@@ -278,42 +278,30 @@
             <p class="text-[#101828]">{{.Location}}</p>
           </div>
         </div>
-
-        <div class="flex flex-col gap-y-5">
-          <div>
-            <p class="text-sm text-[#6A7282]">User Role</p>
-            <p class="text-[#101828]">{{.Role}}</p>
-          </div>
-          <div>
-            <p class="text-sm text-[#6A7282]">Phone Number</p>
-            <p class="text-[#101828]">{{.Phone}}</p>
-          </div>
-          <div>
-            <p class="text-sm text-[#6A7282]">Total Bookings</p>
-            <p class="text-[#101828]">{{.TotalBookings}}</p>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- Bookings Summary table -->
-    <div class="m-10">
+    <div class="mx-4 md:mx-10 my-6 md:my-10">
       <h3 class="font-bold text-lg mb-4">Booking Summary</h3>
       <div class="rounded-t-2xl overflow-hidden border border-gray-200">
-        <table class="w-full text-sm">
-          <thead class="bg-[#336891] text-white">
-            <tr>
-              <th class="px-2 py-3 text-center font-semibold">Provider</th>
-              <th class="px-2 py-3 text-center font-semibold">Type</th>
-              <th class="px-2 py-3 text-center font-semibold">Status</th>
-              <th class="px-2 py-3 text-center font-semibold">Location</th>
-              <th class="px-2 py-3 text-center font-semibold">Rating</th>
-              <th class="px-2 py-3 text-center font-semibold">Revenue</th>
-            </tr>
-          </thead>
-        </table>
-        <div class="overflow-y-auto custom-scrollbar" style="max-height: 440px;">
-          <table class="w-full text-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm min-w-[640px]">
+            <thead class="bg-[#336891] text-white">
+              <tr>
+                <th class="px-2 py-3 text-center font-semibold">Provider</th>
+                <th class="px-2 py-3 text-center font-semibold">Type</th>
+                <th class="px-2 py-3 text-center font-semibold">Status</th>
+                <th class="px-2 py-3 text-center font-semibold">Location</th>
+                <th class="px-2 py-3 text-center font-semibold">Rating</th>
+                <th class="px-2 py-3 text-center font-semibold">Revenue</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <div class="overflow-x-auto">
+          <div class="overflow-y-auto custom-scrollbar" style="max-height: 440px;">
+            <table class="w-full text-sm min-w-[640px]">
             <tbody class="bg-white text-gray-900">
               {{range .Bookings}}
               <tr class="border-b border-gray-200">
@@ -349,6 +337,7 @@
               {{end}}
             </tbody>
           </table>
+        </div>
         </div>
       </div>
     </div>
