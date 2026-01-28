@@ -6,10 +6,28 @@ class Helpers {
     Get.snackbar(
       title,
       message,
-      backgroundColor: isError ? Colors.red : Colors.green,
+      backgroundColor: isError ? const Color(0xFFD32F2F) : const Color(0xFF1e5a8e),
       colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.all(16),
+      borderRadius: 12,
       duration: const Duration(seconds: 3),
+      isDismissible: true,
+      dismissDirection: DismissDirection.horizontal,
+      forwardAnimationCurve: Curves.easeOutBack,
+      icon: Icon(
+        isError ? Icons.error_outline : Icons.check_circle_outline,
+        color: Colors.white,
+        size: 28,
+      ),
+      shouldIconPulse: true,
+      boxShadows: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.2),
+          blurRadius: 8,
+          offset: const Offset(0, 4),
+        ),
+      ],
     );
   }
 

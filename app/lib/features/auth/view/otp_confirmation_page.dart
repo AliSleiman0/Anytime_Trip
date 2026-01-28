@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/helpers.dart';
+import '../controller/auth_controller.dart';
 
 class OtpConfirmationPage extends StatefulWidget {
-  final String emailOtp;
-  final String phoneOtp;
-
-  const OtpConfirmationPage({
-    super.key,
-    required this.emailOtp,
-    required this.phoneOtp,
-  });
+  const OtpConfirmationPage({super.key});
 
   @override
   State<OtpConfirmationPage> createState() => _OtpConfirmationPageState();
@@ -18,7 +13,26 @@ class OtpConfirmationPage extends StatefulWidget {
 
 class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
   String selectedLanguage = 'en';
-  List<String> confirmationOtpDigits = ['', '', '', '', '', ''];
+  final authController = Get.find<AuthController>();
+  
+  // Local variables from navigation arguments
+  String userEmail = '';
+  String userPhone = '';
+  
+  List<String> otpDigits = ['', '', '', ''];
+
+  @override
+  void initState() {
+    super.initState();
+    // Get email and phone from navigation arguments
+    final args = Get.arguments as Map<String, dynamic>?;
+    if (args != null) {
+      userEmail = args['email'] ?? '';
+      userPhone = args['phone'] ?? '';
+    }
+    
+    print('DEBUG [OTP Page initState]: email=$userEmail, phone=$userPhone');
+  }
 
   void _changeLanguage(String languageCode) {
     setState(() {
@@ -73,20 +87,53 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
   }
 
   void _resendOtp() {
-    // TODO: Call API to resend OTP
-    Get.snackbar('Success', 'OTP sent again');
+    if (userPhone.isEmpty) {
+      Helpers.showSnackbar('Error', 'Phone number is missing', isError: true);
+      return;
+    }
+    
+    // Clear existing OTP inputs
+    setState(() {
+      otpDigits = ['', '', '', ''];
+    });
+    
+    // Send new OTP
+    authController.sendOTP('', userPhone, 'phone');
   }
 
-  void _confirmOtp() {
-    String confirmationOtp = confirmationOtpDigits.join();
+  Future<void> _confirmOtp() async {
+    String otp = otpDigits.join();
     
-    if (confirmationOtp.length < 6) {
-      Get.snackbar('Error', 'Please enter complete OTP');
+    if (otp.length < 4) {
+      Helpers.showSnackbar('Invalid OTP', 'Please enter the 4-digit code', isError: true);
       return;
     }
 
-    // Navigate to set new password page
-    Get.toNamed(AppRoutes.SET_NEW_PASSWORD);
+    if (userPhone.isEmpty) {
+      Helpers.showSnackbar('Error', 'Phone number is missing', isError: true);
+      return;
+    }
+
+    if (userEmail.isEmpty) {
+      Helpers.showSnackbar('Error', 'Email is missing', isError: true);
+      return;
+    }
+
+    print('DEBUG [_confirmOtp]: Verifying OTP - phone=$userPhone, code=$otp');
+
+    // Verify OTP
+    final verified = await authController.verifyOTP('', userPhone, otp, 'phone');
+    
+    if (verified) {
+      // Activate account
+      final activated = await authController.activateAccount(userEmail);
+      
+      if (activated) {
+        // Redirect to login page
+        Get.offAllNamed(AppRoutes.LOGIN);
+        Helpers.showSnackbar('Account Activated', 'You can now login with your credentials', isError: false);
+      }
+    }
   }
 
   @override
@@ -144,17 +191,43 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
                   height: 70,
                 ),
                 SizedBox(height: size.height * 0.08),
-                // Display OTP input boxes for new verification code
+                // Title
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Verify OTP',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Enter the 4-digit code sent to\n$userPhone',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
+                // Display OTP input boxes for verification code
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      // Input OTP boxes
-                      ...List.generate(6, (index) {
+                      // Input OTP boxes (4 digits)
+                      ...List.generate(4, (index) {
                         return Container(
-                          width: 50,
-                          height: 50,
+                          width: 60,
+                          height: 60,
                           decoration: BoxDecoration(
                             color: const Color(0xFFF5F5F5),
                             borderRadius: BorderRadius.circular(10),
@@ -173,15 +246,15 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
                               contentPadding: EdgeInsets.zero,
                             ),
                             style: const TextStyle(
-                              fontSize: 18,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
                             onChanged: (value) {
                               setState(() {
-                                confirmationOtpDigits[index] = value;
+                                otpDigits[index] = value;
                               });
-                              if (value.isNotEmpty && index < 5) {
+                              if (value.isNotEmpty && index < 3) {
                                 FocusScope.of(context).nextFocus();
                               }
                             },
@@ -203,9 +276,9 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: "Didn't Receive Password? ",
+                              text: "Didn't Receive OTP? ",
                               style: const TextStyle(
-                                color: Colors.grey,
+                                color: Colors.white70,
                                 fontSize: 12,
                               ),
                             ),
@@ -249,7 +322,7 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
                         ),
                       ),
                       child: Text(
-                        'enter'.tr,
+                        'Verify & Continue'.tr,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

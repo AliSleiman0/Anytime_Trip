@@ -46,14 +46,7 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.OTP_CONFIRMATION,
-      page: () {
-        final emailOtp = Get.arguments?['emailOtp'] ?? '';
-        final phoneOtp = Get.arguments?['phoneOtp'] ?? '';
-        return OtpConfirmationPage(
-          emailOtp: emailOtp,
-          phoneOtp: phoneOtp,
-        );
-      },
+      page: () => const OtpConfirmationPage(),
       binding: AuthBinding(),
     ),
     GetPage(

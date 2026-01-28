@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:country_picker/country_picker.dart';
 import '../controller/auth_controller.dart';
 import '../../../app/routes/app_routes.dart';
+import '../../../core/widgets/policy_dialogs.dart';
+import '../../../core/utils/helpers.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -19,6 +22,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   bool agreeToTerms = false;
+  String? selectedSex;
+  String? selectedCountry;
 
   @override
   void dispose() {
@@ -167,6 +172,114 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                // Sex/Gender Dropdown
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: DropdownButtonFormField<String>(
+                      value: selectedSex,
+                      decoration: InputDecoration(
+                        hintText: 'Select Sex',
+                        border: InputBorder.none,
+                        prefixIcon: const Icon(
+                          Icons.person_outline,
+                          color: Color(0xFF1e5a8e),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                      ),
+                      items: ['Male', 'Female', 'Other'].map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedSex = newValue;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Country of Residence Picker
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: GestureDetector(
+                    onTap: () {
+                      showCountryPicker(
+                        context: context,
+                        showPhoneCode: false,
+                        onSelect: (Country country) {
+                          setState(() {
+                            selectedCountry = country.name;
+                          });
+                        },
+                        countryListTheme: CountryListThemeData(
+                          borderRadius: BorderRadius.circular(12),
+                          inputDecoration: InputDecoration(
+                            labelText: 'Search',
+                            hintText: 'Start typing to search',
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(25),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.flag,
+                            color: Color(0xFF1e5a8e),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              selectedCountry ?? 'Select Country of Residence',
+                              style: TextStyle(
+                                color: selectedCountry == null
+                                    ? Colors.grey[600]
+                                    : Colors.black87,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          const Icon(
+                            Icons.arrow_drop_down,
+                            color: Color(0xFF1e5a8e),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 // Phone Number Input
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -301,30 +414,49 @@ class _RegisterPageState extends State<RegisterPage> {
                         },
                       ),
                       Expanded(
-                        child: RichText(
-                          text: TextSpan(
-                            style: const TextStyle(
-                              color: Colors.black87,
-                              fontSize: 13,
+                        child: GestureDetector(
+                          onTap: () {},
+                          child: RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                color: Colors.black87,
+                                fontSize: 13,
+                              ),
+                              children: [
+                                TextSpan(text: '${'i_agree_to_the'.tr} '),
+                                WidgetSpan(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      PolicyDialogs.showTermsAndConditions(context);
+                                    },
+                                    child: Text(
+                                      'terms_conditions'.tr,
+                                      style: const TextStyle(
+                                        color: Color(0xFFD32F2F),
+                                        decoration: TextDecoration.underline,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const TextSpan(text: ' & '),
+                                WidgetSpan(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      PolicyDialogs.showPrivacyPolicy(context);
+                                    },
+                                    child: Text(
+                                      'privacy_policy'.tr,
+                                      style: const TextStyle(
+                                        color: Color(0xFFD32F2F),
+                                        decoration: TextDecoration.underline,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            children: [
-                              TextSpan(text: '${'i_agree_to_the'.tr} '),
-                              TextSpan(
-                                text: 'terms_conditions'.tr,
-                                style: const TextStyle(
-                                  color: Color(0xFFD32F2F),
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                              TextSpan(text: ' & '),
-                              TextSpan(
-                                text: 'privacy_policy'.tr,
-                                style: const TextStyle(
-                                  color: Color(0xFFD32F2F),
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ],
                           ),
                         ),
                       ),
@@ -349,7 +481,59 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     child: ElevatedButton(
                       onPressed: () {
-                        Get.toNamed(AppRoutes.FORGOT_PASSWORD);
+                        // Validate inputs
+                        if (nameController.text.isEmpty) {
+                          Helpers.showSnackbar('Required Field', 'Please enter your name', isError: true);
+                          return;
+                        }
+                        if (emailController.text.isEmpty) {
+                          Helpers.showSnackbar('Required Field', 'Please enter your email', isError: true);
+                          return;
+                        }
+                        if (phoneController.text.isEmpty) {
+                          Helpers.showSnackbar('Required Field', 'Please enter your phone number', isError: true);
+                          return;
+                        }
+                        if (selectedSex == null) {
+                          Helpers.showSnackbar('Required Field', 'Please select your sex', isError: true);
+                          return;
+                        }
+                        if (selectedCountry == null) {
+                          Helpers.showSnackbar('Required Field', 'Please select your country', isError: true);
+                          return;
+                        }
+                        if (passwordController.text.isEmpty) {
+                          Helpers.showSnackbar('Required Field', 'Please enter your password', isError: true);
+                          return;
+                        }
+                        if (passwordController.text.length < 6) {
+                          Helpers.showSnackbar('Invalid Password', 'Password must be at least 6 characters', isError: true);
+                          return;
+                        }
+                        if (confirmPasswordController.text.isEmpty) {
+                          Helpers.showSnackbar('Required Field', 'Please confirm your password', isError: true);
+                          return;
+                        }
+                        if (passwordController.text != confirmPasswordController.text) {
+                          Helpers.showSnackbar('Password Mismatch', 'Passwords do not match', isError: true);
+                          return;
+                        }
+                        if (!agreeToTerms) {
+                          Helpers.showSnackbar('Agreement Required', 'Please agree to the Terms and Conditions', isError: true);
+                          return;
+                        }
+
+                        // Call the register function
+                        final authController = Get.find<AuthController>();
+                        authController.register(
+                          name: nameController.text,
+                          email: emailController.text,
+                          password: passwordController.text,
+                          confirmPassword: confirmPasswordController.text,
+                          phoneNumber: phoneController.text,
+                          sex: selectedSex!,
+                          country: selectedCountry!,
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1e5a8e),

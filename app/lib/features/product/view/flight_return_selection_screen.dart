@@ -12,6 +12,8 @@ class FlightReturnSelectionScreen extends StatefulWidget {
   final int price;
   final String airline;
   final String tripType;
+  final String departureDate;
+  final String? returnDate;
 
   const FlightReturnSelectionScreen({
     Key? key,
@@ -24,6 +26,8 @@ class FlightReturnSelectionScreen extends StatefulWidget {
     required this.price,
     required this.airline,
     this.tripType = 'roundtrip',
+    required this.departureDate,
+    this.returnDate,
   }) : super(key: key);
 
   @override
@@ -453,7 +457,11 @@ class _FlightReturnSelectionScreenState extends State<FlightReturnSelectionScree
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => SpecialServicesScreen(tripType: widget.tripType),
+                              builder: (context) => SpecialServicesScreen(
+                                tripType: widget.tripType,
+                                departureDate: widget.departureDate,
+                                returnDate: widget.returnDate,
+                              ),
                             ),
                           );
                         },

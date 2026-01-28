@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/unified_ui_components.dart';
+import '../../../core/widgets/policy_dialogs.dart';
+import '../../account/view/bookings_page.dart';
+import 'home_page.dart';
 
 class FlightCheckoutScreen extends StatefulWidget {
   final String from;
@@ -10,6 +13,8 @@ class FlightCheckoutScreen extends StatefulWidget {
   final String stops;
   final String tripType;
   final int price;
+  final String departureDate;
+  final String? returnDate;
   final String? returnDepartureTime;
   final String? returnArrivalTime;
   final String? returnAirline;
@@ -25,6 +30,8 @@ class FlightCheckoutScreen extends StatefulWidget {
     required this.stops,
     required this.tripType,
     required this.price,
+    required this.departureDate,
+    this.returnDate,
     this.returnDepartureTime,
     this.returnArrivalTime,
     this.returnAirline,
@@ -336,9 +343,45 @@ class _FlightCheckoutScreenState extends State<FlightCheckoutScreen> {
                   const SizedBox(height: 16),
                   
                   // Acknowledgement text
-                  const Text(
-                    'By clicking on the button below, I acknowledge that I have reviewed the Privacy Statement and Government Travel Advice and have reviewed and accept the above Rules & Restrictions and Terms of Use.',
-                    style: TextStyle(fontSize: 12, color: Colors.black87),
+                  RichText(
+                    text: TextSpan(
+                      style: const TextStyle(fontSize: 12, color: Colors.black87),
+                      children: [
+                        const TextSpan(text: 'By clicking on the button below, I acknowledge that I have reviewed the '),
+                        WidgetSpan(
+                          child: GestureDetector(
+                            onTap: () {
+                              PolicyDialogs.showPrivacyPolicy(context);
+                            },
+                            child: const Text(
+                              'Privacy Statement',
+                              style: TextStyle(
+                                color: Color(0xFF1e5a8e),
+                                decoration: TextDecoration.underline,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const TextSpan(text: ' and Government Travel Advice and have reviewed and accept the above Rules & Restrictions and '),
+                        WidgetSpan(
+                          child: GestureDetector(
+                            onTap: () {
+                              PolicyDialogs.showTermsAndConditions(context);
+                            },
+                            child: const Text(
+                              'Terms of Use',
+                              style: TextStyle(
+                                color: Color(0xFF1e5a8e),
+                                decoration: TextDecoration.underline,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const TextSpan(text: '.'),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -480,9 +523,45 @@ class _FlightCheckoutScreenState extends State<FlightCheckoutScreen> {
   Widget _buildTravelerForm(int travelerIndex) {
     return Column(
       children: [
-        // First Name and Last Name Row
+        // Title and First Name Row
         Row(
           children: [
+            // Title Dropdown
+            SizedBox(
+              width: 80,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Title', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87)),
+                  const SizedBox(height: 4),
+                  Container(
+                    decoration: const BoxDecoration(
+                      border: Border(left: BorderSide(color: Color(0xFFD32F2F), width: 4)),
+                    ),
+                    child: DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                      value: 'Mr',
+                      items: ['Mr', 'Mrs', 'Ms', 'Dr'].map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value, style: const TextStyle(fontSize: 14)),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        // Will be populated from DB later
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -495,7 +574,7 @@ class _FlightCheckoutScreenState extends State<FlightCheckoutScreen> {
                     ),
                     child: TextField(
                       decoration: InputDecoration(
-                        hintText: 'John Doe',
+                        hintText: 'John',
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
@@ -507,7 +586,12 @@ class _FlightCheckoutScreenState extends State<FlightCheckoutScreen> {
                 ],
               ),
             ),
-            const SizedBox(width: 12),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Last Name Row
+        Row(
+          children: [
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1117,7 +1201,16 @@ class _FlightCheckoutScreenState extends State<FlightCheckoutScreen> {
                 Align(
                   alignment: Alignment.topRight,
                   child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => HomePage()),
+                        (route) => false,
+                      );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => BookingsPage()),
+                      );
+                    },
                     child: Container(
                       width: 32,
                       height: 32,
@@ -1212,8 +1305,14 @@ class _FlightCheckoutScreenState extends State<FlightCheckoutScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => HomePage()),
+                        (route) => false,
+                      );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => BookingsPage()),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1e5a8e),

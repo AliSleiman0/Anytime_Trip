@@ -16,6 +16,9 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
+  bool emailError = false;
+  bool phoneError = false;
+  bool passwordError = false;
 
   @override
   void dispose() {
@@ -135,89 +138,137 @@ class _LoginPageState extends State<LoginPage> {
                 // Email Input
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(25),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(25),
+                          border: Border.all(
+                            color: emailError ? Colors.red : Colors.transparent,
+                            width: 2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: TextField(
-                      controller: emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        hintText: 'enter_email_address'.tr,
-                        border: InputBorder.none,
-                        prefixIcon: const Icon(
-                          Icons.email,
-                          color: Color(0xFF1e5a8e),
+                        child: TextField(
+                          controller: emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          onChanged: (_) {
+                            setState(() {
+                              emailError = false;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'enter_email_address'.tr,
+                            border: InputBorder.none,
+                            prefixIcon: const Icon(
+                              Icons.email,
+                              color: Color(0xFF1e5a8e),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                    ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 16),
                 // Phone Number Input
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: IntlPhoneField(
-                    controller: phoneController,
-                    decoration: InputDecoration(
-                      hintText: '00 123 456',
-                      border: InputBorder.none,
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: BorderSide.none,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IntlPhoneField(
+                        controller: phoneController,
+                        onChanged: (phone) {
+                          setState(() {
+                            phoneError = false;
+                          });
+                          print(phone.completeNumber);
+                        },
+                        decoration: InputDecoration(
+                          hintText: '00 123 456',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25),
+                            borderSide: BorderSide(
+                              color: phoneError ? Colors.red : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25),
+                            borderSide: BorderSide(
+                              color: phoneError ? Colors.red : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25),
+                            borderSide: BorderSide(
+                              color: phoneError ? Colors.red : const Color(0xFF1e5a8e),
+                              width: 2,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: Color(0xFFF5F5F5),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                        ),
+                        initialCountryCode: 'LB',
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: Color(0xFFF5F5F5),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                    ),
-                    initialCountryCode: 'LB',
-                    onChanged: (phone) {
-                      print(phone.completeNumber);
-                    },
+                    ],
                   ),
                 ),
                 const SizedBox(height: 16),
                 // Password Input
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(25),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(25),
+                          border: Border.all(
+                            color: passwordError ? Colors.red : Colors.transparent,
+                            width: 2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: TextField(
-                      controller: passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: 'enter_password'.tr,
-                        border: InputBorder.none,
-                        prefixIcon: const Icon(
-                          Icons.lock,
-                          color: Color(0xFF1e5a8e),
+                        child: TextField(
+                          controller: passwordController,
+                          obscureText: true,
+                          onChanged: (_) {
+                            setState(() {
+                              passwordError = false;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'enter_password'.tr,
+                            border: InputBorder.none,
+                            prefixIcon: const Icon(
+                              Icons.lock,
+                              color: Color(0xFF1e5a8e),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                    ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -259,8 +310,22 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: ElevatedButton(
                       onPressed: () {
-                        // Handle login and navigate to home
-                        Get.offNamed(AppRoutes.HOME);
+                        final authController = Get.find<AuthController>();
+                        
+                        // Set email and password to the controller
+                        authController.emailController.text = emailController.text;
+                        authController.passwordController.text = passwordController.text;
+                        
+                        // Validate fields
+                        setState(() {
+                          emailError = emailController.text.isEmpty;
+                          passwordError = passwordController.text.isEmpty;
+                        });
+
+                        // If fields are filled, call login API
+                        if (!emailError && !passwordError) {
+                          authController.login();
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1e5a8e),
@@ -391,7 +456,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => Get.toNamed(AppRoutes.FORGOT_PASSWORD),
+                      onTap: () => Get.toNamed(AppRoutes.REGISTER),
                       child: Text(
                         'signup'.tr,
                         style: const TextStyle(

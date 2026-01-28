@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "913309810071",
+    "project_id": "anytime-travel",
+    "storage_bucket": "anytime-travel.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:913309810071:android:675dff7350bd45ecc3d8d2",
+        "android_client_info": {
+          "package_name": "com.anytime.travel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvSF_Gl1Rea-MGZiCDooCS5xWxGk3QxfU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

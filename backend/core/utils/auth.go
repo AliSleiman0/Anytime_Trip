@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"crypto/rand"
+	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -57,4 +60,45 @@ func ParseJWT(tokenStr, secret string) (*AdminClaims, error) {
 	}
 
 	return claims, nil
+}
+
+// GenerateOTP generates a random n-digit OTP code
+func GenerateOTP(length int) string {
+	const digits = "0123456789"
+	otp := make([]byte, length)
+
+	for i := range otp {
+		num, _ := rand.Int(rand.Reader, big.NewInt(int64(len(digits))))
+		otp[i] = digits[num.Int64()]
+	}
+
+	return string(otp)
+}
+
+// FormatOTPCode formats OTP for display (e.g., "1234" -> "1 2 3 4")
+func FormatOTPCode(code string) string {
+	result := ""
+	for i, c := range code {
+		if i > 0 {
+			result += " "
+		}
+		result += string(c)
+	}
+	return result
+}
+
+// SendEmailOTP sends OTP via email (placeholder for actual email service)
+func SendEmailOTP(email, code string) error {
+	// TODO: Implement actual email sending logic
+	// For now, just log it
+	fmt.Printf("Sending OTP %s to email %s\n", code, email)
+	return nil
+}
+
+// SendSMSOTP sends OTP via SMS (placeholder for actual SMS service)
+func SendSMSOTP(phone, code string) error {
+	// TODO: Implement actual SMS sending logic
+	// For now, just log it
+	fmt.Printf("Sending OTP %s to phone %s\n", code, phone)
+	return nil
 }

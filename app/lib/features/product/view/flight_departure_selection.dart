@@ -13,6 +13,8 @@ class FlightDepartureSelection extends StatefulWidget {
   final String tripType; // 'oneway', 'roundtrip', 'multicity'
   final int price;
   final String airline;
+  final String departureDate;
+  final String? returnDate;
 
   const FlightDepartureSelection({
     Key? key,
@@ -25,6 +27,8 @@ class FlightDepartureSelection extends StatefulWidget {
     required this.tripType,
     required this.price,
     this.airline = 'Middle East Airlines',
+    required this.departureDate,
+    this.returnDate,
   }) : super(key: key);
 
   @override
@@ -592,13 +596,19 @@ class _FlightDepartureSelectionState extends State<FlightDepartureSelection> wit
             price: widget.price,
             airline: widget.airline,
             tripType: widget.tripType,
+            departureDate: widget.departureDate,
+            returnDate: widget.returnDate,
           ),
         ),
       ).then((_) {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SpecialServicesScreen(tripType: widget.tripType),
+            builder: (context) => SpecialServicesScreen(
+              tripType: widget.tripType,
+              departureDate: widget.departureDate,
+              returnDate: widget.returnDate,
+            ),
           ),
         );
       });
@@ -607,7 +617,11 @@ class _FlightDepartureSelectionState extends State<FlightDepartureSelection> wit
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SpecialServicesScreen(tripType: widget.tripType),
+          builder: (context) => SpecialServicesScreen(
+            tripType: widget.tripType,
+            departureDate: widget.departureDate,
+            returnDate: widget.returnDate,
+          ),
         ),
       );
     }

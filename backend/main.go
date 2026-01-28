@@ -38,6 +38,7 @@ func main() {
 
 	// Initialize repositories
 	appRepository := apprepo.NewUserRepository(dbConn.DB)
+	otpRepository := apprepo.NewOTPRepository(dbConn.DB)
 	adminRepository := adminrepo.NewAdminRepository(dbConn.DB)
 	passwordResetRepository := adminrepo.NewPasswordResetRepository(dbConn.DB)
 	notificationPrefsRepository := adminrepo.NewNotificationPreferencesRepository(dbConn.DB)
@@ -70,7 +71,7 @@ func main() {
 	go notifyHub.Run()
 
 	// Initialize handlers
-	appHandler := apphandlers.NewAppHandler(appRepository)
+	appHandler := apphandlers.NewAppHandler(appRepository, otpRepository, cfg.JWTSecret)
 	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, passwordResetRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, supportTicketRepository, paymentRepository, flightRepository, carRepository, hotelRepository, bannerRepository, travelRepository, popularRepository, predefinedAnswerRepository, loginAttemptRepository, cfg.JWTSecret, chatHub, notifyHub)
 	superAdminHandler := superadminhandlers.NewSuperAdminHandler(superAdminRepository, predefinedAnswerRepository)
 

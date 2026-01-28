@@ -19,10 +19,15 @@ dependencies:
   # Local Storage
   get_storage: ^2.1.1
   
+  # Firebase
+  firebase_core: ^3.8.0
+  firebase_analytics: ^11.4.0
+  
   # UI
   cupertino_icons: ^1.0.0
   flutter_svg: ^1.1.6
   intl_phone_field: ^3.2.0
+  country_picker: ^2.0.26
 
 dev_dependencies:
   flutter_test:

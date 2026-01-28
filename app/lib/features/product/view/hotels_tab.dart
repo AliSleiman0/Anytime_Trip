@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/widgets/global_chatbot_overlay.dart';
 import 'hotels_search_results.dart';
 
 class HotelsTab extends StatefulWidget {
@@ -413,11 +414,14 @@ class _HotelsTabState extends State<HotelsTab> {
   void _showLocationBottomSheet(BuildContext context) {
     final TextEditingController searchController = TextEditingController();
     
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
@@ -623,18 +627,23 @@ class _HotelsTabState extends State<HotelsTab> {
           },
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   void _showDateBottomSheet(BuildContext context) {
     DateTime tempCheckinDate = _checkinDate ?? DateTime.now();
     DateTime tempCheckoutDate = _checkoutDate ?? DateTime.now().add(const Duration(days: 7));
     
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
@@ -780,7 +789,9 @@ class _HotelsTabState extends State<HotelsTab> {
           },
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   void _showTravelersBottomSheet(BuildContext context) {
@@ -788,11 +799,14 @@ class _HotelsTabState extends State<HotelsTab> {
     int tempChildren = _childrenCount;
     int tempRooms = _roomsCount;
     
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
@@ -900,13 +914,18 @@ class _HotelsTabState extends State<HotelsTab> {
           },
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   void _showNationalityBottomSheet(BuildContext context) {
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return Container(
           decoration: const BoxDecoration(
@@ -987,7 +1006,9 @@ class _HotelsTabState extends State<HotelsTab> {
           ),
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   Widget _buildTravelerRow({

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/widgets/global_chatbot_overlay.dart';
 import 'cars_search_results.dart';
 
 class CarsTab extends StatefulWidget {
@@ -516,11 +517,14 @@ class _CarsTabState extends State<CarsTab> {
   void _showLocationBottomSheet(BuildContext context, {required bool isPickup}) {
     final TextEditingController searchController = TextEditingController();
     
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
@@ -731,18 +735,23 @@ class _CarsTabState extends State<CarsTab> {
           },
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   void _showDateBottomSheet(BuildContext context) {
     DateTime tempPickupDate = _pickupDate ?? DateTime.now();
     DateTime tempDropoffDate = _dropoffDate ?? DateTime.now().add(const Duration(days: 7));
     
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
@@ -888,7 +897,9 @@ class _CarsTabState extends State<CarsTab> {
           },
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   void _showTimeBottomSheet(BuildContext context, {required bool isPickup}) {
@@ -899,9 +910,12 @@ class _CarsTabState extends State<CarsTab> {
       '6:00pm', '7:00pm', '8:00pm', '9:00pm', '10:00pm', '11:00pm',
     ];
 
+    isModalOpenNotifier.value = true;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return Container(
           decoration: const BoxDecoration(
@@ -1005,13 +1019,18 @@ class _CarsTabState extends State<CarsTab> {
           ),
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   void _showNationalityBottomSheet(BuildContext context) {
+    isModalOpenNotifier.value = true;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return Container(
           decoration: const BoxDecoration(
@@ -1086,7 +1105,9 @@ class _CarsTabState extends State<CarsTab> {
           ),
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   Widget _buildCalendar(

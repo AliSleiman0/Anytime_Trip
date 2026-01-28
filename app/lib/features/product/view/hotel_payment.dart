@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/unified_ui_components.dart';
+import '../../account/view/bookings_page.dart';
+import 'home_page.dart';
 
 class HotelPayment extends StatefulWidget {
   final Map<String, dynamic> hotel;
@@ -156,6 +158,46 @@ class _HotelPaymentState extends State<HotelPayment> {
                       _selectedTraveler = val ?? '';
                     });
                   }),
+                  const SizedBox(height: 12),
+                  // Title Row
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 100,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Title', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87)),
+                            const SizedBox(height: 4),
+                            Container(
+                              decoration: const BoxDecoration(
+                                border: Border(left: BorderSide(color: Color(0xFFD32F2F), width: 4)),
+                              ),
+                              child: DropdownButtonFormField<String>(
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                ),
+                                value: 'Mr',
+                                items: ['Mr', 'Mrs', 'Ms', 'Dr'].map((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value, style: const TextStyle(fontSize: 14)),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  // Will be populated from DB later
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 12),
                   _buildTextField('First Name', _firstNameController),
                   const SizedBox(height: 12),
@@ -476,8 +518,14 @@ class _HotelPaymentState extends State<HotelPayment> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
-                        Navigator.pop(context);
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => HomePage()),
+                          (route) => false,
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => BookingsPage()),
+                        );
                       },
                       child: Container(
                         decoration: const BoxDecoration(
@@ -553,8 +601,14 @@ class _HotelPaymentState extends State<HotelPayment> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => HomePage()),
+                        (route) => false,
+                      );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => BookingsPage()),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1e5a8e),

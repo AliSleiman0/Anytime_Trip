@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
+import '../../../core/widgets/global_chatbot_overlay.dart';
 import '../controller/product_controller.dart';
+import '../../account/view/notifications_page.dart';
 import 'cars_tab.dart';
 import 'hotels_tab.dart';
 import 'transfers_tab.dart';
@@ -178,54 +180,18 @@ class _HomePageState extends State<HomePage>
           elevation: 0,
           leadingWidth: 0,
           leading: const SizedBox.shrink(),
-          title: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(25),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search flights...',
-                  border: InputBorder.none,
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Image.asset(
-                      'assets/images/logo-search.png',
-                      width: 20,
-                      height: 20,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 16,
-                  ),
-                  suffixIcon: const Icon(
-                    Icons.close,
-                    color: Colors.grey,
-                    size: 20,
-                  ),
-                ),
-              ),
-            ),
-          ),
           titleSpacing: 0,
           actions: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Center(
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const NotificationsPage()),
+                    );
+                  },
                   child: const Icon(
                     Icons.notifications,
                     color: Color(0xFF1e5a8e),
@@ -706,8 +672,14 @@ class _HomePageState extends State<HomePage>
                   builder: (context) => FlightSearchResults(
                     from: _selectedFromLocation,
                     to: _selectedToLocation,
-                    departureDate: _formattedDates,
-                    returnDate: _selectedTripType == 1 ? null : _formattedDates,
+                    departureDate: _departDate != null
+                        ? '${_departDate!.day.toString().padLeft(2, '0')} ${_getMonthAbbr(_departDate!.month)} ${_departDate!.year.toString().substring(2)}'
+                        : '07 Nov 22',
+                    returnDate: _selectedTripType == 1
+                        ? null
+                        : (_returnDate != null
+                            ? '${_returnDate!.day.toString().padLeft(2, '0')} ${_getMonthAbbr(_returnDate!.month)} ${_returnDate!.year.toString().substring(2)}'
+                            : null),
                     travelers: _totalPassengers,
                     travelClass: _selectedClass,
                   ),
@@ -1299,11 +1271,14 @@ class _HomePageState extends State<HomePage>
   void _showLocationBottomSheet(BuildContext context, {required bool isFrom}) {
     final TextEditingController searchController = TextEditingController();
     
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
@@ -1360,6 +1335,7 @@ class _HomePageState extends State<HomePage>
                             ),
                             GestureDetector(
                               onTap: () {
+                                isModalOpenNotifier.value = false;
                                 Navigator.pop(context);
                               },
                               child: Container(
@@ -1485,6 +1461,7 @@ class _HomePageState extends State<HomePage>
                                           _selectedToLocation = destination['name']!;
                                         }
                                       });
+                                      isModalOpenNotifier.value = false;
                                       Navigator.pop(context);
                                     },
                                     child: Container(
@@ -1570,24 +1547,31 @@ class _HomePageState extends State<HomePage>
           },
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   void _showDateBottomSheet(BuildContext context) {
-    DateTime tempDepartDate = _departDate ?? DateTime.now();
-    DateTime tempReturnDate = _returnDate ?? DateTime.now().add(const Duration(days: 7));
+    DateTime? tempDepartDate = _departDate;
+    DateTime? tempReturnDate = _returnDate;
     final bool isOneWay = _selectedTripType == 1;
+    DateTime currentMonth = tempDepartDate ?? DateTime.now();
+    bool isSelectingReturn = false;
+    
+    isModalOpenNotifier.value = true;
     
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
             return DraggableScrollableSheet(
-              initialChildSize: isOneWay ? 0.6 : 0.75,
+              initialChildSize: 0.7,
               minChildSize: 0.5,
               maxChildSize: 0.9,
               builder: (BuildContext context, ScrollController scrollController) {
@@ -1617,10 +1601,21 @@ class _HomePageState extends State<HomePage>
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            Text(
+                              isOneWay ? 'Select Departure Date' : 'Select Travel Dates',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black,
+                              ),
+                            ),
                             GestureDetector(
-                              onTap: () => Navigator.pop(context),
+                              onTap: () {
+                                isModalOpenNotifier.value = false;
+                                Navigator.pop(context);
+                              },
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFD32F2F),
@@ -1637,7 +1632,75 @@ class _HomePageState extends State<HomePage>
                           ],
                         ),
                       ),
-                      // Date pickers content
+                      // Date selection info
+                      if (!isOneWay)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1e5a8e).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'Departure',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        tempDepartDate != null
+                                            ? '${tempDepartDate!.day} ${_getMonthAbbr(tempDepartDate!.month)}'
+                                            : 'Select',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFFD32F2F),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Icon(Icons.arrow_forward, color: Color(0xFF1e5a8e)),
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'Return',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        tempReturnDate != null
+                                            ? '${tempReturnDate!.day} ${_getMonthAbbr(tempReturnDate!.month)}'
+                                            : 'Select',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFFD32F2F),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      // Date picker content
                       Expanded(
                         child: SingleChildScrollView(
                           controller: scrollController,
@@ -1646,53 +1709,50 @@ class _HomePageState extends State<HomePage>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Depart Section
-                                Text(
-                                  isOneWay ? 'Depart' : 'From',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF1e5a8e),
-                                  ),
-                                ),
                                 const SizedBox(height: 12),
-                                _buildCalendar(
-                                  context,
-                                  tempDepartDate,
-                                  (date) {
-                                    setModalState(() {
-                                      tempDepartDate = date;
-                                      // If return date is before depart date, adjust it
-                                      if (!isOneWay && tempReturnDate.isBefore(tempDepartDate)) {
-                                        tempReturnDate = tempDepartDate.add(const Duration(days: 1));
-                                      }
-                                    });
-                                  },
-                                ),
-                                const SizedBox(height: 24),
-                                // Return Section (only for roundtrip)
-                                if (!isOneWay) ...[
-                                  const Text(
-                                    'To',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF1e5a8e),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
+                                if (isOneWay)
                                   _buildCalendar(
                                     context,
-                                    tempReturnDate,
+                                    tempDepartDate ?? DateTime.now(),
                                     (date) {
                                       setModalState(() {
-                                        tempReturnDate = date;
+                                        tempDepartDate = date;
                                       });
                                     },
-                                    minDate: tempDepartDate,
+                                  )
+                                else
+                                  _buildDateRangeCalendar(
+                                    context,
+                                    currentMonth,
+                                    tempDepartDate,
+                                    tempReturnDate,
+                                    (newMonth) {
+                                      setModalState(() {
+                                        currentMonth = newMonth;
+                                      });
+                                    },
+                                    (date) {
+                                      setModalState(() {
+                                        if (tempDepartDate == null || (tempReturnDate != null)) {
+                                          // First selection or reset
+                                          tempDepartDate = date;
+                                          tempReturnDate = null;
+                                          isSelectingReturn = true;
+                                        } else if (date.isBefore(tempDepartDate!) || date.isAtSameMomentAs(tempDepartDate!)) {
+                                          // Selected before or same as departure, reset
+                                          tempDepartDate = date;
+                                          tempReturnDate = null;
+                                          isSelectingReturn = true;
+                                        } else {
+                                          // Second selection, set as return
+                                          tempReturnDate = date;
+                                          isSelectingReturn = false;
+                                        }
+                                      });
+                                    },
+                                    isSelectingReturn: isSelectingReturn,
                                   ),
-                                  const SizedBox(height: 24),
-                                ],
+                                const SizedBox(height: 24),
                               ],
                             ),
                           ),
@@ -1705,19 +1765,23 @@ class _HomePageState extends State<HomePage>
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                _departDate = tempDepartDate;
-                                if (!isOneWay) {
-                                  _returnDate = tempReturnDate;
-                                } else {
-                                  _returnDate = null;
-                                }
-                              });
-                              Navigator.pop(context);
-                            },
+                            onPressed: (tempDepartDate == null || (!isOneWay && tempReturnDate == null))
+                                ? null
+                                : () {
+                                    setState(() {
+                                      _departDate = tempDepartDate;
+                                      if (!isOneWay) {
+                                        _returnDate = tempReturnDate;
+                                      } else {
+                                        _returnDate = null;
+                                      }
+                                    });
+                                    isModalOpenNotifier.value = false;
+                                    Navigator.pop(context);
+                                  },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF1e5a8e),
+                              disabledBackgroundColor: Colors.grey[300],
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(25),
                               ),
@@ -1741,7 +1805,9 @@ class _HomePageState extends State<HomePage>
           },
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   Widget _buildCalendar(
@@ -1754,6 +1820,9 @@ class _HomePageState extends State<HomePage>
     final currentMonth = DateTime(selectedDate.year, selectedDate.month);
     final daysInMonth = DateTime(selectedDate.year, selectedDate.month + 1, 0).day;
     final firstDayOfWeek = DateTime(selectedDate.year, selectedDate.month, 1).weekday;
+    final currentMonthNormalized = DateTime(now.year, now.month);
+    final isPreviousMonthDisabled = currentMonth.year == currentMonthNormalized.year && 
+        currentMonth.month == currentMonthNormalized.month;
     
     return Column(
       children: [
@@ -1762,8 +1831,11 @@ class _HomePageState extends State<HomePage>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon: const Icon(Icons.chevron_left),
-              onPressed: () {
+              icon: Icon(
+                Icons.chevron_left,
+                color: isPreviousMonthDisabled ? Colors.grey[300] : Colors.black,
+              ),
+              onPressed: isPreviousMonthDisabled ? null : () {
                 final newDate = DateTime(selectedDate.year, selectedDate.month - 1);
                 onDateSelected(DateTime(newDate.year, newDate.month, selectedDate.day.clamp(1, DateTime(newDate.year, newDate.month + 1, 0).day)));
               },
@@ -1824,7 +1896,7 @@ class _HomePageState extends State<HomePage>
                     date.month == selectedDate.month &&
                     date.day == selectedDate.day;
                 final isPast = minDate != null && date.isBefore(minDate);
-                final isDisabled = date.isBefore(DateTime(now.year, now.month, now.day));
+                final isDisabled = isPast || date.isBefore(DateTime(now.year, now.month, now.day));
                 
                 return GestureDetector(
                   onTap: (isPast || isDisabled) ? null : () => onDateSelected(date),
@@ -1861,6 +1933,160 @@ class _HomePageState extends State<HomePage>
     );
   }
 
+  // New unified date range calendar
+  Widget _buildDateRangeCalendar(
+    BuildContext context,
+    DateTime currentMonth,
+    DateTime? departDate,
+    DateTime? returnDate,
+    Function(DateTime) onMonthChanged,
+    Function(DateTime) onDateTap, {
+    bool isSelectingReturn = false,
+  }) {
+    final now = DateTime.now();
+    final daysInMonth = DateTime(currentMonth.year, currentMonth.month + 1, 0).day;
+    final firstDayOfWeek = DateTime(currentMonth.year, currentMonth.month, 1).weekday;
+    final currentMonthNormalized = DateTime(now.year, now.month);
+    final isPreviousMonthDisabled = currentMonth.year == currentMonthNormalized.year && 
+        currentMonth.month == currentMonthNormalized.month;
+    
+    return Column(
+      children: [
+        // Month/Year header with navigation
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.chevron_left,
+                color: isPreviousMonthDisabled ? Colors.grey[300] : Colors.black,
+              ),
+              onPressed: isPreviousMonthDisabled ? null : () {
+                final newDate = DateTime(currentMonth.year, currentMonth.month - 1);
+                onMonthChanged(newDate);
+              },
+            ),
+            Text(
+              '${_getMonthName(currentMonth.month)} ${currentMonth.year}',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.chevron_right),
+              onPressed: () {
+                final newDate = DateTime(currentMonth.year, currentMonth.month + 1);
+                onMonthChanged(newDate);
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // Weekday headers
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) {
+            return SizedBox(
+              width: 40,
+              child: Center(
+                child: Text(
+                  day,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 8),
+        // Calendar grid
+        ...List.generate((daysInMonth + firstDayOfWeek % 7 + 6) ~/ 7, (weekIndex) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(7, (dayIndex) {
+                final dayNumber = weekIndex * 7 + dayIndex - (firstDayOfWeek % 7) + 1;
+                
+                if (dayNumber < 1 || dayNumber > daysInMonth) {
+                  return const SizedBox(width: 40, height: 40);
+                }
+                
+                final date = DateTime(currentMonth.year, currentMonth.month, dayNumber);
+                final normalizedDate = DateTime(date.year, date.month, date.day);
+                final normalizedDepart = departDate != null ? DateTime(departDate.year, departDate.month, departDate.day) : null;
+                final normalizedReturn = returnDate != null ? DateTime(returnDate.year, returnDate.month, returnDate.day) : null;
+                
+                final isDepartDate = normalizedDepart != null && normalizedDate.isAtSameMomentAs(normalizedDepart);
+                final isReturnDate = normalizedReturn != null && normalizedDate.isAtSameMomentAs(normalizedReturn);
+                final isInRange = normalizedDepart != null && normalizedReturn != null &&
+                    normalizedDate.isAfter(normalizedDepart) && normalizedDate.isBefore(normalizedReturn);
+                final isDisabled = date.isBefore(DateTime(now.year, now.month, now.day));
+                
+                Color? bgColor;
+                Color? textColor;
+                BorderRadius? borderRadius;
+                
+                if (isDepartDate || isReturnDate) {
+                  bgColor = const Color(0xFFD32F2F);
+                  textColor = Colors.white;
+                  if (isDepartDate && isReturnDate) {
+                    borderRadius = BorderRadius.circular(8);
+                  } else if (isDepartDate) {
+                    borderRadius = const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      bottomLeft: Radius.circular(8),
+                    );
+                  } else {
+                    borderRadius = const BorderRadius.only(
+                      topRight: Radius.circular(8),
+                      bottomRight: Radius.circular(8),
+                    );
+                  }
+                } else if (isInRange) {
+                  bgColor = const Color(0xFFD32F2F).withOpacity(0.15);
+                  textColor = Colors.black;
+                  borderRadius = BorderRadius.zero;
+                } else {
+                  bgColor = Colors.transparent;
+                  textColor = isDisabled ? Colors.grey[400] : Colors.black;
+                  borderRadius = BorderRadius.circular(8);
+                }
+                
+                return GestureDetector(
+                  onTap: isDisabled ? null : () => onDateTap(date),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      borderRadius: borderRadius,
+                    ),
+                    child: Center(
+                      child: Text(
+                        dayNumber.toString(),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: (isDepartDate || isReturnDate) ? FontWeight.w700 : FontWeight.w500,
+                          color: textColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
   String _getMonthName(int month) {
     const months = [
       'January', 'February', 'March', 'April', 'May', 'June',
@@ -1874,11 +2100,14 @@ class _HomePageState extends State<HomePage>
     int tempChildren = _childrenCount;
     int tempInfants = _infantsCount;
     
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
@@ -1978,6 +2207,7 @@ class _HomePageState extends State<HomePage>
                           _childrenCount = tempChildren;
                           _infantsCount = tempInfants;
                         });
+                        isModalOpenNotifier.value = false;
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
@@ -2003,7 +2233,9 @@ class _HomePageState extends State<HomePage>
           },
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   Widget _buildPassengerRow({
@@ -2099,10 +2331,13 @@ class _HomePageState extends State<HomePage>
   }
 
   void _showClassBottomSheet(BuildContext context) {
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return Container(
           decoration: const BoxDecoration(
@@ -2131,7 +2366,10 @@ class _HomePageState extends State<HomePage>
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      isModalOpenNotifier.value = false;
+                      Navigator.pop(context);
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                         color: const Color(0xFFD32F2F),
@@ -2155,6 +2393,7 @@ class _HomePageState extends State<HomePage>
                     setState(() {
                       _selectedClass = className;
                     });
+                    isModalOpenNotifier.value = false;
                     Navigator.pop(context);
                   },
                   child: Container(
@@ -2180,17 +2419,22 @@ class _HomePageState extends State<HomePage>
           ),
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   void _showMultiCityLocationBottomSheet(BuildContext context, int flightIndex, {required bool isFrom}) {
     final TextEditingController searchController = TextEditingController();
+    
+    isModalOpenNotifier.value = true;
     
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
@@ -2458,16 +2702,32 @@ class _HomePageState extends State<HomePage>
   void _showMultiCityDateBottomSheet(BuildContext context, int flightIndex) {
     DateTime tempDate = _multiCityFlights[flightIndex]['date'] ?? DateTime.now();
     
+    // Calculate minimum date based on previous flight (next day after previous flight)
+    DateTime? minDate;
+    if (flightIndex > 0 && _multiCityFlights[flightIndex - 1]['date'] != null) {
+      final previousFlightDate = _multiCityFlights[flightIndex - 1]['date'] as DateTime;
+      // Set minimum date to the day AFTER the previous flight
+      minDate = previousFlightDate.add(const Duration(days: 1));
+      
+      // Ensure tempDate is at least minDate
+      if (tempDate.isBefore(minDate)) {
+        tempDate = minDate;
+      }
+    }
+    
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
             return DraggableScrollableSheet(
-              initialChildSize: 0.6,
+              initialChildSize: 0.65,
               minChildSize: 0.5,
               maxChildSize: 0.9,
               builder: (BuildContext context, ScrollController scrollController) {
@@ -2495,10 +2755,21 @@ class _HomePageState extends State<HomePage>
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            Text(
+                              'Select Flight ${flightIndex + 1} Date',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black,
+                              ),
+                            ),
                             GestureDetector(
-                              onTap: () => Navigator.pop(context),
+                              onTap: () {
+                                isModalOpenNotifier.value = false;
+                                Navigator.pop(context);
+                              },
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFD32F2F),
@@ -2523,8 +2794,38 @@ class _HomePageState extends State<HomePage>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                if (minDate != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF1e5a8e).withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.info_outline,
+                                            color: Color(0xFF1e5a8e),
+                                            size: 18,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              'Date must be after Flight ${flightIndex}',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Color(0xFF1e5a8e),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 const Text(
-                                  'Depart',
+                                  'Departure Date',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -2540,6 +2841,7 @@ class _HomePageState extends State<HomePage>
                                       tempDate = date;
                                     });
                                   },
+                                  minDate: minDate,
                                 ),
                                 const SizedBox(height: 24),
                               ],
@@ -2557,6 +2859,7 @@ class _HomePageState extends State<HomePage>
                               setState(() {
                                 _multiCityFlights[flightIndex]['date'] = tempDate;
                               });
+                              isModalOpenNotifier.value = false;
                               Navigator.pop(context);
                             },
                             style: ElevatedButton.styleFrom(
@@ -2584,7 +2887,9 @@ class _HomePageState extends State<HomePage>
           },
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   Widget _buildDestinationCarousel() {

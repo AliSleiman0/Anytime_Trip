@@ -11,6 +11,8 @@ class FlightDetailsScreen extends StatelessWidget {
   final String stops;
   final String tripType;
   final int price;
+  final String departureDate;
+  final String? returnDate;
   final String? returnDepartureTime;
   final String? returnArrivalTime;
   final String? returnAirline;
@@ -26,6 +28,8 @@ class FlightDetailsScreen extends StatelessWidget {
     required this.stops,
     required this.tripType,
     required this.price,
+    required this.departureDate,
+    this.returnDate,
     this.returnDepartureTime,
     this.returnArrivalTime,
     this.returnAirline,
@@ -62,7 +66,7 @@ class FlightDetailsScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Flexible(child: _buildFlightCard(from, to, departureTime, arrivalTime, airline, stops, 'Departure')),
+                Flexible(child: _buildFlightCard(from, to, departureTime, arrivalTime, airline, stops, departureDate, 'Departure')),
                 if (tripType.toLowerCase().trim() == 'roundtrip') ...[
                   Flexible(
                     child: Column(
@@ -87,7 +91,7 @@ class FlightDetailsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Flexible(child: _buildFlightCard(to, from, returnDepartureTime ?? '', returnArrivalTime ?? '', returnAirline ?? '', returnStops ?? '', 'Return')),
+                  Flexible(child: _buildFlightCard(to, from, returnDepartureTime ?? '', returnArrivalTime ?? '', returnAirline ?? '', returnStops ?? '', returnDate ?? '', 'Return')),
                 ],
               ],
             ),
@@ -121,6 +125,8 @@ class FlightDetailsScreen extends StatelessWidget {
                               stops: stops,
                               tripType: tripType,
                               price: price,
+                              departureDate: departureDate,
+                              returnDate: returnDate,
                               returnDepartureTime: returnDepartureTime,
                               returnArrivalTime: returnArrivalTime,
                               returnAirline: returnAirline,
@@ -156,7 +162,7 @@ class FlightDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFlightCard(String from, String to, String dep, String arr, String airline, String stops, String label) {
+  Widget _buildFlightCard(String from, String to, String dep, String arr, String airline, String stops, String date, String label) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
       padding: const EdgeInsets.all(8),
@@ -169,6 +175,7 @@ class FlightDetailsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('$from to $to', style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(date, style: const TextStyle(fontSize: 12, color: Color(0xFF1e5a8e), fontWeight: FontWeight.w600)),
           Text('$dep - $arr', style: const TextStyle(fontSize: 12)),
           Text(airline, style: const TextStyle(fontSize: 12)),
           Text(stops, style: const TextStyle(fontSize: 12)),

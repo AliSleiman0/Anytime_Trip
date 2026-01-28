@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/helpers.dart';
+import '../controller/auth_controller.dart';
 
 class SetNewPasswordPage extends StatefulWidget {
   const SetNewPasswordPage({super.key});
@@ -11,16 +14,31 @@ class SetNewPasswordPage extends StatefulWidget {
 
 class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
   String selectedLanguage = 'en';
+  final authController = Get.find<AuthController>();
+  final phoneController = TextEditingController();
   final newPasswordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   
+  String userPhone = '';
   List<String> otpDigits = ['', '', '', '', '', ''];
   
   bool newPasswordVisible = false;
   bool confirmPasswordVisible = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Get phone from navigation arguments if provided
+    final args = Get.arguments as Map<String, dynamic>?;
+    if (args != null) {
+      userPhone = args['phone'] ?? '';
+      phoneController.text = userPhone;
+    }
+  }
+
+  @override
   void dispose() {
+    phoneController.dispose();
     newPasswordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
@@ -79,36 +97,57 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
   }
 
   void _resendOtp() {
-    // TODO: Call API to resend OTP
-    Get.snackbar('Success', 'OTP sent again');
+    if (phoneController.text.isEmpty) {
+      Helpers.showSnackbar('Required Field', 'Please enter your phone number first', isError: true);
+      return;
+    }
+    userPhone = phoneController.text;
+    authController.sendOTP('', userPhone, 'phone');
   }
 
-  void _changePassword() {
+  Future<void> _changePassword() async {
+    if (phoneController.text.isEmpty) {
+      Helpers.showSnackbar('Required Field', 'Please enter your phone number', isError: true);
+      return;
+    }
+    
     if (newPasswordController.text.isEmpty) {
-      Get.snackbar('Error', 'Please enter new password');
+      Helpers.showSnackbar('Required Field', 'Please enter new password', isError: true);
       return;
     }
     
     if (confirmPasswordController.text.isEmpty) {
-      Get.snackbar('Error', 'Please confirm password');
+      Helpers.showSnackbar('Required Field', 'Please confirm password', isError: true);
       return;
     }
     
     if (newPasswordController.text != confirmPasswordController.text) {
-      Get.snackbar('Error', 'Passwords do not match');
+      Helpers.showSnackbar('Password Mismatch', 'Passwords do not match', isError: true);
+      return;
+    }
+
+    if (newPasswordController.text.length < 6) {
+      Helpers.showSnackbar('Invalid Password', 'Password must be at least 6 characters', isError: true);
       return;
     }
 
     String otp = otpDigits.join();
     if (otp.length < 6) {
-      Get.snackbar('Error', 'Please enter OTP');
+      Helpers.showSnackbar('Invalid OTP', 'Please enter complete 6-digit OTP', isError: true);
       return;
     }
 
-    // TODO: Call API to change password
-    Get.snackbar('Success', 'Password changed successfully');
-    // Navigate to login
-    Get.offNamed(AppRoutes.LOGIN);
+    // Verify OTP first, then reset password
+    bool otpVerified = await authController.verifyOTP('', phoneController.text, otp, 'phone');
+    if (!otpVerified) {
+      return; // Error message already shown by verifyOTP
+    }
+
+    // Reset password with verified OTP
+    bool success = await authController.resetPassword(phoneController.text, otp, newPasswordController.text);
+    if (success) {
+      Get.offAllNamed(AppRoutes.LOGIN);
+    }
   }
 
   @override
@@ -166,6 +205,54 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                   height: 70,
                 ),
                 SizedBox(height: size.height * 0.08),
+                // Title
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Set New Password',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Create a strong password for your account',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white70,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
+                // Phone Number Input
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: IntlPhoneField(
+                    controller: phoneController,
+                    initialCountryCode: 'LB',
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: BorderSide.none,
+                      ),
+                      hintText: 'Phone Number',
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    ),
+                    onChanged: (phone) {
+                      userPhone = phone.completeNumber;
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
                 // Create New Password Input
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -185,11 +272,22 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                       controller: newPasswordController,
                       obscureText: !newPasswordVisible,
                       decoration: InputDecoration(
-                        hintText: 'create_new_password'.tr,
+                        hintText: 'New Password',
                         border: InputBorder.none,
                         prefixIcon: const Icon(
                           Icons.lock,
                           color: Color(0xFF1e5a8e),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            newPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                            color: Color(0xFF1e5a8e),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              newPasswordVisible = !newPasswordVisible;
+                            });
+                          },
                         ),
                         contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
                       ),
@@ -219,11 +317,22 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                             controller: confirmPasswordController,
                             obscureText: !confirmPasswordVisible,
                             decoration: InputDecoration(
-                              hintText: 'confirm_new_password'.tr,
+                              hintText: 'Confirm Password',
                               border: InputBorder.none,
                               prefixIcon: const Icon(
                                 Icons.lock,
                                 color: Color(0xFF1e5a8e),
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  confirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                                  color: Color(0xFF1e5a8e),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    confirmPasswordVisible = !confirmPasswordVisible;
+                                  });
+                                },
                               ),
                               contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
                             ),
@@ -252,7 +361,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                             ),
                           ),
                           child: Text(
-                            'send_otp'.tr,
+                            'Send OTP',
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -324,9 +433,9 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: "Didn't Receive Password? ",
+                              text: "Didn't Receive OTP? ",
                               style: const TextStyle(
-                                color: Colors.grey,
+                                color: Colors.white70,
                                 fontSize: 12,
                               ),
                             ),
@@ -344,7 +453,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                     ),
                   ),
                 ),
-                SizedBox(height: size.height * 0.08),
+                SizedBox(height: size.height * 0.06),
                 // Change Password Button
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -370,7 +479,7 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                         ),
                       ),
                       child: Text(
-                        'change_password'.tr,
+                        'Reset Password',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -387,7 +496,13 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                   child: Container(
                     width: double.infinity,
                     child: OutlinedButton(
-                      onPressed: () => Get.back(),
+                      onPressed: () {
+                        if (Navigator.canPop(context)) {
+                          Get.back();
+                        } else {
+                          Get.offAllNamed(AppRoutes.LOGIN);
+                        }
+                      },
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         side: const BorderSide(
