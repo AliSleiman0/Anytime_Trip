@@ -98,6 +98,8 @@ func main() {
 	// Setup static files (relative to backend working dir)
 	fiberApp.Static("/static", "./static")
 	fiberApp.Static("/", "./templates")
+	// Serve uploaded files
+	fiberApp.Static("/uploads", "./static/uploads")
 	// Serve admin assets (css/images) under /assets
 	fiberApp.Static("/assets", "../frontend/admin/src/components/assets")
 
@@ -106,7 +108,7 @@ func main() {
 
 	// App routes
 	appGroup := api.Group("/app")
-	appRoutes.SetupRoutes(appGroup, appHandler)
+	appRoutes.SetupRoutes(appGroup, appHandler, cfg.JWTSecret)
 
 	// Admin routes (with middleware) served under /admin
 	adminGroup := fiberApp.Group("/admin")

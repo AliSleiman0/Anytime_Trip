@@ -7,6 +7,8 @@ abstract class AppRoutes {
   static const OTP_CONFIRMATION = '/otp_confirmation';
   static const SET_NEW_PASSWORD = '/set_new_password';
   static const HOME = '/home';
+  static const PROFILE = '/profile';
+  static const COMPLETE_PROFILE = '/complete_profile';
   static const PRODUCT = '/product';
   static const PRODUCT_DETAILS = '/product/:id';
   static const ACCOUNT = '/account';
