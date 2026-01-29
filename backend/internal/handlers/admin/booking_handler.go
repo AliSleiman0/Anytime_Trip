@@ -15,19 +15,21 @@ import (
 
 // BookingRow is a flattened view model combining all booking types for the admin table.
 type BookingRow struct {
-	BookingID     string
-	RefID         string
-	Type          string
-	CustomerName  string
-	CustomerEmail string
-	BookingDate   time.Time
-	TravelDate    time.Time
-	Details       string
-	Amount        string
-	PaymentStatus string
-	PaymentClass  string
-	Status        string
-	StatusClass   string
+	BookingID       string
+	RefID           string
+	Type            string
+	CustomerName    string
+	CustomerEmail   string
+	CustomerPhone   string
+	ServiceProvider string
+	BookingDate     time.Time
+	TravelDate      time.Time
+	Details         string
+	Amount          string
+	PaymentStatus   string
+	PaymentClass    string
+	Status          string
+	StatusClass     string
 }
 
 // NewBookingHandler returns the existing AdminHandler with repos injected.
@@ -50,7 +52,8 @@ func (h *AdminHandler) GetBookings(c *fiber.Ctx) error {
 	}
 
 	data := fiber.Map{
-		"Title": "Bookings",
+		"Title":            "Bookings",
+		"ShowExportButton": true,
 	}
 
 	c.Set("Content-Type", "text/html")
@@ -76,7 +79,12 @@ func (h *AdminHandler) GetBookingsFragment(c *fiber.Ctx) error {
 		return c.Status(500).SendString("Error fetching hotel bookings")
 	}
 
-	rows := make([]BookingRow, 0, len(carBookings)+len(flightBookings)+len(hotelBookings))
+	transferBookings, err := h.transferBookingRepo.FindAll(ctx, 100, 0)
+	if err != nil {
+		return c.Status(500).SendString("Error fetching transfer bookings")
+	}
+
+	rows := make([]BookingRow, 0, len(carBookings)+len(flightBookings)+len(hotelBookings)+len(transferBookings))
 
 	typeFilter := strings.ToLower(c.Query("bookings", "all"))
 	statusFilter := strings.ToLower(c.Query("status", "all"))
@@ -134,20 +142,39 @@ func (h *AdminHandler) GetBookingsFragment(c *fiber.Ctx) error {
 	}
 
 	for _, b := range carBookings {
+		// derive phone and provider safely
+		phone := "-"
+		if h.userRepo != nil && b.UserID != "" {
+			if u, err := h.userRepo.FindByID(ctx, b.UserID); err == nil && u != nil {
+				if u.PhoneNumber != "" {
+					phone = u.PhoneNumber
+				}
+			}
+		}
+		provider := "-"
+		if h.carRepo != nil && b.CarID != "" {
+			if p, err := h.carRepo.FindByID(ctx, b.CarID); err == nil && p != nil {
+				if p.ProviderName != "" {
+					provider = p.ProviderName
+				}
+			}
+		}
 		row := BookingRow{
-			BookingID:     b.BookingID,
-			RefID:         b.ID,
-			Type:          "Car",
-			CustomerName:  b.Customer.Name,
-			CustomerEmail: b.Customer.Email,
-			BookingDate:   b.BookingDate,
-			TravelDate:    b.BookingDate,
-			Details:       b.Details,
-			Amount:        formatAmount(b.Currency, b.Amount),
-			PaymentStatus: string(b.PaymentStatus),
-			PaymentClass:  badgeClass("payment", string(b.PaymentStatus)),
-			Status:        string(b.Status),
-			StatusClass:   badgeClass("status", string(b.Status)),
+			BookingID:       b.BookingID,
+			RefID:           b.ID,
+			Type:            "Car",
+			CustomerName:    b.Customer.Name,
+			CustomerEmail:   b.Customer.Email,
+			CustomerPhone:   phone,
+			ServiceProvider: provider,
+			BookingDate:     b.BookingDate,
+			TravelDate:      b.BookingDate,
+			Details:         b.Details,
+			Amount:          formatAmount(b.Currency, b.Amount),
+			PaymentStatus:   string(b.PaymentStatus),
+			PaymentClass:    badgeClass("payment", string(b.PaymentStatus)),
+			Status:          string(b.Status),
+			StatusClass:     badgeClass("status", string(b.Status)),
 		}
 
 		if matchesFilters(row) {
@@ -156,20 +183,38 @@ func (h *AdminHandler) GetBookingsFragment(c *fiber.Ctx) error {
 	}
 
 	for _, b := range flightBookings {
+		phone := "-"
+		if h.userRepo != nil && b.UserID != "" {
+			if u, err := h.userRepo.FindByID(ctx, b.UserID); err == nil && u != nil {
+				if u.PhoneNumber != "" {
+					phone = u.PhoneNumber
+				}
+			}
+		}
+		provider := "-"
+		if h.flightRepo != nil && b.FlightID != "" {
+			if p, err := h.flightRepo.FindByID(ctx, b.FlightID); err == nil && p != nil {
+				if p.ProviderName != "" {
+					provider = p.ProviderName
+				}
+			}
+		}
 		row := BookingRow{
-			BookingID:     b.BookingID,
-			RefID:         b.ID,
-			Type:          "Flight",
-			CustomerName:  b.Customer.Name,
-			CustomerEmail: b.Customer.Email,
-			BookingDate:   b.BookingDate,
-			TravelDate:    b.BookingDate,
-			Details:       b.Details,
-			Amount:        formatAmount(b.Currency, b.Amount),
-			PaymentStatus: string(b.PaymentStatus),
-			PaymentClass:  badgeClass("payment", string(b.PaymentStatus)),
-			Status:        string(b.Status),
-			StatusClass:   badgeClass("status", string(b.Status)),
+			BookingID:       b.BookingID,
+			RefID:           b.ID,
+			Type:            "Flight",
+			CustomerName:    b.Customer.Name,
+			CustomerEmail:   b.Customer.Email,
+			CustomerPhone:   phone,
+			ServiceProvider: provider,
+			BookingDate:     b.BookingDate,
+			TravelDate:      b.BookingDate,
+			Details:         b.Details,
+			Amount:          formatAmount(b.Currency, b.Amount),
+			PaymentStatus:   string(b.PaymentStatus),
+			PaymentClass:    badgeClass("payment", string(b.PaymentStatus)),
+			Status:          string(b.Status),
+			StatusClass:     badgeClass("status", string(b.Status)),
 		}
 
 		if matchesFilters(row) {
@@ -178,20 +223,78 @@ func (h *AdminHandler) GetBookingsFragment(c *fiber.Ctx) error {
 	}
 
 	for _, b := range hotelBookings {
+		phone := "-"
+		if h.userRepo != nil && b.UserID != "" {
+			if u, err := h.userRepo.FindByID(ctx, b.UserID); err == nil && u != nil {
+				if u.PhoneNumber != "" {
+					phone = u.PhoneNumber
+				}
+			}
+		}
+		provider := "-"
+		if h.hotelRepo != nil && b.HotelID != "" {
+			if p, err := h.hotelRepo.FindByID(ctx, b.HotelID); err == nil && p != nil {
+				if p.ProviderName != "" {
+					provider = p.ProviderName
+				}
+			}
+		}
 		row := BookingRow{
-			BookingID:     b.BookingID,
-			RefID:         b.ID,
-			Type:          "Hotel",
-			CustomerName:  b.Customer.Name,
-			CustomerEmail: b.Customer.Email,
-			BookingDate:   b.BookingDate,
-			TravelDate:    b.BookingDate,
-			Details:       b.Details,
-			Amount:        formatAmount(b.Currency, b.Amount),
-			PaymentStatus: string(b.PaymentStatus),
-			PaymentClass:  badgeClass("payment", string(b.PaymentStatus)),
-			Status:        string(b.Status),
-			StatusClass:   badgeClass("status", string(b.Status)),
+			BookingID:       b.BookingID,
+			RefID:           b.ID,
+			Type:            "Hotel",
+			CustomerName:    b.Customer.Name,
+			CustomerEmail:   b.Customer.Email,
+			CustomerPhone:   phone,
+			ServiceProvider: provider,
+			BookingDate:     b.BookingDate,
+			TravelDate:      b.BookingDate,
+			Details:         b.Details,
+			Amount:          formatAmount(b.Currency, b.Amount),
+			PaymentStatus:   string(b.PaymentStatus),
+			PaymentClass:    badgeClass("payment", string(b.PaymentStatus)),
+			Status:          string(b.Status),
+			StatusClass:     badgeClass("status", string(b.Status)),
+		}
+
+		if matchesFilters(row) {
+			rows = append(rows, row)
+		}
+	}
+
+	for _, b := range transferBookings {
+		phone := "-"
+		if h.userRepo != nil && b.UserID != "" {
+			if u, err := h.userRepo.FindByID(ctx, b.UserID); err == nil && u != nil {
+				if u.PhoneNumber != "" {
+					phone = u.PhoneNumber
+				}
+			}
+		}
+		provider := "-"
+		if h.transferRepo != nil && b.TransferID != "" {
+			if p, err := h.transferRepo.FindByID(ctx, b.TransferID); err == nil && p != nil {
+				if p.ProviderName != "" {
+					provider = p.ProviderName
+				}
+			}
+		}
+		row := BookingRow{
+			BookingID:       b.BookingID,
+			RefID:           b.ID,
+			Type:            "Transfer",
+			CustomerName:    b.Customer.Name,
+			CustomerEmail:   b.Customer.Email,
+			CustomerPhone:   phone,
+			ServiceProvider: provider,
+			BookingDate:     b.BookingDate,
+			TravelDate:      b.BookingDate,
+			Details:         b.Details,
+			Amount:          formatAmount(b.Currency, b.Amount),
+			PaymentStatus:   string(b.PaymentStatus),
+			PaymentClass:    badgeClass("payment", string(b.PaymentStatus)),
+			Status:          string(b.Status),
+			StatusClass:     badgeClass("status", string(b.Status)),
 		}
 
 		if matchesFilters(row) {
@@ -358,6 +461,35 @@ func (h *AdminHandler) GetViewBookingFragment(c *fiber.Ctx) error {
 		return tmpl.Execute(c, data)
 	}
 
+	// Try to find in transfer bookings
+	transferBooking, err := h.transferBookingRepo.FindByID(ctx, bookingID)
+	if err == nil && transferBooking != nil {
+		tmpl, err := template.New("view-booking-frag.html").Funcs(funcMap).ParseFiles(filepath.Clean(filepath.Join("templates", "admin", "fragments", "view-booking-frag.html")))
+		if err != nil {
+			return c.Status(500).SendString("Error loading template: " + err.Error())
+		}
+
+		data := fiber.Map{
+			"BookingID":     transferBooking.BookingID,
+			"FlightName":    "Transfer Booking",
+			"Type":          "Transfer",
+			"Details":       transferBooking.Details,
+			"Amount":        transferBooking.Amount,
+			"Currency":      transferBooking.Currency,
+			"PaymentStatus": string(transferBooking.PaymentStatus),
+			"Email":         transferBooking.Customer.Email,
+			"Phone":         "-",
+			"Seat":          "-",
+			"DepartureDate": transferBooking.BookingDate.Format("01/02/2006"),
+			"ArrivalDate":   transferBooking.BookingDate.Format("01/02/2006"),
+			"ReferenceID":   transferBooking.ID,
+			"RefundAmount":  0.0,
+		}
+
+		c.Set("Content-Type", "text/html")
+		return tmpl.Execute(c, data)
+	}
+
 	return c.Status(404).SendString("Booking not found")
 }
 
@@ -419,6 +551,21 @@ func (h *AdminHandler) UpdateBookingEmail(c *fiber.Ctx) error {
 	hotelBooking, err := h.hotelBookingRepo.FindByID(ctx, req.BookingID)
 	if err == nil && hotelBooking != nil {
 		if err := h.hotelBookingRepo.UpdateCustomerEmail(ctx, req.BookingID, req.Email); err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"success": false,
+				"message": "Failed to update email",
+			})
+		}
+		return c.JSON(fiber.Map{
+			"success": true,
+			"message": "Email updated successfully",
+		})
+	}
+
+	// Try to update in transfer bookings
+	transferBooking, err := h.transferBookingRepo.FindByID(ctx, req.BookingID)
+	if err == nil && transferBooking != nil {
+		if err := h.transferBookingRepo.UpdateCustomerEmail(ctx, req.BookingID, req.Email); err != nil {
 			return c.Status(500).JSON(fiber.Map{
 				"success": false,
 				"message": "Failed to update email",

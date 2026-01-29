@@ -1,4 +1,4 @@
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+
   <style>
     .custom-scrollbar::-webkit-scrollbar {
       width: 8px;
@@ -16,48 +16,55 @@
     }
   </style>
 
-  <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+  <div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto">
     <main class="">
       <!-- header -->
       <div
         hx-get="/admin/header?title=Service Management"
         hx-trigger="load"
         hx-swap="innerHTML"
+        class="mt-10"
       ></div>
 
       <!-- inputs -->
-      <div class="p-4 flex justify-between">
+      <div class="p-4 flex flex-col md:flex-row md:justify-between gap-4">
         <!-- filters -->
-        <div class="flex gap-8">
+        <div class="flex gap-4 md:gap-8 overflow-x-auto pb-2 overflow-x-hidden">
           <button
             data-provider-filter="all"
-            class="text-[#336891] border-b-4 border-[#336891] w-20 h-8"
+            class="text-[#336891] border-b-4 border-[#336891] w-20 h-8 whitespace-nowrap flex-shrink-0"
           >
             All
           </button>
           <button
             data-provider-filter="flight"
-            class="text-[#336891] border-b-4 border-transparent w-20 h-8"
+            class="text-[#336891] border-b-4 border-transparent w-20 h-8 whitespace-nowrap flex-shrink-0"
           >
             Flights
           </button>
           <button
             data-provider-filter="car"
-            class="text-[#336891] border-b-4 border-transparent w-20 h-8"
+            class="text-[#336891] border-b-4 border-transparent w-20 h-8 whitespace-nowrap flex-shrink-0"
           >
             Cars
           </button>
           <button
             data-provider-filter="hotel"
-            class="text-[#336891] border-b-4 border-transparent w-20 h-8"
+            class="text-[#336891] border-b-4 border-transparent w-20 h-8 whitespace-nowrap flex-shrink-0"
           >
             Hotels
           </button>
+          <button
+            data-provider-filter="transfer"
+            class="text-[#336891] border-b-4 border-transparent w-20 h-8 whitespace-nowrap flex-shrink-0"
+          >
+            Transfers
+          </button>
         </div>
 
-        <div class="flex gap-4">
+        <div class="flex flex-col sm:flex-row gap-4">
           <select
-            class="w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+            class="w-full sm:w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
             name="status"
             id="status"
           >
@@ -68,13 +75,11 @@
             <option value="inactive">Inactive</option>
             <option value="archived">Archived</option>
           </select>
-        </div>
 
         <!-- create new button -->
-        <div>
           <button
             id="create-provider-btn"
-            class="bg-[#336891] w-64 h-12 text-white text-lg rounded-xl flex justify-between items-center p-2"
+            class="bg-[#336891] w-full sm:w-64 h-12 text-white text-lg rounded-xl flex justify-between items-center p-2"
           >
             <span
               id="create-provider-icon"
@@ -101,7 +106,8 @@
       <!-- service provider table -->
       <div class="px-4">
         <div class="rounded-t-2xl overflow-hidden border border-gray-200">
-          <table class="w-full text-sm table-fixed">
+          <div class="overflow-x-auto md:overflow-x-visible">
+          <table class="w-full text-sm table-fixed min-w-[1000px] md:min-w-0">
             <colgroup>
               <col class="w-[18%]" />
               <col class="w-[10%]" />
@@ -133,7 +139,7 @@
             class="overflow-y-auto custom-scrollbar"
             style="max-height: 560px"
           >
-            <table class="w-full text-sm table-fixed">
+            <table class="w-full text-sm table-fixed min-w-[1000px] md:min-w-0">
               <colgroup>
                 <col class="w-[18%]" />
                 <col class="w-[10%]" />
@@ -267,6 +273,22 @@
                         <path
                           d="M4.94531 0.5H12.4453C13.1858 0.5 13.8808 0.828713 14.3584 1.39941H14.3594L17.2891 4.8916L17.3926 5.01562L17.5488 5.05469L21.6035 6.08594L21.6064 6.08691C22.7165 6.36279 23.5 7.36387 23.5 8.50781V11.25C23.5 11.7942 23.0442 12.25 22.5 12.25H21.2461L21.1484 12.625C20.8688 13.7036 19.9002 14.5 18.75 14.5C17.5998 14.5 16.6312 13.7036 16.3516 12.625L16.2539 12.25H8.49609L8.39844 12.625C8.11876 13.7036 7.15016 14.5 6 14.5C4.80183 14.5 3.7941 13.6438 3.55957 12.5078L3.49707 12.2012L3.19336 12.125L1.24805 11.6328L1.24707 11.6318L1.08887 11.5781C0.736007 11.422 0.5 11.0672 0.5 10.6641V5.69531C0.5 5.34824 0.599257 5.01683 0.790039 4.73047L0.791016 4.73145L2.87695 1.61426V1.61328C3.342 0.915718 4.11257 0.5 4.94531 0.5ZM6 10C4.88597 10 4 10.886 4 12C4 13.114 4.88597 14 6 14C7.11403 14 8 13.114 8 12C8 10.886 7.11403 10 6 10ZM18.75 10C17.636 10 16.75 10.886 16.75 12C16.75 13.114 17.636 14 18.75 14C19.864 14 20.75 13.114 20.75 12C20.75 10.886 19.864 10 18.75 10ZM1 11.0527L1.37695 11.1484L3.04102 11.5703L3.49609 11.6855L3.63965 11.2393C3.96637 10.2274 4.89867 9.5 6 9.5C7.15016 9.5 8.11876 10.2964 8.39844 11.375L8.49609 11.75H16.2539L16.3516 11.375C16.6312 10.2964 17.5998 9.5 18.75 9.5C19.9002 9.5 20.8688 10.2964 21.1484 11.375L21.2461 11.75H23V8.50781C23 7.64967 22.4683 6.89379 21.6611 6.61816L21.4961 6.56934L17.2773 5.51465L17.2178 5.5H1V11.0527ZM4.94531 1C4.28065 1 3.66175 1.31596 3.28711 1.87988L3.20312 2.00488V2.02832L1.74023 4.22266L1.22168 5H8.75V1H4.94531ZM9.25 5H16.7275L16.0391 4.17871L13.9766 1.71777C13.5971 1.26151 13.038 1 12.4453 1H9.25V5Z"
                           stroke="black"
+                        />
+                      </svg>
+                      {{- else if eq .ProviderType "transfer" }}
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M9 2L3 8M3 8L9 14M3 8H19M15 22L21 16M21 16L15 10M21 16H5"
+                          stroke="black"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
                         />
                       </svg>
                       {{- else }}
@@ -492,6 +514,7 @@
               </tbody>
             </table>
           </div>
+          </div>
         </div>
       </div>
 
@@ -556,6 +579,11 @@
                 <path d="M16.5 4.50023C17.3284 3.6718 18.6716 3.6718 19.5 4.50023C20.3284 5.32866 20.3284 6.6718 19.5 7.50023L17 10.0002L18.8633 17.4363C18.9482 17.7751 18.8501 18.1337 18.6046 18.3822L18.3626 18.6271C17.9174 19.0778 17.1706 19.0061 16.8192 18.479L13.5 13.5002L9.50003 17.5002V19.586C9.50003 19.8512 9.39467 20.1056 9.20714 20.2931L8.92581 20.5744C8.45956 21.0407 7.6776 20.9359 7.35046 20.3635L6.00003 18.0002L3.63678 16.6498C3.06428 16.3226 2.95956 15.5407 3.42581 15.0744L3.70714 14.7931C3.89467 14.6056 4.14903 14.5002 4.41424 14.5002H6.50003L10.5 10.5002L5.52128 7.18106C4.99416 6.82965 4.9225 6.08286 5.37319 5.63762L5.61819 5.39558C5.86667 5.1501 6.22523 5.05206 6.56404 5.13696L14 7.00023L16.5 4.50023Z" stroke="white" stroke-width="1.5"/>
               </svg>
             `,
+            transfer: `
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 2L3 8M3 8L9 14M3 8H19M15 22L21 16M21 16L15 10M21 16H5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            `,
           };
 
           function updateCreateButton() {
@@ -569,6 +597,9 @@
             } else if (currentType === "flight") {
               createIcon.innerHTML = icons.flight;
               createText.textContent = "Create New Flight Provider";
+            } else if (currentType === "transfer") {
+              createIcon.innerHTML = icons.transfer;
+              createText.textContent = "Create New Transfer Provider";
             } else {
               // All
               createIcon.innerHTML = icons.flight;

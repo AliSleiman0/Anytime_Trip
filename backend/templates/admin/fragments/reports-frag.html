@@ -1,9 +1,10 @@
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+<div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto">
   <main>
-    <div
+    <div 
       hx-get="/admin/header?title=Reports and Analytics&subtitle=View detailed insights and performance metrics"
       hx-trigger="load"
       hx-swap="innerHTML"
+      class="mt-10"
     ></div>
 
     <div class="p-4">
@@ -40,7 +41,7 @@
       </div>
 
       <!-- Stats Cards -->
-      <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div class="bg-white rounded-2xl p-4 shadow-xl">
           <div class="text-xs font-semibold text-gray-600 mb-2">
             Overall Revenue
@@ -139,16 +140,16 @@
       </div>
 
       <!-- #1 hotel booked & #1 car rented-->
-      <div class="grid grid-cols-2 gap-4 mb-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <div class="bg-[#FFFFFF] rounded-2xl p-6 shadow-xl items-center">
           <h3 class="text-xl font-bold mb-3">The #1 Hotel Booked</h3>
-          <div class="flex gap-5 rounded-xl">
+          <div class="flex flex-col md:flex-row gap-5 rounded-xl">
             <img
-              class="w-80 h-52 rounded-xl"
+              class="w-full md:w-80 h-52 rounded-xl object-cover"
               src="/static/admin/images/hotel2.jpg"
               alt="Hotel Image"
             />
-            <div>
+            <div class="flex-1">
               <h4 class="text-lg font-semibold">{{.TopHotelName}}</h4>
               <p class="text-xs font-light mb-20">{{.TopHotelLocation}}</p>
               <p class="text-lg font-semibold text-[#009316]">{{.TopHotelBookings}}</p>
@@ -173,13 +174,13 @@
         </div>
         <div class="bg-[#FFFFFF] rounded-2xl p-6 shadow-xl items-center">
           <h3 class="text-xl font-bold mb-3">The #1 car Rented</h3>
-          <div class="flex gap-5 rounded-xl">
+          <div class="flex flex-col md:flex-row gap-5 rounded-xl">
             <img
-              class="w-80 h-52 rounded-xl"
+              class="w-full md:w-80 h-52 rounded-xl object-cover"
               src="/static/admin/images/car.png"
               alt="Car Image"
             />
-            <div>
+            <div class="flex-1">
               <h4 class="text-lg font-semibold">{{.TopCarName}}</h4>
               <p class="text-xs font-light mb-20">{{.TopCarLocation}}</p>
               <p class="text-lg font-semibold text-[#009316]">{{.TopCarBookings}}</p>
@@ -204,13 +205,13 @@
         </div>
         <div class="bg-[#FFFFFF] rounded-2xl p-6 shadow-xl items-center">
           <h3 class="text-xl font-bold mb-3">The #1 Flight Destination</h3>
-          <div class="flex gap-5 rounded-xl">
+          <div class="flex flex-col md:flex-row gap-5 rounded-xl">
             <img
-              class="w-80 h-52 rounded-xl"
+              class="w-full md:w-80 h-52 rounded-xl object-cover"
               src="/static/admin/images/city.png"
               alt="City Image"
             />
-            <div>
+            <div class="flex-1">
               <h4 class="text-lg font-semibold">{{.TopFlightDest}}</h4>
               <p class="text-xs font-light mb-20">{{.TopFlightLocation}}</p>
               <p class="text-lg font-semibold text-[#009316]">{{.TopFlightBookings}}</p>

@@ -47,6 +47,7 @@ func main() {
 	carBookingRepository := apprepo.NewCarBookingRepository(dbConn.DB)
 	flightBookingRepository := apprepo.NewFlightBookingRepository(dbConn.DB)
 	hotelBookingRepository := apprepo.NewHotelBookingRepository(dbConn.DB)
+	transferBookingRepository := apprepo.NewTransferBookingRepository(dbConn.DB)
 	// Support ticket repository
 	supportTicketRepository := apprepo.NewSupportTicketRepository(dbConn.DB)
 	// Payments repository
@@ -54,6 +55,7 @@ func main() {
 	flightRepository := adminrepo.NewFlightRepository(dbConn.DB)
 	carRepository := adminrepo.NewCarRepository(dbConn.DB)
 	hotelRepository := adminrepo.NewHotelRepository(dbConn.DB)
+	transferRepository := adminrepo.NewTransferRepository(dbConn.DB)
 	bannerRepository := adminrepo.NewBannerRepository(dbConn.DB)
 	travelRepository := adminrepo.NewTravelRepository(dbConn.DB)
 	popularRepository := adminrepo.NewPopularRepository(dbConn.DB)
