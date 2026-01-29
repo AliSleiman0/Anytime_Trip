@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:dio/dio.dart';
 import '../../../core/widgets/unified_ui_components.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -17,7 +18,13 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController _phoneController = TextEditingController(text: '00 123 456');
   
   String _selectedNationality = 'Lebanese';
-  String _selectedResidency = 'Oman';
+  String _detectedResidency = 'Detecting...';
+  bool _residencyLoaded = false;
+  
+  // Debug info
+  String _debugInfo = '';
+  String _countryCode = '';
+  String _ipAddress = '';
 
   final List<String> _nationalities = [
     'Lebanese',
@@ -32,18 +39,127 @@ class _ProfilePageState extends State<ProfilePage> {
     'Japanese',
   ];
 
-  final List<String> _residencies = [
-    'Oman',
-    'UAE',
-    'Saudi Arabia',
-    'Kuwait',
-    'Qatar',
-    'Bahrain',
-    'Jordan',
-    'Lebanon',
-    'Egypt',
-    'Iraq',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _detectResidencyFromIP();
+    });
+  }
+
+  Future<void> _detectResidencyFromIP() async {
+    try {
+      // Map of country codes to residency names based on common Middle East countries
+      final Map<String, String> countryToResidency = {
+        'OM': 'Oman',
+        'AE': 'UAE',
+        'SA': 'Saudi Arabia',
+        'KW': 'Kuwait',
+        'QA': 'Qatar',
+        'BH': 'Bahrain',
+        'JO': 'Jordan',
+        'LB': 'Lebanon',
+        'EG': 'Egypt',
+        'IQ': 'Iraq',
+        'US': 'United States',
+        'GB': 'United Kingdom',
+        'FR': 'France',
+        'DE': 'Germany',
+        'IT': 'Italy',
+        'ES': 'Spain',
+        'CA': 'Canada',
+        'AU': 'Australia',
+        'JP': 'Japan',
+      };
+
+      final dio = Dio();
+      
+      // Set timeout to 10 seconds
+      dio.options.connectTimeout = const Duration(seconds: 10);
+      dio.options.receiveTimeout = const Duration(seconds: 10);
+      
+      try {
+        // Try primary API: ip-api.com (45 requests per minute free tier)
+        final response = await dio.get('http://ip-api.com/json/');
+        
+        if (response.statusCode == 200) {
+          final countryCode = response.data['countryCode'] as String;
+          final ipAddress = response.data['query'] as String? ?? 'Unknown';
+          final detectedCountry = countryToResidency[countryCode] ?? response.data['country'] ?? 'Lebanon';
+          
+          if (mounted) {
+            setState(() {
+              _detectedResidency = detectedCountry;
+              _residencyLoaded = true;
+              _countryCode = countryCode;
+              _ipAddress = ipAddress;
+              _debugInfo = 'IP: $ipAddress\nCountry Code: $countryCode\nDetected: $detectedCountry\n\n✅ API: ip-api.com';
+            });
+          }
+          print('✅ Detected country from IP: $countryCode -> $detectedCountry');
+          return;
+        }
+      } catch (e) {
+        print('⚠️ Primary API failed, trying fallback: $e');
+        if (mounted) {
+          setState(() {
+            _debugInfo = 'Primary API failed, trying backup...';
+          });
+        }
+      }
+      
+      // Fallback to ipinfo.io
+      try {
+        final response = await dio.get('https://ipinfo.io/json');
+        
+        if (response.statusCode == 200) {
+          final countryCode = response.data['country'] as String;
+          final ipAddress = response.data['ip'] as String? ?? 'Unknown';
+          final detectedCountry = countryToResidency[countryCode] ?? 'Lebanon';
+          
+          if (mounted) {
+            setState(() {
+              _detectedResidency = detectedCountry;
+              _residencyLoaded = true;
+              _countryCode = countryCode;
+              _ipAddress = ipAddress;
+              _debugInfo = 'IP: $ipAddress\nCountry Code: $countryCode\nDetected: $detectedCountry\n\n✅ API: ipinfo.io';
+            });
+          }
+          print('✅ Detected country from fallback API: $countryCode -> $detectedCountry');
+          return;
+        }
+      } catch (e) {
+        print('⚠️ Fallback API also failed: $e');
+      }
+      
+      // If all APIs fail, use Lebanon as default
+      if (mounted) {
+        setState(() {
+          _detectedResidency = 'Lebanon';
+          _residencyLoaded = true;
+          _debugInfo = '⚠️ Both APIs failed\nUsing default: Lebanon';
+        });
+      }
+    } catch (e) {
+      print('❌ Error detecting residency: $e');
+      if (mounted) {
+        setState(() {
+          _detectedResidency = 'Lebanon';
+          _residencyLoaded = true;
+          _debugInfo = '❌ Error: ${e.toString()}\nUsing default: Lebanon';
+        });
+      }
+    }
+  }
+
+  void _retestDetection() {
+    setState(() {
+      _detectedResidency = 'Detecting...';
+      _debugInfo = '';
+    });
+    _detectResidencyFromIP();
+  }
 
   @override
   void dispose() {
@@ -194,15 +310,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _buildLabeledDropdown(
-                      label: 'Residency',
-                      value: _selectedResidency,
-                      items: _residencies,
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedResidency = value!;
-                        });
-                      },
+                    child: _buildReadOnlyTextField(
+                      label: 'Residency (Auto-Detected)',
+                      value: _detectedResidency,
                     ),
                   ),
                 ],
@@ -339,6 +449,54 @@ class _ProfilePageState extends State<ProfilePage> {
               );
             }).toList(),
             onChanged: onChanged,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReadOnlyTextField({
+    required String label,
+    required String value,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFFD32F2F),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: const Color(0xFF336891), width: 2),
+            borderRadius: BorderRadius.circular(8),
+            color: const Color(0xFFF5F5F5),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+                const Icon(
+                  Icons.location_on,
+                  color: Color(0xFF1e5a8e),
+                  size: 18,
+                ),
+              ],
+            ),
           ),
         ),
       ],

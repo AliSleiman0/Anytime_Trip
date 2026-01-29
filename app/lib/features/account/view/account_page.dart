@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/account_controller.dart';
 import '../../../core/widgets/unified_ui_components.dart';
+import '../../../core/storage/storage_service.dart';
+import '../../../app/routes/app_routes.dart';
 import 'profile_page.dart';
 import 'notifications_page.dart';
 import 'payment_methods_page.dart';
@@ -116,7 +118,14 @@ class AccountPage extends GetView<AccountController> {
             child: SizedBox(
               width: double.infinity,
               child: OutlinedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  // Clear stored user data
+                  final storage = StorageService();
+                  await storage.clearAll();
+                  
+                  // Navigate to login page
+                  Get.offAllNamed(AppRoutes.LOGIN);
+                },
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: const BorderSide(color: Color(0xFFD32F2F), width: 1.5),

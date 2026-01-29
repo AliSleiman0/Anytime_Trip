@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import '../../../app/routes/app_routes.dart';
+import '../../../core/utils/helpers.dart';
+import '../controller/auth_controller.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -12,18 +14,18 @@ class ForgotPasswordPage extends StatefulWidget {
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   String selectedLanguage = 'en';
-  final emailController = TextEditingController();
+  final authController = Get.find<AuthController>();
   final phoneController = TextEditingController();
   
-  List<String> emailOtpDigits = ['', '', '', ''];
-  List<String> phoneOtpDigits = ['', '', '', ''];
-  
-  bool emailVerified = false;
-  bool phoneVerified = false;
+  String userPhone = '';
 
   @override
+  void initState() {
+    super.initState();
+  }
+  
+  @override
   void dispose() {
-    emailController.dispose();
     phoneController.dispose();
     super.dispose();
   }
@@ -80,55 +82,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 
-  void _verifyEmail() {
-    if (emailController.text.isEmpty) {
-      Get.snackbar('Error', 'Please enter email address');
-      return;
-    }
-    setState(() {
-      emailVerified = true;
-    });
-    // TODO: Call API to send OTP to email
-  }
-
-  void _verifyPhone() {
-    if (phoneController.text.isEmpty) {
-      Get.snackbar('Error', 'Please enter phone number');
-      return;
-    }
-    setState(() {
-      phoneVerified = true;
-    });
-    // TODO: Call API to send OTP to phone
-  }
-
-  void _resendEmailOtp() {
-    // TODO: Call API to resend OTP to email
-    Get.snackbar('Success', 'OTP sent to your email');
-  }
-
   void _resendPhoneOtp() {
-    // TODO: Call API to resend OTP to phone
-    Get.snackbar('Success', 'OTP sent to your phone');
+    if (userPhone.isEmpty) {
+      Helpers.showSnackbar('Error', 'Please enter phone number first', isError: true);
+      return;
+    }
+    authController.sendOTP('', userPhone, 'phone');
   }
-
-  void _submitForgotPassword() {
-    if (!emailVerified || !phoneVerified) {
-      Get.snackbar('Error', 'Please verify both email and phone');
-      return;
-    }
-    
-    String emailOtp = emailOtpDigits.join();
-    String phoneOtp = phoneOtpDigits.join();
-    
-    if (emailOtp.length < 4 || phoneOtp.length < 4) {
-      Get.snackbar('Error', 'Please enter OTP codes');
-      return;
-    }
-
-    // Sign up complete - navigate to login
-    Get.snackbar('Success', 'Signup completed successfully');
-    Get.offAllNamed(AppRoutes.LOGIN);
+  
+  Future<void> _sendOTP() async {
+    // Navigate to set password page
+    Get.toNamed(AppRoutes.SET_NEW_PASSWORD);
   }
 
   @override
@@ -178,307 +142,41 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           SingleChildScrollView(
             child: Column(
               children: [
-                SizedBox(height: size.height * 0.08),
+                SizedBox(height: size.height * 0.25),
                 // Logo
                 Image.asset(
                   'assets/images/main-logo.png',
-                  width: 70,
-                  height: 70,
+                  width: 90,
+                  height: 90,
                 ),
                 SizedBox(height: size.height * 0.08),
-                // Email Section
+                
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
+                  child: Column(
                     children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Color(0xFFF5F5F5),
-                            borderRadius: BorderRadius.circular(25),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: TextField(
-                            controller: emailController,
-                            enabled: !emailVerified,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              hintText: 'enter_email_address'.tr,
-                              border: InputBorder.none,
-                              prefixIcon: const Icon(
-                                Icons.email,
-                                color: Color(0xFF1e5a8e),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-                            ),
-                          ),
+                      Text(
+                        'Reset Password',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                      SizedBox(height: 12),
+                      Text(
+                        'Enter your phone number on the next screen to reset your password',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white70,
                         ),
-                        child: ElevatedButton(
-                          onPressed: emailVerified ? null : _verifyEmail,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: emailVerified ? Colors.green : const Color(0xFF1e5a8e),
-                            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                          ),
-                          child: Text(
-                            emailVerified ? 'verified'.tr : 'verify'.tr,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
                 ),
-                if (emailVerified) ...[
-                  const SizedBox(height: 16),
-                  // Email OTP Display
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(4, (index) {
-                        return Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF5F5F5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.grey.shade300,
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: TextField(
-                            textAlign: TextAlign.center,
-                            keyboardType: TextInputType.number,
-                            maxLength: 1,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              counterText: '',
-                              contentPadding: EdgeInsets.zero,
-                            ),
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                            onChanged: (value) {
-                              setState(() {
-                                emailOtpDigits[index] = value;
-                              });
-                              if (value.isNotEmpty && index < 3) {
-                                FocusScope.of(context).nextFocus();
-                              }
-                            },
-                          ),
-                        );
-                      }),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: GestureDetector(
-                        onTap: _resendEmailOtp,
-                        child: RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "Didn't Receive Password? ",
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              TextSpan(
-                                text: 'send again',
-                                style: const TextStyle(
-                                  color: Color(0xFFD32F2F),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 16),
-                // Phone Section
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: IntlPhoneField(
-                          controller: phoneController,
-                          enabled: !phoneVerified,
-                          decoration: InputDecoration(
-                            hintText: '00 123 456',
-                            border: InputBorder.none,
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(25),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(25),
-                              borderSide: BorderSide.none,
-                            ),
-                            disabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(25),
-                              borderSide: BorderSide.none,
-                            ),
-                            filled: true,
-                            fillColor: Color(0xFFF5F5F5),
-                            contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-                          ),
-                          initialCountryCode: 'LB',
-                          onChanged: (phone) {},
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: phoneVerified ? null : _verifyPhone,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: phoneVerified ? Colors.green : const Color(0xFF1e5a8e),
-                            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                          ),
-                          child: Text(
-                            phoneVerified ? 'verified'.tr : 'verify'.tr,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (phoneVerified) ...[
-                  const SizedBox(height: 16),
-                  // Phone OTP Display
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(4, (index) {
-                        return Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF5F5F5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.grey.shade300,
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: TextField(
-                            textAlign: TextAlign.center,
-                            keyboardType: TextInputType.number,
-                            maxLength: 1,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              counterText: '',
-                              contentPadding: EdgeInsets.zero,
-                            ),
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                            onChanged: (value) {
-                              setState(() {
-                                phoneOtpDigits[index] = value;
-                              });
-                              if (value.isNotEmpty && index < 3) {
-                                FocusScope.of(context).nextFocus();
-                              }
-                            },
-                          ),
-                        );
-                      }),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: GestureDetector(
-                        onTap: _resendPhoneOtp,
-                        child: RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "Didn't Receive Password? ",
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              TextSpan(
-                                text: 'send again',
-                                style: const TextStyle(
-                                  color: Color(0xFFD32F2F),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
                 SizedBox(height: size.height * 0.08),
-                // Sent OTP Button
+                // Continue Button
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Container(
@@ -494,7 +192,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ],
                     ),
                     child: ElevatedButton(
-                      onPressed: _submitForgotPassword,
+                      onPressed: _sendOTP,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1e5a8e),
                         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -503,7 +201,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                       ),
                       child: Text(
-                        'Verify',
+                        'Continue',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -513,6 +211,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     ),
                   ),
                 ),
+                
                 const SizedBox(height: 12),
                 // Back Button
                 Padding(

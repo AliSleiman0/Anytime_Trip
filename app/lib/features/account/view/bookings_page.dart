@@ -1392,8 +1392,6 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
   }
 
   void _showRefundDialog(BuildContext context) {
-    final refundController = TextEditingController();
-    
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1448,7 +1446,7 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                     const SizedBox(height: 8),
                     
                     const Text(
-                      'Please enter the refund request details below.',
+                      'Your refund amount will be determined by our admin team based on the booking details and policy.',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
@@ -1457,34 +1455,7 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                       textAlign: TextAlign.center,
                     ),
                     
-                    const SizedBox(height: 20),
-                    
-                    // Refund Amount Input
-                    Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE0E0E0),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: TextField(
-                        controller: refundController,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          hintText: 'Enter Refund Amount',
-                          hintStyle: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black54,
-                          ),
-                        ),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     
                     // Request Button
                     SizedBox(

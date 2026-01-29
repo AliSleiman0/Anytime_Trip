@@ -33,9 +33,6 @@ class _FlightSearchResultsState extends State<FlightSearchResults> {
   Map<String, bool> _filterStops = {};
   Map<String, bool> _filterAirlines = {};
   Map<String, bool> _filterBaggage = {};
-  int _travelTime = 30;
-  double _departureTime = 0.5;
-  double _arrivalTime = 0.5;
   
   final List<Map<String, dynamic>> _datePrices = [
     {'date': 'Thu, Sep 25', 'price': '1,200\$'},
@@ -597,94 +594,6 @@ class _FlightSearchResultsState extends State<FlightSearchResults> {
                           _buildFilterCheckbox('Carry-on bag included', '\$1,000', setModalState, 'baggage'),
                           _buildFilterCheckbox('No cancel fee', '\$1,000', setModalState, 'baggage'),
                           _buildFilterCheckbox('Changes included', '\$1,000', setModalState, 'baggage'),
-                          const SizedBox(height: 24),
-                          
-                          // Travel time
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Travel time',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFFD32F2F),
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF1e5a8e),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: IconButton(
-                                      icon: const Icon(Icons.remove, color: Colors.white, size: 18),
-                                      onPressed: () {
-                                        setModalState(() {
-                                          if (_travelTime > 0) _travelTime--;
-                                        });
-                                      },
-                                      padding: const EdgeInsets.all(4),
-                                      constraints: const BoxConstraints(),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Text(
-                                    '${_travelTime}h',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF1e5a8e),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: IconButton(
-                                      icon: const Icon(Icons.add, color: Colors.white, size: 18),
-                                      onPressed: () {
-                                        setModalState(() {
-                                          _travelTime++;
-                                        });
-                                      },
-                                      padding: const EdgeInsets.all(4),
-                                      constraints: const BoxConstraints(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-                          
-                          // Departure Time
-                          const Text(
-                            'Departure Time',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFFD32F2F),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          _buildTimeSlider(setModalState, true),
-                          const SizedBox(height: 24),
-                          
-                          // Arrival Time
-                          const Text(
-                            'Arrival Time',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFFD32F2F),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          _buildTimeSlider(setModalState, false),
                           const SizedBox(height: 80),
                         ],
                       ),
@@ -801,82 +710,6 @@ class _FlightSearchResultsState extends State<FlightSearchResults> {
     );
   }
 
-  Widget _buildTimeSlider(StateSetter setModalState, bool isDeparture) {
-    double currentValue = isDeparture ? _departureTime : _arrivalTime;
-    
-    return Column(
-      children: [
-        Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.wb_sunny_outlined,
-                size: 20,
-                color: Colors.grey,
-              ),
-            ),
-            Expanded(
-              child: SliderTheme(
-                data: SliderThemeData(
-                  trackHeight: 3,
-                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-                  overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
-                  activeTrackColor: const Color(0xFF1e5a8e),
-                  inactiveTrackColor: Colors.grey.shade300,
-                  thumbColor: const Color(0xFF1e5a8e),
-                ),
-                child: Slider(
-                  value: currentValue,
-                  onChanged: (value) {
-                    setModalState(() {
-                      if (isDeparture) {
-                        _departureTime = value;
-                      } else {
-                        _arrivalTime = value;
-                      }
-                    });
-                  },
-                  min: 0,
-                  max: 1,
-                ),
-              ),
-            ),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 40),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text(
-                'Early Morning',
-                style: TextStyle(fontSize: 11, color: Colors.grey),
-              ),
-              Text(
-                'Morning',
-                style: TextStyle(fontSize: 11, color: Colors.grey),
-              ),
-              Text(
-                'Afternoon',
-                style: TextStyle(fontSize: 11, color: Colors.grey),
-              ),
-              Text(
-                'Evening',
-                style: TextStyle(fontSize: 11, color: Colors.grey),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildFlightCard(Map<String, dynamic> flight) {
     // Determine trip type based on returnDate
     String tripType = widget.returnDate != null ? 'roundtrip' : 'oneway';
@@ -898,6 +731,8 @@ class _FlightSearchResultsState extends State<FlightSearchResults> {
                 tripType: tripType,
                 price: flight['price'],
                 airline: flight['airline'],
+                departureDate: widget.departureDate,
+                returnDate: widget.returnDate,
               ),
             ),
           );
@@ -914,6 +749,8 @@ class _FlightSearchResultsState extends State<FlightSearchResults> {
                 stops: flight['stops'],
                 price: flight['price'],
                 airline: flight['airline'],
+                departureDate: widget.departureDate,
+                returnDate: widget.returnDate,
               ),
             ),
           );
@@ -932,6 +769,8 @@ class _FlightSearchResultsState extends State<FlightSearchResults> {
                 tripType: tripType,
                 price: flight['price'],
                 airline: flight['airline'],
+                departureDate: widget.departureDate,
+                returnDate: widget.returnDate,
               ),
             ),
           );

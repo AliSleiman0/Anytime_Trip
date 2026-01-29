@@ -15,6 +15,7 @@ class ChatbotButton extends StatelessWidget {
     return Positioned(
       bottom: 20,
       right: 20,
+      // Add index to ensure button stays below dropdowns
       child: GestureDetector(
         onTap: () {
           print("Chatbot button tapped!"); // Debug log

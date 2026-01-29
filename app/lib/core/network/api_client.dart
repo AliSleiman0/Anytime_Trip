@@ -35,6 +35,13 @@ class ApiClient {
           return handler.next(response);
         },
         onError: (error, handler) {
+          // Extract error message from response
+          if (error.response?.data != null) {
+            final data = error.response!.data;
+            if (data is Map<String, dynamic> && data['error'] != null) {
+              throw Exception(data['error']);
+            }
+          }
           return handler.next(error);
         },
       ),

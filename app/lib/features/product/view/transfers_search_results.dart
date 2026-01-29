@@ -33,8 +33,6 @@ class _TransfersSearchResultsState extends State<TransfersSearchResults> {
   String _selectedTransferType = '';
   String _selectedVehicleType = '';
   String _selectedProvider = '';
-  double _pickupTimeValue = 0.0; // 0=Early Morning, 1=Morning, 2=Afternoon, 3=Evening
-  double _dropoffTimeValue = 0.0;
   Map<String, bool> _inclusions = {
     'Meet & Greet Service': false,
     'Free Cancellation': false,
@@ -566,40 +564,6 @@ class _TransfersSearchResultsState extends State<TransfersSearchResults> {
                         ],
                       ),
                       const SizedBox(height: 24),
-
-                      // Pickup Time
-                      const Text(
-                        'Pickup Time',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFFD32F2F),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildTimeSlider(_pickupTimeValue, (value) {
-                        setModalState(() {
-                          _pickupTimeValue = value;
-                        });
-                      }),
-                      const SizedBox(height: 24),
-
-                      // Drop-off Time
-                      const Text(
-                        'Drop-off Time',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFFD32F2F),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildTimeSlider(_dropoffTimeValue, (value) {
-                        setModalState(() {
-                          _dropoffTimeValue = value;
-                        });
-                      }),
-                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -685,47 +649,6 @@ class _TransfersSearchResultsState extends State<TransfersSearchResults> {
           child: Text(
             label,
             style: const TextStyle(fontSize: 12),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTimeSlider(double value, Function(double) onChanged) {
-    final labels = ['Early Morning', 'Morning', 'Afternoon', 'Evening'];
-    
-    return Column(
-      children: [
-        SliderTheme(
-          data: SliderThemeData(
-            activeTrackColor: const Color(0xFF1e5a8e),
-            inactiveTrackColor: Colors.grey.shade300,
-            thumbColor: const Color(0xFF1e5a8e),
-            overlayColor: const Color(0xFF1e5a8e).withOpacity(0.2),
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-            trackHeight: 3,
-          ),
-          child: Slider(
-            value: value,
-            min: 0,
-            max: 3,
-            divisions: 3,
-            onChanged: onChanged,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: labels.map((label) {
-              return Flexible(
-                child: Text(
-                  label,
-                  style: const TextStyle(fontSize: 10),
-                  textAlign: TextAlign.center,
-                ),
-              );
-            }).toList(),
           ),
         ),
       ],

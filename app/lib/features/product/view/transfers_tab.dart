@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/widgets/global_chatbot_overlay.dart';
 import 'transfers_search_results.dart';
 
 class TransfersTab extends StatefulWidget {
@@ -553,11 +554,14 @@ class _TransfersTabState extends State<TransfersTab> {
 
   // Bottom Sheet Methods
   void _showTransferTypeBottomSheet(BuildContext context) {
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return Container(
           decoration: const BoxDecoration(
@@ -648,15 +652,20 @@ class _TransfersTabState extends State<TransfersTab> {
           ),
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   void _showLocationBottomSheet(BuildContext context, {required bool isPickup}) {
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return Container(
           decoration: const BoxDecoration(
@@ -745,15 +754,20 @@ class _TransfersTabState extends State<TransfersTab> {
           ),
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   void _showDateBottomSheet(BuildContext context) {
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return Container(
           height: MediaQuery.of(context).size.height * 0.6,
@@ -823,7 +837,9 @@ class _TransfersTabState extends State<TransfersTab> {
           ),
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   void _showTimeBottomSheet(BuildContext context) {
@@ -831,11 +847,14 @@ class _TransfersTabState extends State<TransfersTab> {
     int tempMinute = _timeMinute;
     bool tempIsAM = _isAM;
 
+    isModalOpenNotifier.value = true;
+
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
@@ -1067,15 +1086,20 @@ class _TransfersTabState extends State<TransfersTab> {
           },
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   void _showPassengersBottomSheet(BuildContext context) {
+    isModalOpenNotifier.value = true;
+    
     showModalBottomSheet(
       context: context,
       isDismissible: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      elevation: 10,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
@@ -1175,7 +1199,9 @@ class _TransfersTabState extends State<TransfersTab> {
           },
         );
       },
-    );
+    ).then((_) {
+      isModalOpenNotifier.value = false;
+    });
   }
 
   Widget _buildPassengerRow(String label, int count, VoidCallback onDecrease, VoidCallback onIncrease) {

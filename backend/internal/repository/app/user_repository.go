@@ -158,3 +158,23 @@ func (r *UserRepository) UpdateFreeze(ctx context.Context, id string, freeze boo
 	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
 	return err
 }
+
+// FindByEmail finds a user by email
+func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*app.User, error) {
+	var user app.User
+	err := r.collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+// FindByPhoneNumber finds a user by phone number
+func (r *UserRepository) FindByPhoneNumber(ctx context.Context, phoneNumber string) (*app.User, error) {
+	var user app.User
+	err := r.collection.FindOne(ctx, bson.M{"phone_number": phoneNumber}).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
