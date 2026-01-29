@@ -49,5 +49,11 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<true/>
+		<key>NSCameraUsageDescription</key>
+		<string>We need access to your camera to take profile pictures</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>We need access to your photo library to select profile pictures</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>We need access to save profile pictures to your photo library</string>
 	</dict>
 </plist>

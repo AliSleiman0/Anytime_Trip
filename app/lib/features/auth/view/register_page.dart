@@ -6,6 +6,7 @@ import '../controller/auth_controller.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/widgets/policy_dialogs.dart';
 import '../../../core/utils/helpers.dart';
+import '../../../services/auth_service.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -24,6 +25,8 @@ class _RegisterPageState extends State<RegisterPage> {
   bool agreeToTerms = false;
   String? selectedSex;
   String? selectedCountry;
+  final _authService = AuthService();
+  bool _isGoogleLoading = false;
 
   @override
   void dispose() {
@@ -620,7 +623,49 @@ class _RegisterPageState extends State<RegisterPage> {
                       ],
                     ),
                     child: OutlinedButton(
-                      onPressed: () {},
+                      onPressed: _isGoogleLoading ? null : () async {
+                        setState(() => _isGoogleLoading = true);
+                        try {
+                          final result = await _authService.signInWithGoogle();
+                          
+                          if (!mounted) return;
+                          
+                          if (result == null) {
+                            Helpers.showSnackbar(
+                              'Cancelled',
+                              'Google sign-in was cancelled',
+                              isError: false,
+                            );
+                          } else {
+                            final user = result['user'];
+                            final isNewUser = result['isNewUser'] as bool;
+                            
+                            Helpers.showSnackbar(
+                              'Welcome!',
+                              'Signed in as ${user.email}',
+                              isError: false,
+                            );
+                            
+                            // Navigate based on user status
+                            if (isNewUser) {
+                              // New user - go to complete profile
+                              Get.offAllNamed(AppRoutes.COMPLETE_PROFILE);
+                            } else {
+                              // Existing user - go to home
+                              Get.offAllNamed(AppRoutes.HOME);
+                            }
+                          }
+                        } catch (e) {
+                          if (!mounted) return;
+                          Helpers.showSnackbar(
+                            'Error',
+                            'Google sign-in failed: $e',
+                            isError: true,
+                          );
+                        } finally {
+                          if (mounted) setState(() => _isGoogleLoading = false);
+                        }
+                      },
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         side: const BorderSide(
@@ -631,25 +676,31 @@ class _RegisterPageState extends State<RegisterPage> {
                           borderRadius: BorderRadius.circular(25),
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/gmail.png',
-                            width: 24,
-                            height: 24,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'continue_with_google'.tr,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
+                      child: _isGoogleLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/images/gmail.png',
+                                  width: 24,
+                                  height: 24,
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  'continue_with_google'.tr,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                 ),

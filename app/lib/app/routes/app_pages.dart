@@ -6,6 +6,7 @@ import '../../features/auth/view/forgot_password_page.dart';
 import '../../features/auth/view/otp_confirmation_page.dart';
 import '../../features/auth/view/set_new_password_page.dart';
 import '../../features/auth/view/splash_page.dart';
+import '../../features/auth/view/complete_profile_page.dart';
 import '../../features/product/binding/product_binding.dart';
 import '../../features/product/view/home_page.dart';
 import '../../features/product/view/product_page.dart';
@@ -52,6 +53,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.SET_NEW_PASSWORD,
       page: () => const SetNewPasswordPage(),
+      binding: AuthBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.COMPLETE_PROFILE,
+      page: () => const CompleteProfilePage(),
       binding: AuthBinding(),
     ),
     GetPage(
