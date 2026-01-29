@@ -1,4 +1,4 @@
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto p-6">
+<div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto p-4 md:p-6">
   <!-- Header -->
   <div hx-get="/admin/header?title=Bookings" hx-trigger="load" hx-swap="innerHTML"></div>
 
@@ -12,9 +12,9 @@
   </button>
 
   <!-- Main Content -->
-  <div class="rounded-lg p-8">
+  <div class="rounded-lg p-4 md:p-8">
     <!-- Row 1: Flight Name, Type, Details, Amount -->
-    <div class="grid grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
       <div>
         <p class="text-gray-600 text-sm mb-1">Name</p>
         <p class="text-gray-900 font-semibold">{{.FlightName}}</p>
@@ -34,7 +34,7 @@
     </div>
 
     <!-- Row 2: Payment Status, Status, Departure Date, Arrival Date -->
-    <div class="grid grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
       <div>
         <p class="text-gray-600 text-sm mb-1">Payment Status</p>
         <span class="inline-block px-3 py-1 rounded-full text-white text-xs font-semibold {{if eq .PaymentStatus "paid"}}bg-green-500{{else if eq .PaymentStatus "pending"}}bg-yellow-500{{else if eq .PaymentStatus "refunded"}}bg-blue-500{{else}}bg-gray-500{{end}}">
@@ -56,7 +56,7 @@
     </div>
 
     <!-- Row 3: Seat, Email Address, Phone Number, Reference ID -->
-    <div class="grid grid-cols-4 gap-6 mb-8 pb-8 border-b border-gray-200">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8 pb-6 md:pb-8 border-b border-gray-200">
       <div>
         <p class="text-gray-600 text-sm mb-1">Seat</p>
         <p class="text-gray-900 font-semibold flex items-center gap-2">
@@ -90,7 +90,7 @@
     </div>
 
     <!-- Refund Amount and Buttons -->
-    <div class="mt-4 flex items-center justify-center gap-3">
+    <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
           <div class="relative flex items-center">
             <label class="absolute -top-2 left-3 px-1 text-[11px] font-medium text-[#336891] bg-[#eef5fa]">Refund Amount</label>
             <input
@@ -98,11 +98,11 @@
               type="text"
               value="{{printf "%.2f" .RefundAmount}}"
               data-original="{{printf "%.2f" .RefundAmount}}"
-              class="h-10 border border-[#336891] rounded px-3 w-36 text-sm bg-[#eef5fa] focus:outline-none focus:ring-2 focus:ring-[#336891]/40"
+              class="h-10 border border-[#336891] rounded px-3 w-full sm:w-36 text-sm bg-[#eef5fa] focus:outline-none focus:ring-2 focus:ring-[#336891]/40"
             />
           </div>
-          <button onclick="resetRefund()" type="button" class="h-10 px-4 border border-gray-300 rounded text-sm">Cancel</button>
-          <button onclick="saveRefund()" type="button" class="h-10 px-4 bg-[#336891] text-white rounded text-sm">Confirm</button>
+          <button onclick="resetRefund()" type="button" class="h-10 px-4 border border-gray-300 rounded text-sm w-full sm:w-auto">Cancel</button>
+          <button onclick="saveRefund()" type="button" class="h-10 px-4 bg-[#336891] text-white rounded text-sm w-full sm:w-auto">Confirm</button>
         </div>
   </div>
 </div>

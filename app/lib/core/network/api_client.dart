@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'endpoints.dart';
+import '../storage/storage_service.dart';
 
 class ApiClient {
   late Dio _dio;
+  final StorageService _storage = StorageService();
   
   static final ApiClient _instance = ApiClient._internal();
   factory ApiClient() => _instance;
@@ -23,12 +25,12 @@ class ApiClient {
     // Add interceptors
     _dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
+        onRequest: (options, handler) async {
           // Add auth token if available
-          // final token = Get.find<StorageService>().getToken();
-          // if (token != null) {
-          //   options.headers['Authorization'] = 'Bearer $token';
-          // }
+          final token = await _storage.getToken();
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
           return handler.next(options);
         },
         onResponse: (response, handler) {

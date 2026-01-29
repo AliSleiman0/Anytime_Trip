@@ -6,6 +6,7 @@ class Endpoints {
   // Auth endpoints
   static const String login = '/app/login';
   static const String register = '/app/signup';
+  static const String googleSignIn = '/app/google-signin';
   static const String logout = '/app/logout';
   static const String sendOTP = '/app/send-otp';
   static const String verifyOTP = '/app/verify-otp';
@@ -19,6 +20,7 @@ class Endpoints {
   // Account endpoints
   static const String profile = '/app/profile';
   static const String updateProfile = '/app/profile/update';
+  static const String uploadProfileImage = '/app/profile/upload-image';
 
   // Order endpoints
   static const String orders = '/app/orders';

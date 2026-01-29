@@ -26,6 +26,18 @@ type ServiceProviderView struct {
 	IsFreezed     bool
 }
 
+// BookingView represents a booking entry for the provider detail page
+type BookingView struct {
+	UserName    string
+	BookingType string
+	Status      string
+	StatusClass string
+	Destination string
+	Rating      string
+	Amount      string
+	BookingDate string
+}
+
 // ProviderDetailView is a simplified view model for the detail screen
 type ProviderDetailView struct {
 	ID                     string
@@ -46,6 +58,7 @@ type ProviderDetailView struct {
 	TotalBookingsThisMonth string
 	IsFreezed              bool
 	FreezeActionText       string
+	Bookings               []BookingView
 }
 
 func statusBadgeClass(status string) string {
@@ -109,11 +122,13 @@ type AdminHandler struct {
 	carBookingRepo        *app.CarBookingRepository
 	flightBookingRepo     *app.FlightBookingRepository
 	hotelBookingRepo      *app.HotelBookingRepository
+	transferBookingRepo   *app.TransferBookingRepository
 	supportTicketRepo     *app.SupportTicketRepository
 	paymentRepo           *app.PaymentRepository
 	flightRepo            *adminrepo.FlightRepository
 	carRepo               *adminrepo.CarRepository
 	hotelRepo             *adminrepo.HotelRepository
+	transferRepo          *adminrepo.TransferRepository
 	travelRepo            *adminrepo.TravelRepository
 	bannerRepo            *adminrepo.BannerRepository
 	popularRepo           *adminrepo.PopularRepository
@@ -124,7 +139,7 @@ type AdminHandler struct {
 	loginAttemptRepo      *adminrepo.LoginAttemptRepository
 }
 
-func NewAdminHandler(adminRepo *adminrepo.AdminRepository, notificationPrefsRepo *adminrepo.NotificationPreferencesRepository, passwordResetRepo *adminrepo.PasswordResetRepository, userRepo *app.UserRepository, carBookingRepo *app.CarBookingRepository, flightBookingRepo *app.FlightBookingRepository, hotelBookingRepo *app.HotelBookingRepository, supportTicketRepo *app.SupportTicketRepository, paymentRepo *app.PaymentRepository, flightRepo *adminrepo.FlightRepository, carRepo *adminrepo.CarRepository, hotelRepo *adminrepo.HotelRepository, bannerRepo *adminrepo.BannerRepository, travelRepo *adminrepo.TravelRepository, popularRepo *adminrepo.PopularRepository, predefinedAnswerRepo *superadminrepo.PredefinedAnswerRepository, loginAttemptRepo *adminrepo.LoginAttemptRepository, jwtSecret string, chatHub *ws.Hub, notifyHub *ws.AdminHub) *AdminHandler {
+func NewAdminHandler(adminRepo *adminrepo.AdminRepository, notificationPrefsRepo *adminrepo.NotificationPreferencesRepository, passwordResetRepo *adminrepo.PasswordResetRepository, userRepo *app.UserRepository, carBookingRepo *app.CarBookingRepository, flightBookingRepo *app.FlightBookingRepository, hotelBookingRepo *app.HotelBookingRepository, transferBookingRepo *app.TransferBookingRepository, supportTicketRepo *app.SupportTicketRepository, paymentRepo *app.PaymentRepository, flightRepo *adminrepo.FlightRepository, carRepo *adminrepo.CarRepository, hotelRepo *adminrepo.HotelRepository, transferRepo *adminrepo.TransferRepository, bannerRepo *adminrepo.BannerRepository, travelRepo *adminrepo.TravelRepository, popularRepo *adminrepo.PopularRepository, predefinedAnswerRepo *superadminrepo.PredefinedAnswerRepository, loginAttemptRepo *adminrepo.LoginAttemptRepository, jwtSecret string, chatHub *ws.Hub, notifyHub *ws.AdminHub) *AdminHandler {
 	return &AdminHandler{
 		adminRepo:             adminRepo,
 		notificationPrefsRepo: notificationPrefsRepo,
@@ -133,11 +148,13 @@ func NewAdminHandler(adminRepo *adminrepo.AdminRepository, notificationPrefsRepo
 		carBookingRepo:        carBookingRepo,
 		flightBookingRepo:     flightBookingRepo,
 		hotelBookingRepo:      hotelBookingRepo,
+		transferBookingRepo:   transferBookingRepo,
 		supportTicketRepo:     supportTicketRepo,
 		paymentRepo:           paymentRepo,
 		flightRepo:            flightRepo,
 		carRepo:               carRepo,
 		hotelRepo:             hotelRepo,
+		transferRepo:          transferRepo,
 		bannerRepo:            bannerRepo,
 		travelRepo:            travelRepo,
 		popularRepo:           popularRepo,

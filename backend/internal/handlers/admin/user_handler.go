@@ -28,14 +28,15 @@ type UserRow struct {
 
 // UserBookingRow is a view model for a single booking line in the user details view.
 type UserBookingRow struct {
-	Provider    string
-	Type        string
-	Status      string
-	StatusClass string
-	Location    string
-	Rating      string
-	Revenue     string
-	CreatedAt   time.Time
+	Provider     string
+	ProviderName string
+	Type         string
+	Status       string
+	StatusClass  string
+	Location     string
+	Rating       string
+	Revenue      string
+	CreatedAt    time.Time
 }
 
 // ManageUsers renders the user management page
@@ -46,7 +47,8 @@ func (h *AdminHandler) ManageUsers(c *fiber.Ctx) error {
 	}
 
 	data := fiber.Map{
-		"Title": "Users",
+		"Title":            "Users",
+		"ShowExportButton": true,
 	}
 
 	c.Set("Content-Type", "text/html")
@@ -271,15 +273,21 @@ func (h *AdminHandler) GetViewUserFragment(c *fiber.Ctx) error {
 
 	carBookings, _ := h.carBookingRepo.FindByUserID(ctx, userID)
 	for _, b := range carBookings {
+		car, _ := h.carRepo.FindByID(ctx, b.CarID)
+		providerName := "-"
+		if car != nil {
+			providerName = car.ProviderName
+		}
 		bookings = append(bookings, UserBookingRow{
-			Provider:    "Car",
-			Type:        "Car Rental",
-			Status:      titleCase(string(b.Status)),
-			StatusClass: statusBadge(string(b.Status)),
-			Location:    "-",
-			Rating:      "-",
-			Revenue:     formatAmount(b.Currency, b.Amount),
-			CreatedAt:   b.CreatedAt,
+			Provider:     "Car",
+			ProviderName: providerName,
+			Type:         "Car Rental",
+			Status:       titleCase(string(b.Status)),
+			StatusClass:  statusBadge(string(b.Status)),
+			Location:     "-",
+			Rating:       "-",
+			Revenue:      formatAmount(b.Currency, b.Amount),
+			CreatedAt:    b.CreatedAt,
 		})
 		if b.CreatedAt.After(lastBookingAt) {
 			lastBookingAt = b.CreatedAt
@@ -288,15 +296,21 @@ func (h *AdminHandler) GetViewUserFragment(c *fiber.Ctx) error {
 
 	flightBookings, _ := h.flightBookingRepo.FindByUserID(ctx, userID)
 	for _, b := range flightBookings {
+		flight, _ := h.flightRepo.FindByID(ctx, b.FlightID)
+		providerName := "-"
+		if flight != nil {
+			providerName = flight.ProviderName
+		}
 		bookings = append(bookings, UserBookingRow{
-			Provider:    "Flight",
-			Type:        "Flight Booking",
-			Status:      titleCase(string(b.Status)),
-			StatusClass: statusBadge(string(b.Status)),
-			Location:    "-",
-			Rating:      "-",
-			Revenue:     formatAmount(b.Currency, b.Amount),
-			CreatedAt:   b.CreatedAt,
+			Provider:     "Flight",
+			ProviderName: providerName,
+			Type:         "Flight Booking",
+			Status:       titleCase(string(b.Status)),
+			StatusClass:  statusBadge(string(b.Status)),
+			Location:     "-",
+			Rating:       "-",
+			Revenue:      formatAmount(b.Currency, b.Amount),
+			CreatedAt:    b.CreatedAt,
 		})
 		if b.CreatedAt.After(lastBookingAt) {
 			lastBookingAt = b.CreatedAt
@@ -305,15 +319,44 @@ func (h *AdminHandler) GetViewUserFragment(c *fiber.Ctx) error {
 
 	hotelBookings, _ := h.hotelBookingRepo.FindByUserID(ctx, userID)
 	for _, b := range hotelBookings {
+		hotel, _ := h.hotelRepo.FindByID(ctx, b.HotelID)
+		providerName := "-"
+		if hotel != nil {
+			providerName = hotel.ProviderName
+		}
 		bookings = append(bookings, UserBookingRow{
-			Provider:    "Hotel",
-			Type:        "Hotel Booking",
-			Status:      titleCase(string(b.Status)),
-			StatusClass: statusBadge(string(b.Status)),
-			Location:    "-",
-			Rating:      "-",
-			Revenue:     formatAmount(b.Currency, b.Amount),
-			CreatedAt:   b.CreatedAt,
+			Provider:     "Hotel",
+			ProviderName: providerName,
+			Type:         "Hotel Booking",
+			Status:       titleCase(string(b.Status)),
+			StatusClass:  statusBadge(string(b.Status)),
+			Location:     "-",
+			Rating:       "-",
+			Revenue:      formatAmount(b.Currency, b.Amount),
+			CreatedAt:    b.CreatedAt,
+		})
+		if b.CreatedAt.After(lastBookingAt) {
+			lastBookingAt = b.CreatedAt
+		}
+	}
+
+	transferBookings, _ := h.transferBookingRepo.FindByUserID(ctx, userID)
+	for _, b := range transferBookings {
+		transfer, _ := h.transferRepo.FindByID(ctx, b.TransferID)
+		providerName := "-"
+		if transfer != nil {
+			providerName = transfer.ProviderName
+		}
+		bookings = append(bookings, UserBookingRow{
+			Provider:     "Transfer",
+			ProviderName: providerName,
+			Type:         "Transfer Booking",
+			Status:       titleCase(string(b.Status)),
+			StatusClass:  statusBadge(string(b.Status)),
+			Location:     "-",
+			Rating:       "-",
+			Revenue:      formatAmount(b.Currency, b.Amount),
+			CreatedAt:    b.CreatedAt,
 		})
 		if b.CreatedAt.After(lastBookingAt) {
 			lastBookingAt = b.CreatedAt

@@ -9,6 +9,7 @@ type User struct {
 	Email         string    `json:"email" bson:"email"`
 	PhoneNumber   string    `json:"phone_number" bson:"phone_number"`
 	PasswordHash  string    `json:"-" bson:"password_hash"` // Hidden from JSON responses
+	ProfileImage  string    `json:"profile_image" bson:"profile_image,omitempty"`
 	Sex           string    `json:"sex" bson:"sex"`
 	Country       string    `json:"country" bson:"country"`
 	IsActive      bool      `json:"is_active" bson:"is_active"`

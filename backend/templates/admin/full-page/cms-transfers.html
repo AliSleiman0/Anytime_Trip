@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} - Anytime Trip Admin</title>
+    <!-- Include HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <!-- Include Tailwind CSS or your CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <!-- jsPDF and html2canvas for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <!-- Export Script -->
+    <script src="/static/export.js"></script>
+</head>
+<body class="bg-[#E6F0F9]">
+    <!-- Sidebar Component -->
+    <div hx-get="/admin/sidebar" hx-trigger="load" hx-swap="innerHTML"></div>
+    
+    <!-- Main Content Area - Admin Dashboard Fragment -->
+    <div id="main-content" hx-get="/admin/cms/transfers-frag" hx-trigger="load" hx-swap="innerHTML"></div>
+    
+        
+</body>
+</html>

@@ -1,0 +1,426 @@
+<style>
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #336891;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2a5573;
+  }
+</style>
+
+<div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto">
+  <main class="">
+    <!-- header -->
+    <div
+      hx-get="/admin/header?title=Service Management"
+      hx-trigger="load"
+      hx-swap="innerHTML"
+    ></div>
+
+    <!-- inputs -->
+    <div class="p-4 flex flex-col md:flex-row justify-between gap-4">
+      <!-- filters -->
+      <div class="flex gap-4 md:gap-8 overflow-x-auto">
+        <a href="/admin/cms/flights" class="text-[#336891] w-20 h-8 flex items-center justify-center flex-shrink-0">
+          Flights
+        </a>
+        <a href="/admin/cms/cars" class="text-[#336891] w-20 h-8 flex items-center justify-center flex-shrink-0">
+          Cars
+        </a>
+        <a href="/admin/cms/hotels" class="text-[#336891] w-20 h-8 flex items-center justify-center flex-shrink-0">
+          Hotels
+        </a>
+        <a href="/admin/cms/transfers" class="text-[#336891] border-b-4 border-[#336891] w-20 h-8 flex items-center justify-center flex-shrink-0">
+          Transfers
+        </a>
+      </div>
+
+      <div class="flex items-center gap-2 md:gap-4 w-full md:w-auto">
+        <p class="flex items-center gap-2 whitespace-nowrap">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20 5.6001C20 5.04005 19.9996 4.75981 19.8906 4.5459C19.7948 4.35774 19.6423 4.20487 19.4542 4.10899C19.2403 4 18.9597 4 18.3996 4H5.59961C5.03956 4 4.75981 4 4.5459 4.10899C4.35774 4.20487 4.20487 4.35774 4.10899 4.5459C4 4.75981 4 5.04005 4 5.6001V6.33736C4 6.58195 4 6.70433 4.02763 6.81942C4.05213 6.92146 4.09263 7.01893 4.14746 7.1084C4.20928 7.20928 4.29591 7.29591 4.46875 7.46875L9.53149 12.5315C9.70443 12.7044 9.79044 12.7904 9.85228 12.8914C9.90711 12.9808 9.94816 13.0786 9.97266 13.1807C10 13.2946 10 13.4155 10 13.6552V18.411C10 19.2682 10 19.6971 10.1805 19.9552C10.3382 20.1806 10.5814 20.331 10.8535 20.3712C11.1651 20.4172 11.5487 20.2257 12.3154 19.8424L13.1154 19.4424C13.4365 19.2819 13.5966 19.2013 13.7139 19.0815C13.8176 18.9756 13.897 18.8485 13.9453 18.7084C14 18.5499 14 18.37 14 18.011V13.6626C14 13.418 14 13.2958 14.0276 13.1807C14.0521 13.0786 14.0926 12.9808 14.1475 12.8914C14.2089 12.7911 14.2947 12.7053 14.4653 12.5347L14.4688 12.5315L19.5315 7.46875C19.7044 7.2958 19.7904 7.20932 19.8523 7.1084C19.9071 7.01893 19.9482 6.92146 19.9727 6.81942C20 6.70551 20 6.58444 20 6.3448V5.6001Z"
+              stroke="#1D1D1D"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Filter:
+        </p>
+        <select
+          class="w-full md:w-56 h-12 border rounded-sm border-[#6FA4CD] px-4 text-gray-700 shadow-[0_4px_4px_0_#0000001A] focus:outline-none focus:border-[#336891]"
+          name="status"
+          id="status"
+          onchange="filterTransfers()"
+        >
+          <option class="text-[#9B9B9B]" value="all">All Statuses</option>
+          <option class="text-[#9B9B9B]" value="active">Active</option>
+          <option class="text-[#9B9B9B]" value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Transfers management Table -->
+    <div class="px-4">
+      <div class="rounded-t-2xl overflow-hidden border border-gray-200">
+        <div class="overflow-y-auto custom-scrollbar" style="max-height: 560px;">
+          <table class="w-full text-sm">
+            <thead class="bg-[#336891] text-white sticky top-0 z-20">
+              <tr>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Service Name</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Provider</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Status</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Pickup Time</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Pickup Location</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Dropoff Time</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 12%;">Dropoff Location</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Cost</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 10%;">Extras</th>
+                <th class="px-4 py-3 text-center font-semibold" style="width: 8%;">Action</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white text-gray-900">
+              {{range .Transfers}}
+              <tr class="border-b border-gray-200" data-transfer-id="{{.ID}}" data-service-name="{{.ServiceName}}" data-status="{{.Status}}" data-cost="{{.Cost}}" data-currency="{{.Currency}}" data-profit-percent="{{.ProfitPercent}}" data-pickup-location="{{.PickupLocation}}" data-pickup-time="{{formatDateTime .PickupTime}}" data-dropoff-location="{{.DropoffLocation}}" data-dropoff-time="{{formatDateTime .DropoffTime}}" data-refundable="{{.Refundable}}" data-allow-changes="{{.AllowChanges}}" data-meet-and-greet="{{.MeetAndGreet}}" data-luggage-included="{{.LuggageIncluded}}">
+                <td class="px-4 py-3 text-center text-sm font-semibold" style="width: 12%;">
+                  {{.ServiceName}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
+                  {{.ProviderName}}
+                </td>
+                <td class="px-4 py-3 text-center" style="width: 8%;">
+                  {{if eq .Status "active"}}
+                  <span class="bg-[#D4F5D4] text-[#009316] px-3 py-1 rounded-full text-xs font-semibold">Active</span>
+                  {{else if eq .Status "inactive"}}
+                  <span class="bg-[#FFE4E6] text-[#DC2626] px-3 py-1 rounded-full text-xs font-semibold">Inactive</span>
+                  {{else}}
+                  <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold">{{.Status}}</span>
+                  {{end}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
+                  {{formatTime .PickupTime}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 12%;">
+                  {{.PickupLocation}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
+                  {{formatTime .DropoffTime}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 12%;">
+                  {{.DropoffLocation}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm font-semibold text-gray-900" style="width: 8%;">
+                  {{.Currency}} {{printf "%.2f" .Cost}}
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-800" style="width: 10%;">
+                  {{if .Refundable}}Refundable<br/>{{end}}
+                  {{if .AllowChanges}}Flexible<br/>{{end}}
+                  {{if .MeetAndGreet}}Meet & Greet<br/>{{end}}
+                  {{if .LuggageIncluded}}Luggage{{end}}
+                </td>
+                <td class="px-4 py-3 text-center" style="width: 8%;">
+                  <div class="flex justify-center gap-2">
+                    <button class="bg-[#D24124] w-5 h-5 rounded flex items-center justify-center">
+                      <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.25 16.625C5.25 17.5875 6.0375 18.375 7 18.375H14C14.9625 18.375 15.75 17.5875 15.75 16.625V7.875C15.75 6.9125 14.9625 6.125 14 6.125H7C6.0375 6.125 5.25 6.9125 5.25 7.875V16.625ZM15.75 3.5H13.5625L12.9412 2.87875C12.7837 2.72125 12.5563 2.625 12.3288 2.625H8.67125C8.44375 2.625 8.21625 2.72125 8.05875 2.87875L7.4375 3.5H5.25C4.76875 3.5 4.375 3.89375 4.375 4.375C4.375 4.85625 4.76875 5.25 5.25 5.25H15.75C16.2312 5.25 16.625 4.85625 16.625 4.375C16.625 3.89375 16.2312 3.5 15.75 3.5Z" fill="white"/>
+                      </svg>
+                    </button>
+                    <button class="bg-[#336891] w-5 h-5 rounded flex items-center justify-center">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.8385 1.71707C10.6198 1.49836 10.3231 1.37549 10.0137 1.37549C9.70436 1.37549 9.40766 1.49836 9.18888 1.71707L8.2293 2.67724L11.3227 5.77066L12.2823 4.81166C12.3907 4.70331 12.4767 4.57468 12.5353 4.4331C12.594 4.29153 12.6242 4.13978 12.6242 3.98653C12.6242 3.83328 12.594 3.68154 12.5353 3.53996C12.4767 3.39838 12.3907 3.26975 12.2823 3.16141L10.8385 1.71707ZM10.4979 6.59549L7.40446 3.50207L2.25071 8.65582L1.62305 12.3775L5.34471 11.7492L10.4979 6.59549Z" fill="white"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {{end}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      .swal2-cancel-btn-custom {
+        color: #000 !important;
+        border: 1px solid #000 !important;
+        background-color: transparent !important;
+      }
+
+      tbody tr td:last-child {
+        position: relative;
+        pointer-events: auto;
+      }
+
+      tbody tr td:last-child button {
+        position: relative;
+        z-index: 10;
+        pointer-events: auto;
+      }
+    </style>
+    <script>
+      // Filter transfers by status
+      function filterTransfers() {
+        const statusFilter = document.getElementById('status').value;
+        const rows = document.querySelectorAll('tbody tr');
+        
+        rows.forEach(row => {
+          const rowStatus = row.dataset.status;
+          
+          if (statusFilter === 'all' || rowStatus === statusFilter) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      }
+
+      let currentTransferData = null;
+
+      function openTransferModal(event) {
+        if (event) {
+          event.stopPropagation();
+          event.preventDefault();
+        }
+
+        const row = event.target.closest('tr');
+        if (row) {
+          currentTransferData = {
+            id: row.dataset.transferId,
+            serviceName: row.dataset.serviceName,
+            status: row.dataset.status,
+            cost: parseFloat(row.dataset.cost) || 0,
+            currency: row.dataset.currency || 'USD',
+            profitPercent: parseFloat(row.dataset.profitPercent) || 0,
+            pickupLocation: row.dataset.pickupLocation || '',
+            pickupTime: row.dataset.pickupTime || '',
+            dropoffLocation: row.dataset.dropoffLocation || '',
+            dropoffTime: row.dataset.dropoffTime || '',
+            refundable: row.dataset.refundable === 'true',
+            allowChanges: row.dataset.allowChanges === 'true',
+            meetAndGreet: row.dataset.meetAndGreet === 'true',
+            luggageIncluded: row.dataset.luggageIncluded === 'true'
+          };
+        }
+
+        const modalHtml = `
+           <div class="flex flex-col gap-4 text-[#1d1d1d] font-sans">
+            <div class="text-center">
+              <div class="text-lg font-bold text-[#1f3242]">Transfer Service</div>
+              <div class="text-xs text-[#5b7282] mt-1">${currentTransferData?.serviceName || ''}</div>
+            </div>
+
+            <div class="grid gap-3">
+              <div class="flex flex-col gap-1">
+                <label class="text-xs font-semibold text-[#5b7282]">Service Name</label>
+                <input id="transfer-service-name" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="${currentTransferData?.serviceName || ''}" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Pickup Location</label>
+                  <input id="transfer-pickup-location" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="${currentTransferData?.pickupLocation || ''}" />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Pickup Time</label>
+                  <input id="transfer-pickup-time" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="datetime-local" value="${currentTransferData?.pickupTime || ''}" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Dropoff Location</label>
+                  <input id="transfer-dropoff-location" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="text" value="${currentTransferData?.dropoffLocation || ''}" />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs font-semibold text-[#5b7282]">Dropoff Time</label>
+                  <input id="transfer-dropoff-time" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="datetime-local" value="${currentTransferData?.dropoffTime || ''}" />
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-1">
+                <label class="text-xs font-semibold text-[#5b7282]">Total Commission</label>
+                <div class="grid grid-cols-[1fr_auto] gap-2">
+                  <input id="transfer-commission" class="h-10 rounded-md border border-[#8aaecd] px-3 text-sm text-[#1d1d1d] placeholder-[#93a7b5]" type="number" step="0.1" placeholder="10%" value="${currentTransferData?.profitPercent || 0}" />
+                  <div class="h-10 px-3 rounded-md border border-[#8aaecd] bg-[#f7fafc] text-sm font-semibold flex items-center justify-center text-[#1d1d1d]">${currentTransferData?.currency || '$'} ${((currentTransferData?.cost || 0) * (currentTransferData?.profitPercent || 0) / 100).toFixed(2)}</div>
+                </div>
+              </div>
+
+              <div class="grid gap-2 mt-3">
+                <div class="text-sm font-bold text-[#1f3242] text-start">Service Features</div>
+                <div class="grid grid-cols-2 gap-3 text-sm font-medium text-[#1d1d1d]">
+                  <label class="flex items-center gap-2"><input type="checkbox" id="refundable" class="h-4 w-4" ${currentTransferData?.refundable ? 'checked' : ''} /> Refundable</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="allow-changes" class="h-4 w-4" ${currentTransferData?.allowChanges ? 'checked' : ''} /> Allow Changes</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="meet-and-greet" class="h-4 w-4" ${currentTransferData?.meetAndGreet ? 'checked' : ''} /> Meet and Greet</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" id="luggage-included" class="h-4 w-4" ${currentTransferData?.luggageIncluded ? 'checked' : ''} /> Luggage Included</label>
+                </div>
+              </div>
+
+              <div class="flex justify-center gap-3 pt-1">
+                <button class="min-w-[96px] px-4 py-2.5 rounded-lg border border-[#1f3242] text-[#1f3242] font-bold text-sm" id="transfer-modal-cancel">Cancel</button>
+                <button class="min-w-[96px] px-4 py-2.5 rounded-lg border border-[#336891] bg-[#336891] text-white font-bold text-sm" id="transfer-modal-save">Save</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        Swal.fire({
+          width: "560px",
+          padding: "18px",
+          showConfirmButton: false,
+          showDenyButton: false,
+          showCancelButton: false,
+          html: modalHtml,
+        });
+
+        setTimeout(() => {
+          const closeModal = () => Swal.close();
+          const cancelBtn = document.getElementById("transfer-modal-cancel");
+          const saveBtn = document.getElementById("transfer-modal-save");
+          if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+          if (saveBtn) saveBtn.addEventListener("click", saveTransferData);
+
+          const commissionInput = document.getElementById("transfer-commission");
+          if (commissionInput) {
+            commissionInput.addEventListener("input", () => {
+              const percent = parseFloat(commissionInput.value) || 0;
+              const calculated = ((currentTransferData?.cost || 0) * percent / 100).toFixed(2);
+              document.querySelector('[id*="commission"]').closest('.grid').querySelector('div:last-child').textContent = `${currentTransferData?.currency || '$'} ${calculated}`;
+            });
+          }
+        }, 0);
+      }
+
+      async function saveTransferData() {
+        const data = {
+          id: currentTransferData?.id,
+          service_name: document.getElementById('transfer-service-name')?.value || '',
+          pickup_location: document.getElementById('transfer-pickup-location')?.value || '',
+          pickup_time: document.getElementById('transfer-pickup-time')?.value || '',
+          dropoff_location: document.getElementById('transfer-dropoff-location')?.value || '',
+          dropoff_time: document.getElementById('transfer-dropoff-time')?.value || '',
+          profit_percent: parseFloat(document.getElementById('transfer-commission')?.value) || 0,
+          refundable: document.getElementById('refundable')?.checked || false,
+          allow_changes: document.getElementById('allow-changes')?.checked || false,
+          meet_and_greet: document.getElementById('meet-and-greet')?.checked || false,
+          luggage_included: document.getElementById('luggage-included')?.checked || false
+        };
+
+        try {
+          const response = await fetch('/admin/cms/transfers/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: 'Transfer updated successfully',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: result.error || 'Failed to update transfer'
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Network error occurred'
+          });
+        }
+      }
+
+      function openDeleteModal(event) {
+        if (event) {
+          event.stopPropagation();
+          event.preventDefault();
+        }
+
+        const modalHtml = `
+          <div class="flex flex-col items-center gap-4 text-[#1d1d1d] font-sans">
+            <div class="w-12 h-12 rounded-full bg-[#fdeeed] flex items-center justify-center shadow-[0_8px_32px_0_#fbd3ce]">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 6.25V10.625" stroke="#D24124" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M10 13.75H10.0083" stroke="#D24124" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M9.99935 2.49935C5.39602 2.49935 1.66602 6.22935 1.66602 10.8327C1.66602 15.436 5.39602 19.166 9.99935 19.166C14.6027 19.166 18.3327 15.436 18.3327 10.8327C18.3327 6.22935 14.6027 2.49935 9.99935 2.49935Z" stroke="#D24124" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="text-center flex flex-col gap-1">
+              <div class="text-lg font-bold text-[#1f3242]">Delete Content</div>
+              <div class="text-sm text-[#1d1d1d]">Are you sure you want to delete this transfer service?<br/>This change cannot be undone</div>
+            </div>
+
+            <div class="flex gap-3">
+              <button class="min-w-[120px] px-4 py-2.5 rounded-lg border border-[#1f3242] text-[#1f3242] font-semibold text-sm bg-white" id="transfer-delete-cancel">Cancel</button>
+              <button class="min-w-[120px] px-4 py-2.5 rounded-lg border border-[#d24124] bg-[#d24124] text-white font-semibold text-sm" id="transfer-delete-confirm">Delete content</button>
+            </div>
+          </div>
+        `;
+
+        Swal.fire({
+          width: "420px",
+          padding: "18px",
+          showConfirmButton: false,
+          showDenyButton: false,
+          showCancelButton: false,
+          html: modalHtml,
+        });
+
+        setTimeout(() => {
+          const cancelBtn = document.getElementById("transfer-delete-cancel");
+          const confirmBtn = document.getElementById("transfer-delete-confirm");
+          const closeModal = () => Swal.close();
+          if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+          if (confirmBtn) confirmBtn.addEventListener("click", closeModal);
+        }, 0);
+      }
+
+      document.addEventListener("click", (event) => {
+        const btn = event.target.closest("button");
+        if (!btn) return;
+        const cell = btn.closest("td");
+        if (!cell) return;
+        const row = cell.parentElement;
+        if (!row) return;
+        const cellIndex = Array.from(row.children).indexOf(cell);
+        if (cellIndex !== 9) return; // action column is at index 9
+        const buttons = Array.from(cell.querySelectorAll("button"));
+        const btnIndex = buttons.indexOf(btn);
+        if (btnIndex === 0) {
+          openDeleteModal(event);
+        }
+        if (btnIndex === 1) {
+          openTransferModal(event);
+        }
+      });
+    </script>
+  </main>
+</div>

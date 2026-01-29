@@ -3,6 +3,8 @@ package app
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -639,5 +641,316 @@ func (h *AppHandler) ResetPassword(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Password reset successfully",
+	})
+}
+
+// GoogleSignIn handles Google OAuth sign-in
+func (h *AppHandler) GoogleSignIn(c *fiber.Ctx) error {
+	fmt.Println("========== GOOGLE SIGN-IN REQUEST RECEIVED ==========")
+
+	var req struct {
+		UID      string `json:"uid"`
+		Email    string `json:"email"`
+		Name     string `json:"name"`
+		PhotoURL string `json:"photo_url"`
+	}
+
+	// Parse request body
+	if err := c.BodyParser(&req); err != nil {
+		fmt.Printf("[ERROR] Failed to parse request body: %v\n", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request format",
+		})
+	}
+
+	fmt.Printf("[INFO] Request data: UID=%s, Email=%s, Name=%s\n", req.UID, req.Email, req.Name)
+
+	// Validate required fields
+	if req.UID == "" || req.Email == "" {
+		fmt.Println("[ERROR] Missing required fields: UID or Email")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "UID and email are required",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Normalize email to lowercase
+	email := strings.ToLower(req.Email)
+	fmt.Printf("[INFO] Normalized email: %s\n", email)
+
+	// Check if user exists by email
+	fmt.Println("[INFO] Checking if user exists in database...")
+	existingUser, err := h.userRepo.FindByEmail(ctx, email)
+	isNewUser := false
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			// New user - create account
+			fmt.Println("[INFO] User not found - creating new user")
+			isNewUser = true
+			user := &appmodels.User{
+				ID:            uuid.New().String(),
+				Name:          req.Name,
+				Email:         email,
+				PhoneNumber:   "", // To be filled in profile completion
+				PasswordHash:  "", // No password for Google sign-in
+				Sex:           "", // To be filled in profile completion
+				Country:       "", // To be filled in profile completion
+				IsActive:      true,
+				IsFreezed:     false,
+				TotalBookings: 0,
+				CreatedAt:     time.Now(),
+				LastLogin:     time.Now(),
+			}
+
+			fmt.Printf("[INFO] Creating new user with ID: %s\n", user.ID)
+
+			// Save user to database
+			if err := h.userRepo.Create(ctx, user); err != nil {
+				fmt.Printf("[ERROR] Failed to create user in database: %v\n", err)
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+					"error": "Failed to create user",
+				})
+			}
+
+			fmt.Println("[SUCCESS] New user created successfully")
+			existingUser = user
+		} else {
+			fmt.Printf("[ERROR] Database error while finding user: %v\n", err)
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Database error",
+			})
+		}
+	} else {
+		// Existing user - update last login
+		fmt.Printf("[INFO] Existing user found: %s (ID: %s)\n", existingUser.Email, existingUser.ID)
+		existingUser.LastLogin = time.Now()
+		if err := h.userRepo.Update(ctx, existingUser.ID, existingUser); err != nil {
+			fmt.Printf("[WARNING] Failed to update last login: %v\n", err)
+		} else {
+			fmt.Println("[INFO] Last login updated successfully")
+		}
+	}
+
+	// Generate JWT token
+	fmt.Println("[INFO] Generating JWT token...")
+	tokenString, err := utils.GenerateJWT(existingUser.ID, "user", h.jwtSecret, 24*7*time.Hour)
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to generate JWT token: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to generate token",
+		})
+	}
+
+	fmt.Printf("[SUCCESS] JWT token generated successfully\n")
+	fmt.Printf("[INFO] Returning response - isNewUser: %v\n", isNewUser)
+	fmt.Println("========== GOOGLE SIGN-IN COMPLETED ==========")
+
+	// Return user data and token
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":   "Sign-in successful",
+		"token":     tokenString,
+		"isNewUser": isNewUser,
+		"user": fiber.Map{
+			"id":             existingUser.ID,
+			"name":           existingUser.Name,
+			"email":          existingUser.Email,
+			"phone_number":   existingUser.PhoneNumber,
+			"profile_image":  existingUser.ProfileImage,
+			"sex":            existingUser.Sex,
+			"country":        existingUser.Country,
+			"total_bookings": existingUser.TotalBookings,
+			"is_active":      existingUser.IsActive,
+			"created_at":     existingUser.CreatedAt,
+			"last_login":     existingUser.LastLogin,
+		},
+	})
+}
+
+// UpdateProfile updates user profile information
+func (h *AppHandler) UpdateProfile(c *fiber.Ctx) error {
+	fmt.Println("========== UPDATE PROFILE REQUEST ==========")
+
+	var req struct {
+		PhoneNumber string `json:"phone_number"`
+		Sex         string `json:"sex"`
+		Country     string `json:"country"`
+	}
+
+	// Parse request body
+	if err := c.BodyParser(&req); err != nil {
+		fmt.Printf("[ERROR] Failed to parse request: %v\n", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request format",
+		})
+	}
+
+	fmt.Printf("[INFO] Update data - Phone: %s, Sex: %s, Country: %s\n", req.PhoneNumber, req.Sex, req.Country)
+
+	// Get user ID from JWT token (assuming middleware sets it)
+	userID := c.Locals("user_id")
+	fmt.Printf("[INFO] User ID from token: %v\n", userID)
+
+	if userID == nil {
+		fmt.Println("[ERROR] No user_id in context")
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Find user
+	fmt.Printf("[INFO] Looking up user with ID: %s\n", userID.(string))
+	user, err := h.userRepo.FindByID(ctx, userID.(string))
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to find user: %v\n", err)
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "User not found",
+		})
+	}
+
+	fmt.Printf("[INFO] Found user: %s (%s)\n", user.Email, user.ID)
+
+	// Update fields if provided
+	if req.PhoneNumber != "" {
+		user.PhoneNumber = req.PhoneNumber
+	}
+	if req.Sex != "" {
+		user.Sex = req.Sex
+	}
+	if req.Country != "" {
+		user.Country = req.Country
+	}
+
+	// Save updated user
+	if err := h.userRepo.Update(ctx, user.ID, user); err != nil {
+		fmt.Printf("[ERROR] Failed to update user: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to update profile",
+		})
+	}
+
+	fmt.Println("[SUCCESS] Profile updated successfully")
+	fmt.Println("========== UPDATE PROFILE COMPLETED ==========")
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Profile updated successfully",
+		"user": fiber.Map{
+			"id":             user.ID,
+			"name":           user.Name,
+			"email":          user.Email,
+			"phone_number":   user.PhoneNumber,
+			"profile_image":  user.ProfileImage,
+			"sex":            user.Sex,
+			"country":        user.Country,
+			"total_bookings": user.TotalBookings,
+			"is_active":      user.IsActive,
+			"created_at":     user.CreatedAt,
+			"last_login":     user.LastLogin,
+		},
+	})
+}
+
+// UploadProfileImage handles profile image upload
+func (h *AppHandler) UploadProfileImage(c *fiber.Ctx) error {
+	fmt.Println("========== UPLOAD PROFILE IMAGE REQUEST ==========")
+
+	// Get user ID from JWT token
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	// Get the uploaded file
+	file, err := c.FormFile("image")
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to get file: %v\n", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "No image file provided",
+		})
+	}
+
+	// Validate file size (max 5MB)
+	if file.Size > 5*1024*1024 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "File size exceeds 5MB limit",
+		})
+	}
+
+	// Validate file type
+	contentType := file.Header.Get("Content-Type")
+	if !strings.HasPrefix(contentType, "image/") {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid file type. Only images are allowed",
+		})
+	}
+
+	// Create uploads directory if it doesn't exist
+	uploadDir := "./static/uploads/profiles"
+	if err := os.MkdirAll(uploadDir, 0755); err != nil {
+		fmt.Printf("[ERROR] Failed to create upload directory: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to create upload directory",
+		})
+	}
+
+	// Generate unique filename
+	ext := filepath.Ext(file.Filename)
+	filename := fmt.Sprintf("%s_%d%s", userID.(string), time.Now().Unix(), ext)
+	filePath := filepath.Join(uploadDir, filename)
+
+	// Save the file
+	if err := c.SaveFile(file, filePath); err != nil {
+		fmt.Printf("[ERROR] Failed to save file: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to save image",
+		})
+	}
+
+	// Generate public URL
+	imageURL := fmt.Sprintf("/uploads/profiles/%s", filename)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Find user
+	user, err := h.userRepo.FindByID(ctx, userID.(string))
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to find user: %v\n", err)
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "User not found",
+		})
+	}
+
+	// Delete old profile image if exists
+	if user.ProfileImage != "" {
+		oldPath := strings.TrimPrefix(user.ProfileImage, "/")
+		oldPath = filepath.Join("./static", oldPath)
+		if err := os.Remove(oldPath); err != nil {
+			fmt.Printf("[WARN] Failed to delete old image: %v\n", err)
+		}
+	}
+
+	// Update user's profile image
+	user.ProfileImage = imageURL
+	if err := h.userRepo.Update(ctx, user.ID, user); err != nil {
+		fmt.Printf("[ERROR] Failed to update user: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to update profile image",
+		})
+	}
+
+	fmt.Printf("[SUCCESS] Profile image uploaded: %s\n", imageURL)
+	fmt.Println("========== UPLOAD PROFILE IMAGE COMPLETED ==========")
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":       "Profile image uploaded successfully",
+		"profile_image": imageURL,
 	})
 }

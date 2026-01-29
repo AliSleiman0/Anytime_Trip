@@ -1,4 +1,4 @@
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+<div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto">
   <main class="">
     <div hx-get="/admin/header?title=Dashboard&subtitle=Here's what's happening today!" hx-trigger="load" hx-swap="innerHTML"></div>
 
@@ -7,7 +7,7 @@
     <div class="flex items-center justify-center gap-5 flex-wrap">
       <!-- card 1 -->
       <div
-        class="flex bg-white rounded-xl w-64 h-32 justify-between items-center px-6 m-4 shadow-[0_4px_4px_0_#0000001A]"
+        class="flex bg-white rounded-xl w-64 h-32 justify-between items-center px-6 shadow-[0_4px_4px_0_#0000001A]"
       >
         <div class="w-full">
           <p class="mb-2">New Users</p>
@@ -58,7 +58,7 @@
 
       <!-- card 2 -->
       <div
-        class="flex bg-white rounded-xl w-64 h-32 justify-between items-center px-6 m-4 shadow-[0_4px_4px_0_#0000001A]"
+        class="flex bg-white rounded-xl w-64 h-32 justify-between items-center px-6 shadow-[0_4px_4px_0_#0000001A]"
       >
         <div class="w-full">
           <p class="mb-2">Active Users</p>
@@ -109,7 +109,7 @@
 
       <!-- card 3 -->
       <div
-        class="flex bg-white rounded-xl w-64 h-32 justify-between items-center px-6 m-4 shadow-[0_4px_4px_0_#0000001A]"
+        class="flex bg-white rounded-xl w-64 h-32 justify-between items-center px-6 shadow-[0_4px_4px_0_#0000001A]"
       >
         <div class="w-full">
           <p class="mb-2">Unactive Users</p>
@@ -160,7 +160,7 @@
 
       <!-- card 4 -->
       <div
-        class="flex bg-white rounded-xl w-64 h-32 justify-between items-center px-6 m-4 shadow-[0_4px_4px_0_#0000001A]"
+        class="flex bg-white rounded-xl w-64 h-32 justify-between items-center px-6 shadow-[0_4px_4px_0_#0000001A]"
       >
         <div class="w-full">
           <p class="mb-2">Visits</p>
@@ -211,9 +211,9 @@
     </div>
 
     <!-- Charts -->
-    <div class="flex items-center justify-center gap-5">
+    <div class="grid grid-cols-1 lg:grid-cols-2 items-start gap-5 mt-5 mx-5">
       <!-- Active Booking Chart -->
-      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2">
+      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] p-4 w-full">
         <div class="flex items-center justify-between mb-2">
           <h2 class="text-lg font-semibold">Active Booking</h2>
           <div class="flex items-center gap-4 text-sm">
@@ -238,7 +238,7 @@
       </div>
 
       <!-- Flights Chart -->
-      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2">
+      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] p-4 w-full">
         <div class="flex items-center justify-between mb-2">
           <h2 class="text-lg font-semibold">Flights</h2>
           <div class="flex items-center gap-4 text-sm">
@@ -266,6 +266,7 @@
     </div>
 
     <!-- Chart.js for dashboard charts -->
+     <!-- ERRORS IN THIS SCRIPT COMPILER CANT READ IT, NO ERROR -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script>
       (function(){
@@ -379,9 +380,9 @@
 
 
     <!-- bars -->
-     <div class="flex justify-center items-center gap-5">
+     <div class="grid grid-cols-1 lg:grid-cols-2 items-start gap-5 mt-5 mx-5">
       <!-- Car Rental Chart -->
-      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2">
+      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] p-4 w-full">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold">Car Rental</h2>
           <button class="text-gray-400 hover:text-gray-600">
@@ -396,7 +397,7 @@
       </div>
 
       <!-- Hotels Bookings Chart -->
-      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] m-4 p-4 w-1/2">
+      <div class="bg-white rounded-xl shadow-[0_4px_4px_0_#0000001A] p-4 w-full">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-lg font-semibold">Hotels Bookings</h2>
           <button class="text-gray-400 hover:text-gray-600">

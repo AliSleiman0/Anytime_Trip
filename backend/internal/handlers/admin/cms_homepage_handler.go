@@ -713,54 +713,27 @@ func (h *AdminHandler) GetCMSBannerFragment(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(c.Context(), 5*time.Second)
 	defer cancel()
 
-	type bannerSection struct {
-		Index int
-		Item  *adminmodel.Banner
-	}
-
-	sections := map[int]*adminmodel.Banner{}
-	maxIndex := 0
+	banner1 := &adminmodel.Banner{}
+	banner2 := &adminmodel.Banner{}
 
 	if h.bannerRepo != nil {
 		if items, err := h.bannerRepo.ListAll(ctx); err == nil {
 			for _, it := range items {
-				parts := strings.Split(it.ID, "_")
-				if len(parts) != 2 {
-					continue
-				}
-				idx, err := strconv.Atoi(parts[1])
-				if err != nil || idx == 0 {
-					continue
-				}
-				sections[idx] = it
-				if idx > maxIndex {
-					maxIndex = idx
+				if it.ID == "banner_1" {
+					banner1 = it
+				} else if it.ID == "banner_2" {
+					banner2 = it
 				}
 			}
 		}
 	}
 
-	if maxIndex < 1 {
-		maxIndex = 1
-	}
-
-	for i := 1; i <= maxIndex; i++ {
-		if _, ok := sections[i]; !ok {
-			sections[i] = &adminmodel.Banner{}
-		}
-	}
-
-	ordered := make([]bannerSection, 0, len(sections))
-	for i := 1; i <= maxIndex; i++ {
-		ordered = append(ordered, bannerSection{Index: i, Item: sections[i]})
-	}
-
 	data := struct {
-		Sections  []bannerSection
-		NextIndex int
+		Banner1 *adminmodel.Banner
+		Banner2 *adminmodel.Banner
 	}{
-		Sections:  ordered,
-		NextIndex: maxIndex + 1,
+		Banner1: banner1,
+		Banner2: banner2,
 	}
 
 	c.Set("Content-Type", "text/html")

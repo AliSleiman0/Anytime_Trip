@@ -15,7 +15,7 @@
   }
 </style>
 
-<div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+
   <style>
     .custom-scrollbar::-webkit-scrollbar {
       width: 8px;
@@ -33,10 +33,10 @@
     }
   </style>
 
-  <div class="fixed top-0 left-64 right-0 h-screen overflow-auto">
+  <div class="fixed top-0 left-0 md:left-64 right-0 h-screen overflow-auto">
   <main>
     <!-- Back Button and Navigation -->
-    <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-10">
+    <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-between sticky top-0 z-10 pt-16">
       <button onclick="window.history.back()" class="flex items-center gap-2 text-[#336891] hover:text-[#254d6f] transition">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M15 19L8 12L15 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -56,7 +56,7 @@
       <div></div>
     </div>
 
-    <div class="p-6">
+    <div class="p-4 md:p-6">
       <!-- Admin Settings Section -->
       <div id="admin-section" class="settings-section">
         <!-- Title -->
@@ -76,11 +76,11 @@
               </div>
               <div class="flex-1">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Profile Picture</h2>
-                <div class="flex gap-3">
-                  <button class="px-6 py-2 border border-[#D24124] text-[#D24124] rounded-lg hover:bg-red-50 transition font-semibold text-sm">
+                <div class="flex flex-col sm:flex-row gap-3">
+                  <button class="w-full sm:w-auto px-6 py-2 border border-[#D24124] text-[#D24124] rounded-lg hover:bg-red-50 transition font-semibold text-sm">
                     Delete Photo
                   </button>
-                  <button class="px-6 py-2 bg-[#336891] text-white rounded-lg hover:bg-[#254d6f] transition font-semibold text-sm">
+                  <button class="w-full sm:w-auto px-6 py-2 bg-[#336891] text-white rounded-lg hover:bg-[#254d6f] transition font-semibold text-sm">
                     Upload Photo
                   </button>
                 </div>
@@ -89,7 +89,7 @@
           </div>
 
           <!-- Password, Currency, Language -->
-          <div class="grid grid-cols-3 gap-6 mb-8 pb-8 border-b border-gray-200">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 pb-8 border-b border-gray-200">
             <div>
               <label class="block text-sm font-semibold text-gray-600 mb-2">Password</label>
               <div class="flex items-center gap-2">
@@ -302,11 +302,11 @@
             </div>
           </div>
 
-          <div class="flex gap-3 pt-4">
-            <button onclick="saveNotificationPreferences()" class="px-6 py-3 bg-[#336891] text-white rounded-lg hover:bg-[#254d6f] transition font-semibold text-sm">
+          <div class="flex flex-col sm:flex-row gap-3 pt-4">
+            <button onclick="saveNotificationPreferences()" class="w-full sm:w-auto px-6 py-3 bg-[#336891] text-white rounded-lg hover:bg-[#254d6f] transition font-semibold text-sm">
               Save Changes
             </button>
-            <button onclick="loadNotificationPreferences()" class="px-6 py-3 border border-[#6FA4CD] text-gray-800 rounded-lg hover:bg-gray-50 transition font-semibold text-sm">
+            <button onclick="loadNotificationPreferences()" class="w-full sm:w-auto px-6 py-3 border border-[#6FA4CD] text-gray-800 rounded-lg hover:bg-gray-50 transition font-semibold text-sm">
               Cancel
             </button>
           </div>
@@ -316,8 +316,8 @@
   </main>
 
   <!-- Language Change Modal -->
-  <div id="languageModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+  <div id="languageModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl p-4 md:p-8 w-full max-w-md">
       <h2 class="text-2xl font-bold text-gray-800 mb-6">Change Language</h2>
       
       <div class="space-y-4">
@@ -358,8 +358,8 @@
   </div>
 
   <!-- Currency Change Modal -->
-  <div id="currencyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+  <div id="currencyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl p-4 md:p-8 w-full max-w-md">
       <h2 class="text-2xl font-bold text-gray-800 mb-6">Change Currency</h2>
       
       <div class="space-y-4">
@@ -396,8 +396,8 @@
   </div>
 
   <!-- Password Change Modal -->
-  <div id="passwordModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+  <div id="passwordModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl p-4 md:p-8 w-full max-w-md">
       <h2 class="text-2xl font-bold text-gray-800 mb-6">Change Password</h2>
       
       <form id="passwordChangeForm" class="space-y-4">

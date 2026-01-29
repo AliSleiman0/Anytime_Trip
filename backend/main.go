@@ -47,6 +47,7 @@ func main() {
 	carBookingRepository := apprepo.NewCarBookingRepository(dbConn.DB)
 	flightBookingRepository := apprepo.NewFlightBookingRepository(dbConn.DB)
 	hotelBookingRepository := apprepo.NewHotelBookingRepository(dbConn.DB)
+	transferBookingRepository := apprepo.NewTransferBookingRepository(dbConn.DB)
 	// Support ticket repository
 	supportTicketRepository := apprepo.NewSupportTicketRepository(dbConn.DB)
 	// Payments repository
@@ -54,6 +55,7 @@ func main() {
 	flightRepository := adminrepo.NewFlightRepository(dbConn.DB)
 	carRepository := adminrepo.NewCarRepository(dbConn.DB)
 	hotelRepository := adminrepo.NewHotelRepository(dbConn.DB)
+	transferRepository := adminrepo.NewTransferRepository(dbConn.DB)
 	bannerRepository := adminrepo.NewBannerRepository(dbConn.DB)
 	travelRepository := adminrepo.NewTravelRepository(dbConn.DB)
 	popularRepository := adminrepo.NewPopularRepository(dbConn.DB)
@@ -96,6 +98,8 @@ func main() {
 	// Setup static files (relative to backend working dir)
 	fiberApp.Static("/static", "./static")
 	fiberApp.Static("/", "./templates")
+	// Serve uploaded files
+	fiberApp.Static("/uploads", "./static/uploads")
 	// Serve admin assets (css/images) under /assets
 	fiberApp.Static("/assets", "../frontend/admin/src/components/assets")
 
@@ -104,7 +108,7 @@ func main() {
 
 	// App routes
 	appGroup := api.Group("/app")
-	appRoutes.SetupRoutes(appGroup, appHandler)
+	appRoutes.SetupRoutes(appGroup, appHandler, cfg.JWTSecret)
 
 	// Admin routes (with middleware) served under /admin
 	adminGroup := fiberApp.Group("/admin")

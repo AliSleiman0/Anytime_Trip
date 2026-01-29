@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	modelsAdmin "Anytime_Travel/backend/internal/models/admin"
+	"Anytime_Travel/backend/internal/repository/app"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -20,7 +21,8 @@ func (h *AdminHandler) ManageServiceProviders(c *fiber.Ctx) error {
 	}
 
 	data := fiber.Map{
-		"Title": "Service Providers",
+		"Title":            "Service Providers",
+		"ShowExportButton": true,
 	}
 
 	c.Set("Content-Type", "text/html")
@@ -34,8 +36,9 @@ func (h *AdminHandler) GetServiceProvidersFragment(c *fiber.Ctx) error {
 	flights, _ := h.flightRepo.FindAll(ctx, 0, 0)
 	cars, _ := h.carRepo.FindAll(ctx, 0, 0)
 	hotels, _ := h.hotelRepo.FindAll(ctx, 0, 0)
+	transfers, _ := h.transferRepo.FindAll(ctx, 0, 0)
 
-	providers := make([]ServiceProviderView, 0, len(flights)+len(cars)+len(hotels))
+	providers := make([]ServiceProviderView, 0, len(flights)+len(cars)+len(hotels)+len(transfers))
 
 	for _, f := range flights {
 		providers = append(providers, ServiceProviderView{
@@ -82,6 +85,22 @@ func (h *AdminHandler) GetServiceProvidersFragment(c *fiber.Ctx) error {
 			Revenue:       htl.Revenue,
 			ProviderType:  "hotel",
 			IsFreezed:     htl.IsFreezed,
+		})
+	}
+
+	for _, transfer := range transfers {
+		providers = append(providers, ServiceProviderView{
+			ID:            transfer.ID,
+			Name:          transfer.ProviderName,
+			Type:          transfer.ProviderType,
+			Status:        string(transfer.Status),
+			Location:      transfer.Location,
+			ContactEmail:  transfer.ContactEmail,
+			Rating:        transfer.Rating,
+			TotalBookings: transfer.TotalBookings,
+			Revenue:       transfer.Revenue,
+			ProviderType:  "transfer",
+			IsFreezed:     transfer.IsFreezed,
 		})
 	}
 
@@ -172,6 +191,7 @@ func (h *AdminHandler) GetViewServiceFragment(c *fiber.Ctx) error {
 			PhoneNumberDisplay:     "N/A",
 			RevenueThisMonth:       "--",
 			TotalBookingsThisMonth: "--",
+			Bookings:               getFlightBookingsForProvider(ctx, h.flightBookingRepo, h.userRepo, flight.ID),
 		}
 	case "car":
 		car, err := h.carRepo.FindByID(ctx, id)
@@ -209,6 +229,7 @@ func (h *AdminHandler) GetViewServiceFragment(c *fiber.Ctx) error {
 			PhoneNumberDisplay:     "N/A",
 			RevenueThisMonth:       "--",
 			TotalBookingsThisMonth: "--",
+			Bookings:               getCarBookingsForProvider(ctx, h.carBookingRepo, h.userRepo, car.ID),
 		}
 	case "hotel":
 		hotel, err := h.hotelRepo.FindByID(ctx, id)
@@ -246,6 +267,45 @@ func (h *AdminHandler) GetViewServiceFragment(c *fiber.Ctx) error {
 			PhoneNumberDisplay:     "N/A",
 			RevenueThisMonth:       "--",
 			TotalBookingsThisMonth: "--",
+			Bookings:               getHotelBookingsForProvider(ctx, h.hotelBookingRepo, h.userRepo, hotel.ID),
+		}
+	case "transfer":
+		transfer, err := h.transferRepo.FindByID(ctx, id)
+		if err != nil {
+			return c.Status(404).SendString("transfer provider not found")
+		}
+
+		currency := transfer.Currency
+		if currency == "" {
+			currency = "$"
+		}
+
+		detail = ProviderDetailView{
+			IsFreezed: transfer.IsFreezed,
+			FreezeActionText: func() string {
+				if transfer.IsFreezed {
+					return "Unfreeze Account"
+				} else {
+					return "Freeze Account"
+				}
+			}(),
+			ID:                     transfer.ID,
+			Name:                   transfer.ProviderName,
+			Email:                  transfer.ContactEmail,
+			Status:                 string(transfer.Status),
+			StatusClass:            statusBadgeClass(string(transfer.Status)),
+			Type:                   transfer.ProviderType,
+			Location:               transfer.Location,
+			CreatedAt:              transfer.CreatedAt.Format("02 Jan, 2006"),
+			Rating:                 fmt.Sprintf("%.1f", transfer.Rating),
+			TotalBookings:          transfer.TotalBookings,
+			Revenue:                formatCurrency(currency, transfer.Revenue),
+			ProviderType:           providerType,
+			ProfitShareDisplay:     formatProfitPercent(transfer.ProfitPercent, transfer.Profit, transfer.Revenue),
+			PhoneNumberDisplay:     "N/A",
+			RevenueThisMonth:       "--",
+			TotalBookingsThisMonth: "--",
+			Bookings:               getTransferBookingsForProvider(ctx, h.userRepo, transfer.ID),
 		}
 	default:
 		return c.Status(400).SendString("invalid provider type")
@@ -547,4 +607,176 @@ func (h *AdminHandler) ToggleActivateProvider(c *fiber.Ctx) error {
 	default:
 		return c.Status(400).JSON(fiber.Map{"success": false, "message": "Invalid provider type"})
 	}
+}
+
+// getFlightBookingsForProvider fetches all flight bookings for a specific flight provider
+func getFlightBookingsForProvider(ctx context.Context, flightBookingRepo *app.FlightBookingRepository, userRepo *app.UserRepository, flightProviderID string) []BookingView {
+	bookings := make([]BookingView, 0)
+
+	allBookings, err := flightBookingRepo.FindAll(ctx, 1000, 0)
+	if err != nil {
+		return bookings
+	}
+
+	titleCase := func(s string) string {
+		if s == "" {
+			return "-"
+		}
+		s = strings.ToLower(s)
+		return strings.ToUpper(string(s[0])) + s[1:]
+	}
+
+	statusBadge := func(status string) string {
+		switch strings.ToLower(status) {
+		case "confirmed", "completed", "paid", "active":
+			return "px-3 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
+		case "pending":
+			return "px-3 py-1 bg-[#FFD966] text-[#8A6D00] rounded-full text-xs font-semibold"
+		case "cancelled":
+			return "px-3 py-1 bg-[#FEE2E2] text-[#B91C1C] rounded-full text-xs font-semibold"
+		default:
+			return "px-3 py-1 bg-[#E5E7EB] text-[#374151] rounded-full text-xs font-semibold"
+		}
+	}
+
+	for _, b := range allBookings {
+		if b.FlightID != flightProviderID {
+			continue
+		}
+
+		user, _ := userRepo.FindByID(ctx, b.UserID)
+		userName := "Unknown"
+		if user != nil {
+			userName = user.Name
+		}
+
+		bookings = append(bookings, BookingView{
+			UserName:    userName,
+			BookingType: "Flight Booking",
+			Status:      titleCase(string(b.Status)),
+			StatusClass: statusBadge(string(b.Status)),
+			Destination: "-",
+			BookingDate: b.CreatedAt.Format("02 Jan, 2006"),
+			Amount:      fmt.Sprintf("%s %.2f", strings.ToUpper(b.Currency), b.Amount),
+		})
+	}
+
+	return bookings
+}
+
+// getCarBookingsForProvider fetches all car bookings for a specific car provider
+func getCarBookingsForProvider(ctx context.Context, carBookingRepo *app.CarBookingRepository, userRepo *app.UserRepository, carProviderID string) []BookingView {
+	bookings := make([]BookingView, 0)
+
+	allBookings, err := carBookingRepo.FindAll(ctx, 1000, 0)
+	if err != nil {
+		return bookings
+	}
+
+	titleCase := func(s string) string {
+		if s == "" {
+			return "-"
+		}
+		s = strings.ToLower(s)
+		return strings.ToUpper(string(s[0])) + s[1:]
+	}
+
+	statusBadge := func(status string) string {
+		switch strings.ToLower(status) {
+		case "confirmed", "completed", "paid", "active":
+			return "px-3 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
+		case "pending":
+			return "px-3 py-1 bg-[#FFD966] text-[#8A6D00] rounded-full text-xs font-semibold"
+		case "cancelled":
+			return "px-3 py-1 bg-[#FEE2E2] text-[#B91C1C] rounded-full text-xs font-semibold"
+		default:
+			return "px-3 py-1 bg-[#E5E7EB] text-[#374151] rounded-full text-xs font-semibold"
+		}
+	}
+
+	for _, b := range allBookings {
+		if b.CarID != carProviderID {
+			continue
+		}
+
+		user, _ := userRepo.FindByID(ctx, b.UserID)
+		userName := "Unknown"
+		if user != nil {
+			userName = user.Name
+		}
+
+		bookings = append(bookings, BookingView{
+			UserName:    userName,
+			BookingType: "Car Rental",
+			Status:      titleCase(string(b.Status)),
+			StatusClass: statusBadge(string(b.Status)),
+			Destination: "-",
+			BookingDate: b.CreatedAt.Format("02 Jan, 2006"),
+			Amount:      fmt.Sprintf("%s %.2f", strings.ToUpper(b.Currency), b.Amount),
+		})
+	}
+
+	return bookings
+}
+
+// getHotelBookingsForProvider fetches all hotel bookings for a specific hotel provider
+func getHotelBookingsForProvider(ctx context.Context, hotelBookingRepo *app.HotelBookingRepository, userRepo *app.UserRepository, hotelProviderID string) []BookingView {
+	bookings := make([]BookingView, 0)
+
+	allBookings, err := hotelBookingRepo.FindAll(ctx, 1000, 0)
+	if err != nil {
+		return bookings
+	}
+
+	titleCase := func(s string) string {
+		if s == "" {
+			return "-"
+		}
+		s = strings.ToLower(s)
+		return strings.ToUpper(string(s[0])) + s[1:]
+	}
+
+	statusBadge := func(status string) string {
+		switch strings.ToLower(status) {
+		case "confirmed", "completed", "paid", "active":
+			return "px-3 py-1 bg-[#26CE0033] text-[#26CE00] rounded-full text-xs font-semibold"
+		case "pending":
+			return "px-3 py-1 bg-[#FFD966] text-[#8A6D00] rounded-full text-xs font-semibold"
+		case "cancelled":
+			return "px-3 py-1 bg-[#FEE2E2] text-[#B91C1C] rounded-full text-xs font-semibold"
+		default:
+			return "px-3 py-1 bg-[#E5E7EB] text-[#374151] rounded-full text-xs font-semibold"
+		}
+	}
+
+	for _, b := range allBookings {
+		if b.HotelID != hotelProviderID {
+			continue
+		}
+
+		user, _ := userRepo.FindByID(ctx, b.UserID)
+		userName := "Unknown"
+		if user != nil {
+			userName = user.Name
+		}
+
+		bookings = append(bookings, BookingView{
+			UserName:    userName,
+			BookingType: "Hotel Booking",
+			Status:      titleCase(string(b.Status)),
+			StatusClass: statusBadge(string(b.Status)),
+			Destination: "-",
+			BookingDate: b.CreatedAt.Format("02 Jan, 2006"),
+			Amount:      fmt.Sprintf("%s %.2f", strings.ToUpper(b.Currency), b.Amount),
+		})
+	}
+
+	return bookings
+}
+func getTransferBookingsForProvider(ctx context.Context, userRepo *app.UserRepository, transferProviderID string) []BookingView {
+	bookings := make([]BookingView, 0)
+
+	// TODO: Implement transfer booking repository and fetch bookings
+	// For now, return empty bookings list until transfer booking repository is created
+	return bookings
 }
