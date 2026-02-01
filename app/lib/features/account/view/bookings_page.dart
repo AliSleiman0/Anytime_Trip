@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/storage/storage_service.dart';
+import '../../../core/network/endpoints.dart';
 
 class BookingsPage extends StatefulWidget {
   const BookingsPage({super.key});
@@ -210,8 +212,19 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
     super.dispose();
   }
 
+  String _getUserName() {
+    final user = StorageService().getUser();
+    return user?['name'] ?? 'User';
+  }
+
+  String? _getProfileImage() {
+    final user = StorageService().getUser();
+    return user?['profile_image'];
+  }
+
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -224,9 +237,9 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Hello, User123',
-              style: TextStyle(
+            Text(
+              'Hello, ${_getUserName()}',
+              style: const TextStyle(
                 color: Colors.black87,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -241,13 +254,27 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                 color: const Color(0xFFE0E0E0),
               ),
               child: ClipOval(
-                child: Image.asset(
-                  'assets/images/defaultp.png',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.person, size: 20, color: Color(0xFF1e5a8e));
-                  },
-                ),
+                child: _getProfileImage() != null && _getProfileImage()!.isNotEmpty
+                    ? Image.network(
+                        '${Endpoints.baseUrl.replaceAll('/api', '')}${_getProfileImage()}',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/defaultp.png',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(Icons.person, size: 20, color: Color(0xFF1e5a8e));
+                            },
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        'assets/images/defaultp.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.person, size: 20, color: Color(0xFF1e5a8e));
+                        },
+                      ),
               ),
             ),
           ],

@@ -15,21 +15,24 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // AppHandler handles app-level requests
 type AppHandler struct {
-	userRepo  *app.UserRepository
-	otpRepo   *app.OTPRepository
-	jwtSecret string
+	userRepo          *app.UserRepository
+	otpRepo           *app.OTPRepository
+	paymentMethodRepo *app.PaymentMethodRepository
+	jwtSecret         string
 }
 
-func NewAppHandler(userRepo *app.UserRepository, otpRepo *app.OTPRepository, jwtSecret string) *AppHandler {
+func NewAppHandler(userRepo *app.UserRepository, otpRepo *app.OTPRepository, paymentMethodRepo *app.PaymentMethodRepository, jwtSecret string) *AppHandler {
 	return &AppHandler{
-		userRepo:  userRepo,
-		otpRepo:   otpRepo,
-		jwtSecret: jwtSecret,
+		userRepo:          userRepo,
+		otpRepo:           otpRepo,
+		paymentMethodRepo: paymentMethodRepo,
+		jwtSecret:         jwtSecret,
 	}
 }
 
@@ -40,8 +43,40 @@ func (h *AppHandler) GetDashboard(c *fiber.Ctx) error {
 }
 
 func (h *AppHandler) GetProfile(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{
-		"message": "App User Profile",
+	// Get user ID from JWT token (assuming middleware sets it)
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Find user by ID
+	user, err := h.userRepo.FindByID(ctx, userID.(string))
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "User not found",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Profile fetched successfully",
+		"user": fiber.Map{
+			"id":             user.ID,
+			"name":           user.Name,
+			"email":          user.Email,
+			"phone_number":   user.PhoneNumber,
+			"profile_image":  user.ProfileImage,
+			"sex":            user.Sex,
+			"country":        user.Country,
+			"total_bookings": user.TotalBookings,
+			"is_active":      user.IsActive,
+			"created_at":     user.CreatedAt,
+			"last_login":     user.LastLogin,
+		},
 	})
 }
 
@@ -952,5 +987,432 @@ func (h *AppHandler) UploadProfileImage(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message":       "Profile image uploaded successfully",
 		"profile_image": imageURL,
+	})
+}
+
+// GetNotificationPreferences retrieves the user's notification preferences
+func (h *AppHandler) GetNotificationPreferences(c *fiber.Ctx) error {
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	user, err := h.userRepo.FindByID(ctx, userID.(string))
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "User not found",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":     "Notification preferences retrieved successfully",
+		"preferences": user.NotificationPreferences,
+	})
+}
+
+// SaveNotificationPreferences saves or updates the user's notification preferences
+func (h *AppHandler) SaveNotificationPreferences(c *fiber.Ctx) error {
+	fmt.Println("========== SAVE NOTIFICATION PREFERENCES REQUEST ==========")
+
+	userID := c.Locals("user_id")
+	if userID == nil {
+		fmt.Println("[ERROR] No user_id in context")
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	var prefs appmodels.NotificationPreferences
+	if err := c.BodyParser(&prefs); err != nil {
+		fmt.Printf("[ERROR] Failed to parse request: %v\n", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request format",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Find user
+	user, err := h.userRepo.FindByID(ctx, userID.(string))
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to find user: %v\n", err)
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "User not found",
+		})
+	}
+
+	// Update notification preferences
+	user.NotificationPreferences = prefs
+
+	// Save updated user
+	if err := h.userRepo.Update(ctx, user.ID, user); err != nil {
+		fmt.Printf("[ERROR] Failed to update user: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to save notification preferences",
+		})
+	}
+
+	fmt.Println("[SUCCESS] Notification preferences saved successfully")
+	fmt.Println("========== SAVE NOTIFICATION PREFERENCES COMPLETED ==========")
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":     "Notification preferences saved successfully",
+		"preferences": user.NotificationPreferences,
+	})
+}
+
+// AddPaymentMethod adds a new payment method for the user
+func (h *AppHandler) AddPaymentMethod(c *fiber.Ctx) error {
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	var req appmodels.AddPaymentMethodRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	// Extract only last 4 digits - NEVER store full card number or CVV
+	var cardLast4 string
+	if len(req.CardNumber) >= 4 {
+		cardLast4 = req.CardNumber[len(req.CardNumber)-4:]
+	}
+
+	pm := &appmodels.PaymentMethod{
+		UserID:          userID.(string),
+		CardHolderName:  req.CardHolderName,
+		CardNumberLast4: cardLast4,
+		CardBrand:       req.CardBrand,
+		ExpiryMonth:     req.ExpiryMonth,
+		ExpiryYear:      req.ExpiryYear,
+		BillingAddress:  req.BillingAddress,
+		City:            req.City,
+		State:           req.State,
+		PostalCode:      req.PostalCode,
+		Country:         req.Country,
+		PhoneNumber:     req.PhoneNumber,
+		IsDefault:       req.IsDefault,
+		IsActive:        true,
+	}
+
+	result, err := h.paymentMethodRepo.AddPaymentMethod(ctx, pm)
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to add payment method: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to add payment method",
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "Payment method added successfully",
+		"data":    result,
+	})
+}
+
+// GetPaymentMethods retrieves all payment methods for the user
+func (h *AppHandler) GetPaymentMethods(c *fiber.Ctx) error {
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	methods, err := h.paymentMethodRepo.GetPaymentMethodsByUserID(ctx, userID.(string))
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to retrieve payment methods: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to retrieve payment methods",
+		})
+	}
+
+	if methods == nil {
+		methods = []appmodels.PaymentMethod{}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Payment methods retrieved successfully",
+		"data":    methods,
+	})
+}
+
+// UpdatePaymentMethod updates a payment method
+func (h *AppHandler) UpdatePaymentMethod(c *fiber.Ctx) error {
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	id := c.Params("id")
+	if id == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Payment method ID is required",
+		})
+	}
+
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid payment method ID",
+		})
+	}
+
+	var req appmodels.UpdatePaymentMethodRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	// Get existing payment method
+	existing, err := h.paymentMethodRepo.GetPaymentMethodByID(ctx, objectID)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Payment method not found",
+		})
+	}
+
+	// Verify ownership
+	if existing.UserID != userID.(string) {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Cannot update payment method of another user",
+		})
+	}
+
+	// Update only provided fields
+	if req.CardHolderName != "" {
+		existing.CardHolderName = req.CardHolderName
+	}
+	if req.BillingAddress != "" {
+		existing.BillingAddress = req.BillingAddress
+	}
+	if req.City != "" {
+		existing.City = req.City
+	}
+	if req.State != "" {
+		existing.State = req.State
+	}
+	if req.PostalCode != "" {
+		existing.PostalCode = req.PostalCode
+	}
+	if req.Country != "" {
+		existing.Country = req.Country
+	}
+	if req.PhoneNumber != "" {
+		existing.PhoneNumber = req.PhoneNumber
+	}
+	existing.IsDefault = req.IsDefault
+
+	result, err := h.paymentMethodRepo.UpdatePaymentMethod(ctx, objectID, existing)
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to update payment method: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to update payment method",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Payment method updated successfully",
+		"data":    result,
+	})
+}
+
+// DeletePaymentMethod deletes a payment method
+func (h *AppHandler) DeletePaymentMethod(c *fiber.Ctx) error {
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	id := c.Params("id")
+	if id == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Payment method ID is required",
+		})
+	}
+
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid payment method ID",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	// Verify ownership
+	existing, err := h.paymentMethodRepo.GetPaymentMethodByID(ctx, objectID)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Payment method not found",
+		})
+	}
+
+	if existing.UserID != userID.(string) {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Cannot delete payment method of another user",
+		})
+	}
+
+	if err := h.paymentMethodRepo.DeletePaymentMethod(ctx, objectID); err != nil {
+		fmt.Printf("[ERROR] Failed to delete payment method: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to delete payment method",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Payment method deleted successfully",
+	})
+}
+
+// SetDefaultPaymentMethod sets a payment method as default
+func (h *AppHandler) SetDefaultPaymentMethod(c *fiber.Ctx) error {
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	id := c.Params("id")
+	if id == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Payment method ID is required",
+		})
+	}
+
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid payment method ID",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	// Verify ownership
+	existing, err := h.paymentMethodRepo.GetPaymentMethodByID(ctx, objectID)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Payment method not found",
+		})
+	}
+
+	if existing.UserID != userID.(string) {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Cannot set payment method of another user as default",
+		})
+	}
+
+	if err := h.paymentMethodRepo.SetDefaultPaymentMethod(ctx, objectID, userID.(string)); err != nil {
+		fmt.Printf("[ERROR] Failed to set default payment method: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to set default payment method",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Default payment method set successfully",
+	})
+}
+
+// GetSecurityPreferences retrieves security preferences for the logged-in user
+func (h *AppHandler) GetSecurityPreferences(c *fiber.Ctx) error {
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	user, err := h.userRepo.FindByID(ctx, userID.(string))
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to fetch user: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to fetch security preferences",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":     "Security preferences retrieved successfully",
+		"preferences": user.SecurityPreferences,
+	})
+}
+
+// SaveSecurityPreferences saves security preferences for the logged-in user
+func (h *AppHandler) SaveSecurityPreferences(c *fiber.Ctx) error {
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	var preferences appmodels.SecurityPreferences
+	if err := c.BodyParser(&preferences); err != nil {
+		fmt.Printf("[ERROR] Failed to parse security preferences: %v\n", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	// Get user
+	user, err := h.userRepo.FindByID(ctx, userID.(string))
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to fetch user: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to save security preferences",
+		})
+	}
+
+	// Update security preferences
+	user.SecurityPreferences = preferences
+
+	// Save updated user
+	if err := h.userRepo.Update(ctx, user.ID, user); err != nil {
+		fmt.Printf("[ERROR] Failed to update user: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to save security preferences",
+		})
+	}
+
+	fmt.Println("[SUCCESS] Security preferences saved successfully")
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":     "Security preferences saved successfully",
+		"preferences": user.SecurityPreferences,
 	})
 }
