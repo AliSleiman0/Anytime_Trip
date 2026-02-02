@@ -7,6 +7,7 @@ class StorageService {
   static const String _tokenKey = 'auth_token';
   static const String _userKey = 'user_data';
   static const String _themeKey = 'theme_mode';
+  static const String _notificationPreferencesKey = 'notification_preferences';
 
   // Token operations
   Future<void> saveToken(String token) async {
@@ -41,6 +42,23 @@ class StorageService {
 
   String? getThemeMode() {
     return _box.read(_themeKey);
+  }
+
+  // Notification preferences operations
+  Future<void> saveNotificationPreferences(Map<String, bool> preferences) async {
+    await _box.write(_notificationPreferencesKey, preferences);
+  }
+
+  Map<String, bool>? getNotificationPreferences() {
+    final data = _box.read(_notificationPreferencesKey);
+    if (data is Map) {
+      return Map<String, bool>.from(data);
+    }
+    return null;
+  }
+
+  Future<void> removeNotificationPreferences() async {
+    await _box.remove(_notificationPreferencesKey);
   }
 
   // Clear all data

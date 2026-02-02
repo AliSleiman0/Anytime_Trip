@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../core/storage/storage_service.dart';
+import '../../../core/network/endpoints.dart';
+import '../service/account_api.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -10,26 +13,100 @@ class NotificationsPage extends StatefulWidget {
 class _NotificationsPageState extends State<NotificationsPage> {
   // Notification preferences states
   late Map<String, bool> notificationPreferences;
+  final _storage = StorageService();
+  final _api = AccountApi();
 
   @override
   void initState() {
     super.initState();
-    notificationPreferences = {
-      'All Notifications': false,
-      'Push Notifications': true,
-      'Email Alerts': false,
-      'SMS Updates': true,
-      'In-App Messages': false,
-      'Social Media Alerts': true,
-      'Webhook Notifications': false,
-      'Browser Notifications': true,
-      'RSS Feed Updates': false,
-      'Chatbot Messages': true,
-    };
+    _loadNotificationPreferences();
+  }
+
+  Future<void> _loadNotificationPreferences() async {
+    try {
+      // Try to load from API first
+      final apiPrefs = await _api.getNotificationPreferences();
+      
+      setState(() {
+        if (apiPrefs != null && apiPrefs.isNotEmpty) {
+          notificationPreferences = apiPrefs;
+          // Also save to local storage
+          _storage.saveNotificationPreferences(apiPrefs);
+        } else {
+          // If no API data, check local storage
+          final saved = _storage.getNotificationPreferences();
+          if (saved != null && saved.isNotEmpty) {
+            notificationPreferences = saved;
+          } else {
+            // Use default preferences if none found
+            notificationPreferences = {
+              'All Notifications': false,
+              'Push Notifications': true,
+              'Email Alerts': false,
+              'SMS Updates': true,
+              'In-App Messages': false,
+              'Social Media Alerts': true,
+              'Webhook Notifications': false,
+              'Browser Notifications': true,
+              'RSS Feed Updates': false,
+              'Chatbot Messages': true,
+            };
+            // Save defaults to both storage and API
+            _saveNotificationPreferences();
+          }
+        }
+      });
+    } catch (e) {
+      print('Error loading preferences from API: $e');
+      // Fallback to local storage
+      final saved = _storage.getNotificationPreferences();
+      setState(() {
+        if (saved != null && saved.isNotEmpty) {
+          notificationPreferences = saved;
+        } else {
+          notificationPreferences = {
+            'All Notifications': false,
+            'Push Notifications': true,
+            'Email Alerts': false,
+            'SMS Updates': true,
+            'In-App Messages': false,
+            'Social Media Alerts': true,
+            'Webhook Notifications': false,
+            'Browser Notifications': true,
+            'RSS Feed Updates': false,
+            'Chatbot Messages': true,
+          };
+        }
+      });
+    }
+  }
+
+  Future<void> _saveNotificationPreferences() async {
+    try {
+      // Save to local storage
+      await _storage.saveNotificationPreferences(notificationPreferences);
+      // Save to backend API
+      await _api.saveNotificationPreferences(notificationPreferences);
+    } catch (e) {
+      print('Error saving preferences: $e');
+      // Still save to local storage even if API fails
+      await _storage.saveNotificationPreferences(notificationPreferences);
+    }
+  }
+
+  String _getUserName() {
+    final user = StorageService().getUser();
+    return user?['name'] ?? 'User';
+  }
+
+  String? _getProfileImage() {
+    final user = StorageService().getUser();
+    return user?['profile_image'];
   }
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -42,9 +119,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Hello, User123',
-              style: TextStyle(
+            Text(
+              'Hello, ${_getUserName()}',
+              style: const TextStyle(
                 color: Colors.black87,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -59,13 +136,27 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 color: const Color(0xFFE0E0E0),
               ),
               child: ClipOval(
-                child: Image.asset(
-                  'assets/images/defaultp.png',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.person, size: 20, color: Color(0xFF1e5a8e));
-                  },
-                ),
+                child: _getProfileImage() != null && _getProfileImage()!.isNotEmpty
+                    ? Image.network(
+                        '${Endpoints.baseUrl.replaceAll('/api', '')}${_getProfileImage()}',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/defaultp.png',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(Icons.person, size: 20, color: Color(0xFF1e5a8e));
+                            },
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        'assets/images/defaultp.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.person, size: 20, color: Color(0xFF1e5a8e));
+                        },
+                      ),
               ),
             ),
           ],
@@ -112,6 +203,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   setState(() {
                     notificationPreferences[entry.key] = value;
                   });
+                  // Save to storage when changed
+                  _saveNotificationPreferences();
                 },
                 activeColor: const Color(0xFF336891),
                 inactiveThumbColor: const Color(0xFFB0BEC5),

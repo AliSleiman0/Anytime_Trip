@@ -21,6 +21,13 @@ class Endpoints {
   static const String profile = '/app/profile';
   static const String updateProfile = '/app/profile/update';
   static const String uploadProfileImage = '/app/profile/upload-image';
+  static const String getNotificationPreferences = '/app/notification-preferences';
+  static const String saveNotificationPreferences = '/app/notification-preferences';
+  static const String getSecurityPreferences = '/app/security-preferences';
+  static const String saveSecurityPreferences = '/app/security-preferences';
+  static const String paymentMethods = '/app/payment-methods';
+  static String paymentMethodDetails(String id) => '/app/payment-methods/$id';
+  static String setDefaultPaymentMethod(String id) => '/app/payment-methods/$id/set-default';
 
   // Order endpoints
   static const String orders = '/app/orders';

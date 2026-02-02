@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../core/storage/storage_service.dart';
+import '../../../core/network/endpoints.dart';
+import '../service/account_api.dart';
 
 class SecurityPage extends StatefulWidget {
   const SecurityPage({super.key});
@@ -8,33 +11,69 @@ class SecurityPage extends StatefulWidget {
 }
 
 class _SecurityPageState extends State<SecurityPage> {
-  late TextEditingController _passwordController;
-  late TextEditingController _recoveryCodeController;
-  bool _obscurePassword = true;
-  bool _enable2FA = false;
-
-  final List<Map<String, String>> _devices = [
-    {'name': 'Device9183', 'location': 'Lebanon, Beirut', 'date': '9/9/2024'},
-    {'name': 'Laptop194', 'location': 'Lebanon, Beirut', 'date': '9/9/2024'},
-    {'name': 'Tablet553', 'location': 'Lebanon, Tripoli', 'date': '9/10/2024'},
-    {'name': 'Smartphone745', 'location': 'Lebanon, Sidon', 'date': '9/10/2024'},
-    {'name': 'Smartwatch432', 'location': 'Lebanon, Tyre', 'date': '9/11/2024'},
-    {'name': 'Camera819', 'location': 'Lebanon, Byblos', 'date': '9/11/2024'},
-    {'name': 'Headphones226', 'location': 'Lebanon, Baalbek', 'date': '9/12/2024'},
-  ];
+  final _api = AccountApi();
+  bool _isLoading = true;
+  bool _twoFactorAuth = false;
 
   @override
   void initState() {
     super.initState();
-    _passwordController = TextEditingController(text: '********************');
-    _recoveryCodeController = TextEditingController(text: '19A8-1P42-10JT-LAJ1');
+    _loadSecurityPreferences();
   }
 
-  @override
-  void dispose() {
-    _passwordController.dispose();
-    _recoveryCodeController.dispose();
-    super.dispose();
+  Future<void> _loadSecurityPreferences() async {
+    try {
+      setState(() => _isLoading = true);
+      final prefs = await _api.getSecurityPreferences();
+      if (prefs != null) {
+        setState(() {
+          _twoFactorAuth = prefs['two_factor_auth'] ?? false;
+          _isLoading = false;
+        });
+      } else {
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      print('[SECURITY_PREFS_ERROR] Failed to load security preferences: $e');
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _saveSecurityPreferences() async {
+    try {
+      final preferences = {
+        'two_factor_auth': _twoFactorAuth,
+      };
+
+      await _api.saveSecurityPreferences(preferences);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Two-Factor Authentication updated')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save preferences: $e')),
+        );
+      }
+    }
+  }
+
+  void _on2FAToggle(bool value) {
+    setState(() => _twoFactorAuth = value);
+    _saveSecurityPreferences();
+  }
+
+  String _getUserName() {
+    final user = StorageService().getUser();
+    return user?['name'] ?? 'User';
+  }
+
+  String? _getProfileImage() {
+    final user = StorageService().getUser();
+    return user?['profile_image'];
   }
 
   @override
@@ -51,9 +90,9 @@ class _SecurityPageState extends State<SecurityPage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Hello, User123',
-              style: TextStyle(
+            Text(
+              'Hello, ${_getUserName()}',
+              style: const TextStyle(
                 color: Colors.black87,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -68,209 +107,117 @@ class _SecurityPageState extends State<SecurityPage> {
                 color: const Color(0xFFE0E0E0),
               ),
               child: ClipOval(
-                child: Image.asset(
-                  'assets/images/defaultp.png',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.person, size: 20, color: Color(0xFF1e5a8e));
-                  },
-                ),
+                child: _getProfileImage() != null && _getProfileImage()!.isNotEmpty
+                    ? Image.network(
+                        '${Endpoints.baseUrl.replaceAll('/api', '')}${_getProfileImage()}',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/defaultp.png',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(Icons.person, size: 20, color: Color(0xFF1e5a8e));
+                            },
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        'assets/images/defaultp.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.person, size: 20, color: Color(0xFF1e5a8e));
+                        },
+                      ),
               ),
             ),
           ],
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-
-              // Password Field
-              _buildPasswordField(),
-              const SizedBox(height: 16),
-
-              // Recovery Code Field
-              _buildLabeledTextField(
-                label: 'Recovery Code',
-                controller: _recoveryCodeController,
-              ),
-              const SizedBox(height: 32),
-
-              // Devices Section Header
-              const Text(
-                'Devices',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // 2FA Toggle
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD4DFE8),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const SizedBox(height: 16),
                     const Text(
-                      'Enable 2 Factor Authentication',
+                      'Security Settings',
                       style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                         color: Colors.black87,
                       ),
                     ),
-                    Transform.scale(
-                      scale: 0.8,
-                      child: Switch(
-                        value: _enable2FA,
-                        onChanged: (bool value) {
-                          setState(() {
-                            _enable2FA = value;
-                          });
-                        },
-                        activeColor: const Color(0xFFD24124),
-                        inactiveThumbColor: const Color(0xFFB0BEC5),
-                        inactiveTrackColor: const Color(0xFFE0E0E0),
-                      ),
+                    const SizedBox(height: 16),
+                    _buildSecurityToggle(
+                      'Enable Two-Factor Authentication',
+                      'Add an extra layer of security to your account by requiring a second verification method',
+                      _twoFactorAuth,
+                      _on2FAToggle,
                     ),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+            ),
+    );
+  }
 
-              // Device List
-              ..._devices.map((device) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD4DFE8),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '${device['name']}     (${device['location']} ${device['date']})',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
+  Widget _buildSecurityToggle(
+    String title,
+    String description,
+    bool value,
+    Function(bool) onChanged,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFD4DFE8),
+        borderRadius: BorderRadius.circular(12),
       ),
-    );
-  }
-
-  Widget _buildPasswordField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Password',
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFFD32F2F),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFF336891), width: 2),
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.white,
-          ),
-          child: TextField(
-            controller: _passwordController,
-            obscureText: _obscurePassword,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-              suffixIcon: Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: IconButton(
-                  icon: Icon(
-                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                    color: const Color(0xFF1e5a8e),
-                    size: 20,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                  splashRadius: 20,
                 ),
-              ),
-            ),
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLabeledTextField({
-    required String label,
-    required TextEditingController controller,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFFD32F2F),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFF336891), width: 2),
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.white,
-          ),
-          child: TextField(
-            controller: controller,
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-            ),
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-      ],
+          const SizedBox(width: 16),
+          Transform.scale(
+            scale: 0.8,
+            child: Switch(
+              value: value,
+              onChanged: onChanged,
+              activeColor: const Color(0xFFD24124),
+              inactiveThumbColor: const Color(0xFFB0BEC5),
+              inactiveTrackColor: const Color(0xFFE0E0E0),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
