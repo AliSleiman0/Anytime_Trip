@@ -1,0 +1,213 @@
+{
+  "info": {
+    "name": "Anytime Travel - Booking Email Notifications",
+    "description": "Test collection for booking email notification feature",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. User Signup",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Elias Sakr\",\n  \"email\": \"elias.s.sakr10@gmail.com\",\n  \"phone_number\": \"71088907\",\n  \"password\": \"elias12345\",\n  \"confirm_password\": \"elias12345\",\n  \"sex\": \"Male\",\n  \"country\": \"Lebanon\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/app/signup",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "app", "signup"]
+        },
+        "description": "Create a test user account"
+      }
+    },
+    {
+      "name": "2. User Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "if (jsonData.token) {",
+              "    pm.environment.set(\"auth_token\", jsonData.token);",
+              "    pm.environment.set(\"user_id\", jsonData.user.id);",
+              "    console.log(\"Token saved:\", jsonData.token);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"elias.s.sakr10@gmail.com\",\n  \"password\": \"elias12345\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/app/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "app", "login"]
+        },
+        "description": "Login and save JWT token"
+      }
+    },
+    {
+      "name": "3. Enable Email Notifications",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"Email\": true,\n  \"SMS\": false,\n  \"Chatbot\": false\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/app/notification-preferences",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "app", "notification-preferences"]
+        },
+        "description": "Enable email notifications for the user"
+      }
+    },
+    {
+      "name": "4. Create Hotel Booking",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"hotel_id\": \"hotel_001\",\n  \"status\": \"confirmed\",\n  \"customer\": {\n    \"name\": \"Elias Sakr\",\n    \"email\": \"elias.s.sakr10@gmail.com\"\n  },\n  \"guests\": [\n    {\n      \"name\": \"Elias Sakr\",\n      \"type\": \"Adult\"\n    },\n    {\n      \"name\": \"Sarah Sakr\",\n      \"type\": \"Adult\"\n    }\n  ],\n  \"hotel_name\": \"Beirut Hotel\",\n  \"hotel_image\": \"https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800\",\n  \"check_in_date\": \"2026-10-22T15:00:00Z\",\n  \"check_out_date\": \"2026-10-29T11:00:00Z\",\n  \"nights\": 7,\n  \"rooms\": 1,\n  \"pricing\": {\n    \"night_price\": 404.00,\n    \"taxes\": 83.73,\n    \"destination_fee\": 21.47,\n    \"service_fee\": 93.53,\n    \"total\": 602.73\n  },\n  \"details\": \"Deluxe Room - Sea View\",\n  \"booking_date\": \"2026-01-28T00:00:00Z\",\n  \"amount\": 602.73,\n  \"currency\": \"USD\",\n  \"payment_status\": \"paid\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/app/bookings/hotel",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "app", "bookings", "hotel"]
+        },
+        "description": "Create a hotel booking and trigger email notification"
+      }
+    },
+    {
+      "name": "5. Create Flight Booking",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"flight_id\": \"flight_001\",\n  \"status\": \"confirmed\",\n  \"customer\": {\n    \"name\": \"Elias Sakr\",\n    \"email\": \"elias.s.sakr10@gmail.com\"\n  },\n  \"details\": \"JFK-LAX AA100\",\n  \"booking_date\": \"2026-03-20T00:00:00Z\",\n  \"amount\": 450.00,\n  \"currency\": \"USD\",\n  \"payment_status\": \"paid\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/app/bookings/flight",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "app", "bookings", "flight"]
+        },
+        "description": "Create a flight booking and trigger email notification"
+      }
+    },
+    {
+      "name": "6. Create Car Booking",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"car_id\": \"car_001\",\n  \"status\": \"confirmed\",\n  \"customer\": {\n    \"name\": \"Elias Sakr\",\n    \"email\": \"elias.s.sakr10@gmail.com\"\n  },\n  \"details\": \"SUV Rental - 3 Days\",\n  \"booking_date\": \"2026-03-10T00:00:00Z\",\n  \"amount\": 300.00,\n  \"currency\": \"USD\",\n  \"payment_status\": \"paid\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/app/bookings/car",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "app", "bookings", "car"]
+        },
+        "description": "Create a car booking and trigger email notification"
+      }
+    },
+    {
+      "name": "7. Create Transfer Booking",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"transfer_id\": \"transfer_001\",\n  \"status\": \"confirmed\",\n  \"customer\": {\n    \"name\": \"Elias Sakr\",\n    \"email\": \"elias.s.sakr10@gmail.com\"\n  },\n  \"details\": \"Airport Pickup - Terminal 3\",\n  \"booking_date\": \"2026-03-25T00:00:00Z\",\n  \"amount\": 75.00,\n  \"currency\": \"USD\",\n  \"payment_status\": \"paid\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/app/bookings/transfer",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "app", "bookings", "transfer"]
+        },
+        "description": "Create a transfer booking and trigger email notification"
+      }
+    }
+  ]
+}

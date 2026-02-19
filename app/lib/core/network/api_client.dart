@@ -31,16 +31,26 @@ class ApiClient {
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
           }
+          print('[ApiClient] Request: ${options.method} ${options.baseUrl}${options.path}');
+          print('[ApiClient] Has token: ${token != null}');
           return handler.next(options);
         },
         onResponse: (response, handler) {
+          print('[ApiClient] Response: ${response.statusCode} - ${response.requestOptions.path}');
           return handler.next(response);
         },
         onError: (error, handler) {
+          print('[ApiClient] Error interceptor triggered');
+          print('[ApiClient] Error type: ${error.type}');
+          print('[ApiClient] Error message: ${error.message}');
+          print('[ApiClient] Response status: ${error.response?.statusCode}');
+          print('[ApiClient] Response data: ${error.response?.data}');
+          
           // Extract error message from response
           if (error.response?.data != null) {
             final data = error.response!.data;
             if (data is Map<String, dynamic> && data['error'] != null) {
+              print('[ApiClient] Throwing error from response: ${data['error']}');
               throw Exception(data['error']);
             }
           }

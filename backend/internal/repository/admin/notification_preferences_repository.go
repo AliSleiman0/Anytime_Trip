@@ -93,3 +93,19 @@ func (r *NotificationPreferencesRepository) Delete(ctx context.Context, adminID 
 	_, err := r.collection.DeleteOne(ctx, bson.M{"admin_id": adminID})
 	return err
 }
+
+// FindAll finds all admin notification preferences
+func (r *NotificationPreferencesRepository) FindAll(ctx context.Context) ([]admin.NotificationPreferences, error) {
+	cursor, err := r.collection.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var preferences []admin.NotificationPreferences
+	if err := cursor.All(ctx, &preferences); err != nil {
+		return nil, err
+	}
+
+	return preferences, nil
+}

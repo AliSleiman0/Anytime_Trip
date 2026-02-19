@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/network/api_client.dart';
+import '../../../core/network/endpoints.dart';
+import '../../../core/storage/storage_service.dart';
 
 class ChatbotRatingDialog extends StatefulWidget {
   const ChatbotRatingDialog({super.key});
@@ -11,11 +14,71 @@ class ChatbotRatingDialog extends StatefulWidget {
 class _ChatbotRatingDialogState extends State<ChatbotRatingDialog> {
   int _rating = 4;
   final TextEditingController _feedbackController = TextEditingController();
+  bool _isSubmitting = false;
+  final ApiClient _apiClient = ApiClient();
+  final StorageService _storage = StorageService();
 
   @override
   void dispose() {
     _feedbackController.dispose();
     super.dispose();
+  }
+
+  Future<void> _submitRating() async {
+    if (_isSubmitting) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      final token = _storage.getToken();
+      if (token == null) {
+        Get.snackbar(
+          'Error',
+          'Authentication token not found',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      final response = await _apiClient.post(
+        Endpoints.submitChatbotRating,
+        data: {
+          'rating': _rating,
+          'feedback': _feedbackController.text.trim(),
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Get.back();
+        Get.snackbar(
+          'Success',
+          'Thank you for your feedback!',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        Get.snackbar(
+          'Error',
+          'Failed to submit rating',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to submit rating: ${e.toString()}',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
   }
 
   @override
@@ -192,7 +255,7 @@ class _ChatbotRatingDialogState extends State<ChatbotRatingDialog> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () => Get.back(),
+                          onPressed: _isSubmitting ? null : _submitRating,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF336891),
                             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -200,14 +263,23 @@ class _ChatbotRatingDialogState extends State<ChatbotRatingDialog> {
                               borderRadius: BorderRadius.circular(24),
                             ),
                           ),
-                          child: const Text(
-                            'Send',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                          child: _isSubmitting
+                              ? const SizedBox(
+                                  height: 18,
+                                  width: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'Send',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                         ),
                       ),
                     ],

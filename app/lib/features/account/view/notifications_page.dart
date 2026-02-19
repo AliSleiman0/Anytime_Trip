@@ -12,7 +12,11 @@ class NotificationsPage extends StatefulWidget {
 
 class _NotificationsPageState extends State<NotificationsPage> {
   // Notification preferences states
-  late Map<String, bool> notificationPreferences;
+  Map<String, bool> notificationPreferences = {
+    'Email': true,
+    'SMS': true,
+    'Chatbot': true,
+  };
   final _storage = StorageService();
   final _api = AccountApi();
 
@@ -23,59 +27,62 @@ class _NotificationsPageState extends State<NotificationsPage> {
   }
 
   Future<void> _loadNotificationPreferences() async {
+    // Initialize with only 3 options
+    final allowedKeys = {'Email', 'SMS', 'Chatbot'};
+    
     try {
       // Try to load from API first
       final apiPrefs = await _api.getNotificationPreferences();
       
       setState(() {
+        // Start with defaults
+        notificationPreferences = {
+          'Email': true,
+          'SMS': true,
+          'Chatbot': true,
+        };
+        
+        // Merge saved values for only the allowed keys
         if (apiPrefs != null && apiPrefs.isNotEmpty) {
-          notificationPreferences = apiPrefs;
-          // Also save to local storage
-          _storage.saveNotificationPreferences(apiPrefs);
+          for (var key in allowedKeys) {
+            if (apiPrefs.containsKey(key)) {
+              notificationPreferences[key] = apiPrefs[key]!;
+            }
+          }
         } else {
           // If no API data, check local storage
           final saved = _storage.getNotificationPreferences();
           if (saved != null && saved.isNotEmpty) {
-            notificationPreferences = saved;
-          } else {
-            // Use default preferences if none found
-            notificationPreferences = {
-              'All Notifications': false,
-              'Push Notifications': true,
-              'Email Alerts': false,
-              'SMS Updates': true,
-              'In-App Messages': false,
-              'Social Media Alerts': true,
-              'Webhook Notifications': false,
-              'Browser Notifications': true,
-              'RSS Feed Updates': false,
-              'Chatbot Messages': true,
-            };
-            // Save defaults to both storage and API
-            _saveNotificationPreferences();
+            for (var key in allowedKeys) {
+              if (saved.containsKey(key)) {
+                notificationPreferences[key] = saved[key]!;
+              }
+            }
           }
         }
+        
+        // Save the cleaned preferences
+        _saveNotificationPreferences();
       });
     } catch (e) {
       print('Error loading preferences from API: $e');
       // Fallback to local storage
       final saved = _storage.getNotificationPreferences();
       setState(() {
+        // Start with defaults
+        notificationPreferences = {
+          'Email': true,
+          'SMS': true,
+          'Chatbot': true,
+        };
+        
+        // Merge saved values for only the allowed keys
         if (saved != null && saved.isNotEmpty) {
-          notificationPreferences = saved;
-        } else {
-          notificationPreferences = {
-            'All Notifications': false,
-            'Push Notifications': true,
-            'Email Alerts': false,
-            'SMS Updates': true,
-            'In-App Messages': false,
-            'Social Media Alerts': true,
-            'Webhook Notifications': false,
-            'Browser Notifications': true,
-            'RSS Feed Updates': false,
-            'Chatbot Messages': true,
-          };
+          for (var key in allowedKeys) {
+            if (saved.containsKey(key)) {
+              notificationPreferences[key] = saved[key]!;
+            }
+          }
         }
       });
     }

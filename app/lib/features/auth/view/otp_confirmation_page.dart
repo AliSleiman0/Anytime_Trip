@@ -19,7 +19,7 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
   String userEmail = '';
   String userPhone = '';
   
-  List<String> otpDigits = ['', '', '', ''];
+  List<String> otpDigits = ['', '', '', '', '', ''];
 
   @override
   void initState() {
@@ -87,30 +87,25 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
   }
 
   void _resendOtp() {
-    if (userPhone.isEmpty) {
-      Helpers.showSnackbar('Error', 'Phone number is missing', isError: true);
+    if (userEmail.isEmpty) {
+      Helpers.showSnackbar('Error', 'Email address is missing', isError: true);
       return;
     }
     
     // Clear existing OTP inputs
     setState(() {
-      otpDigits = ['', '', '', ''];
+      otpDigits = ['', '', '', '', '', ''];
     });
     
-    // Send new OTP
-    authController.sendOTP('', userPhone, 'phone');
+    // Send new OTP via email
+    authController.sendOTP(userEmail, '', 'email');
   }
 
   Future<void> _confirmOtp() async {
     String otp = otpDigits.join();
     
-    if (otp.length < 4) {
-      Helpers.showSnackbar('Invalid OTP', 'Please enter the 4-digit code', isError: true);
-      return;
-    }
-
-    if (userPhone.isEmpty) {
-      Helpers.showSnackbar('Error', 'Phone number is missing', isError: true);
+    if (otp.length < 6) {
+      Helpers.showSnackbar('Invalid OTP', 'Please enter the 6-digit code', isError: true);
       return;
     }
 
@@ -119,10 +114,10 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
       return;
     }
 
-    print('DEBUG [_confirmOtp]: Verifying OTP - phone=$userPhone, code=$otp');
+    print('DEBUG [_confirmOtp]: Verifying OTP - email=$userEmail, code=$otp');
 
     // Verify OTP
-    final verified = await authController.verifyOTP('', userPhone, otp, 'phone');
+    final verified = await authController.verifyOTP(userEmail, '', otp, 'email');
     
     if (verified) {
       // Activate account
@@ -206,7 +201,7 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Enter the 4-digit code sent to\n$userPhone',
+                        'Enter the 6-digit code sent to\n$userEmail',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 14,
@@ -223,11 +218,11 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      // Input OTP boxes (4 digits)
-                      ...List.generate(4, (index) {
+                      // Input OTP boxes (6 digits)
+                      ...List.generate(6, (index) {
                         return Container(
-                          width: 60,
-                          height: 60,
+                          width: 50,
+                          height: 50,
                           decoration: BoxDecoration(
                             color: const Color(0xFFF5F5F5),
                             borderRadius: BorderRadius.circular(10),
@@ -246,7 +241,7 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
                               contentPadding: EdgeInsets.zero,
                             ),
                             style: const TextStyle(
-                              fontSize: 24,
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
@@ -254,7 +249,7 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
                               setState(() {
                                 otpDigits[index] = value;
                               });
-                              if (value.isNotEmpty && index < 3) {
+                              if (value.isNotEmpty && index < 5) {
                                 FocusScope.of(context).nextFocus();
                               }
                             },

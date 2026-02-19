@@ -309,7 +309,7 @@ func (h *AdminHandler) GetViewUserFragment(c *fiber.Ctx) error {
 			StatusClass:  statusBadge(string(b.Status)),
 			Location:     "-",
 			Rating:       "-",
-			Revenue:      formatAmount(b.Currency, b.Amount),
+			Revenue:      formatAmount(b.Pricing.Currency, b.Pricing.Total),
 			CreatedAt:    b.CreatedAt,
 		})
 		if b.CreatedAt.After(lastBookingAt) {

@@ -183,4 +183,49 @@ class AuthController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<bool> forgotPassword(String email) async {
+    try {
+      isLoading.value = true;
+      final response = await _authApi.forgotPassword(email);
+      Helpers.showSnackbar('Success', 'Verification code sent to your email', isError: false);
+      return true;
+    } catch (e) {
+      String errorMessage = e.toString().replaceAll('Exception: ', '');
+      Helpers.showSnackbar('Error', errorMessage, isError: true);
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> verifyResetCode(String email, String code) async {
+    try {
+      isLoading.value = true;
+      final response = await _authApi.verifyResetCode(email, code);
+      Helpers.showSnackbar('Success', 'Code verified successfully', isError: false);
+      return true;
+    } catch (e) {
+      String errorMessage = e.toString().replaceAll('Exception: ', '');
+      Helpers.showSnackbar('Error', errorMessage, isError: true);
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> resetPasswordWithEmail(String email, String code, String newPassword) async {
+    try {
+      isLoading.value = true;
+      final response = await _authApi.resetPasswordWithEmail(email, code, newPassword);
+      Helpers.showSnackbar('Success', 'Password reset successfully', isError: false);
+      return true;
+    } catch (e) {
+      String errorMessage = e.toString().replaceAll('Exception: ', '');
+      Helpers.showSnackbar('Error', errorMessage, isError: true);
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }

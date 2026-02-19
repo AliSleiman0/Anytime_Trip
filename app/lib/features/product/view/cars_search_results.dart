@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'car_details.dart';
 import '../../../core/widgets/unified_ui_components.dart';
+import '../../../core/network/endpoints.dart';
+import '../service/banner_service.dart';
+import '../model/banner_model.dart';
+import '../../../core/services/car_service.dart';
 
 class CarsSearchResults extends StatefulWidget {
   final String pickupLocation;
@@ -41,8 +45,78 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
     'Additional Driver Included': false,
   };
 
+  // Search banners
+  final BannerService _bannerService = BannerService();
+  final CarService _carService = CarService();
+  List<BannerModel> _searchBanners = [];
+  bool _searchBannersLoading = true;
+  
+  // Car results
+  List<dynamic> _carResults = [];
+  bool _carResultsLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSearchBanners();
+    _loadCarResults();
+  }
+
+  Future<void> _loadSearchBanners() async {
+    try {
+      final banners = await _bannerService.getHomepageBanners();
+      if (mounted) {
+        setState(() {
+          // Use second banner (index 1) for search results
+          _searchBanners = banners.length > 1 ? [banners[1]] : [];
+          _searchBannersLoading = false;
+        });
+      }
+    } catch (e) {
+      print('[CARS_SEARCH] Failed to load search banners: $e');
+      if (mounted) {
+        setState(() {
+          _searchBannersLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadCarResults() async {
+    try {
+      setState(() {
+        _carResultsLoading = true;
+        _errorMessage = null;
+      });
+
+      // For now, we don't send pickup/dropoff times since the backend search
+      // doesn't filter by time yet. We'll add this when implementing availability checking.
+      final cars = await _carService.searchCars(
+        pickupLocation: widget.pickupLocation,
+        dropoffLocation: widget.dropoffLocation,
+        // pickupTime and dropoffTime omitted for now
+      );
+
+      if (mounted) {
+        setState(() {
+          _carResults = cars;
+          _carResultsLoading = false;
+        });
+      }
+    } catch (e) {
+      print('[CARS_SEARCH] Failed to load car results: $e');
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Failed to load cars. Please try again.';
+          _carResultsLoading = false;
+        });
+      }
+    }
+  }
+
   // Mock car results
-  final List<Map<String, dynamic>> _carResults = [
+  final List<Map<String, dynamic>> _mockCarResults = [
     {
       'category': 'Midsize SUV',
       'name': 'Toyota RAV 4 or similar',
@@ -128,7 +202,63 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
           ),
         ],
       ),
-      body: ListView.builder(
+      body: _carResultsLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1e5a8e)),
+              ),
+            )
+          : _errorMessage != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 60,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        _errorMessage!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadCarResults,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1e5a8e),
+                        ),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                )
+              : _carResults.isEmpty
+                  ? const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 60,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'No cars found',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Try adjusting your search criteria',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: _carResults.length + 1, // +1 for the "Results" header
         itemBuilder: (context, index) {
@@ -155,28 +285,8 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
               children: [
                 _buildCarCard(_carResults[carIndex]),
                 const SizedBox(height: 16),
-                // Ad Banner
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    'assets/images/Ad.png',
-                    width: double.infinity,
-                    height: 100,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Center(
-                          child: Text('Advertisement'),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                // Ad Banner from database
+                _buildSearchBanner(),
                 const SizedBox(height: 16),
               ],
             );
@@ -193,14 +303,102 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
     );
   }
 
-  Widget _buildCarCard(Map<String, dynamic> car) {
+  Widget _buildSearchBanner() {
+    if (_searchBanners.isNotEmpty) {
+      final banner = _searchBanners[0];
+      final imageUrl = '${Endpoints.baseUrl.replaceAll('/api', '')}${banner.imagePath}';
+      
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.network(
+          imageUrl,
+          width: double.infinity,
+          height: 100,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              'assets/images/Ad.png',
+              width: double.infinity,
+              height: 100,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Center(
+                    child: Text('Advertisement'),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      );
+    }
+    
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.asset(
+        'assets/images/Ad.png',
+        width: double.infinity,
+        height: 100,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            height: 100,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Center(
+              child: Text('Advertisement'),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCarCard(dynamic car) {
+    // Handle both Map (from API) and dynamic types - convert to Map<String, dynamic>
+    final Map<String, dynamic> carMap = car is Map<String, dynamic> 
+        ? car 
+        : (car is Map ? Map<String, dynamic>.from(car as Map) : {});
+    
+    final carType = carMap['car_type'] ?? carMap['category'] ?? 'Car';
+    final carName = carMap['car_name'] ?? carMap['name'] ?? 'Vehicle';
+    final passengers = carMap['passengers']?.toString() ?? '4';
+    final transmission = carMap['transmission'] ?? 'Automatic';
+    final mileage = carMap['mileage'] ?? 'Unlimited mileage';
+    final cost = carMap['cost']?.toString() ?? carMap['price'] ?? '0';
+    final currency = carMap['currency'] ?? '\$';
+    final shuttle = carMap['shuttle_to_counter'] == true 
+        ? 'Shuttle to counter and car' 
+        : (carMap['shuttle'] ?? 'Walk to counter');
+    
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => CarDetails(
-              car: car,
+              car: carMap,
               pickupLocation: widget.pickupLocation,
               dropoffLocation: widget.dropoffLocation,
               pickupDate: widget.pickupDate,
@@ -225,7 +423,7 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  car['category'],
+                  carType,
                   style: const TextStyle(
                     color: Color(0xFFD32F2F),
                     fontSize: 14,
@@ -234,7 +432,7 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  car['name'],
+                  carName,
                   style: const TextStyle(
                     color: Colors.black87,
                     fontSize: 13,
@@ -242,7 +440,7 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${car['passengers']} - ${car['transmission']}',
+                  '$passengers Passengers - $transmission',
                   style: const TextStyle(
                     color: Colors.black87,
                     fontSize: 13,
@@ -250,7 +448,7 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  car['mileage'],
+                  mileage,
                   style: const TextStyle(
                     color: Colors.black87,
                     fontSize: 13,
@@ -258,7 +456,7 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  car['shuttle'],
+                  shuttle,
                   style: const TextStyle(
                     color: Colors.black87,
                     fontSize: 13,
@@ -289,7 +487,7 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
               ),
               const SizedBox(height: 8),
               Text(
-                car['price'],
+                '$currency$cost',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,

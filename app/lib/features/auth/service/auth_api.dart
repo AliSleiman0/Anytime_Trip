@@ -111,4 +111,47 @@ class AuthApi {
       rethrow;
     }
   }
+
+  Future<Map<String, dynamic>> forgotPassword(String email) async {
+    try {
+      final response = await _apiClient.post(
+        Endpoints.forgotPassword,
+        data: {'email': email},
+      );
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyResetCode(String email, String code) async {
+    try {
+      final response = await _apiClient.post(
+        Endpoints.verifyResetCode,
+        data: {
+          'email': email,
+          'code': code,
+        },
+      );
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> resetPasswordWithEmail(String email, String code, String newPassword) async {
+    try {
+      final response = await _apiClient.post(
+        Endpoints.resetPassword,
+        data: {
+          'email': email,
+          'code': code,
+          'new_password': newPassword,
+        },
+      );
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

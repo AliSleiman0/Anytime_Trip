@@ -11,13 +11,26 @@ class ChatbotChatDialog extends StatefulWidget {
 
 class _ChatbotChatDialogState extends State<ChatbotChatDialog> {
   final TextEditingController _messageController = TextEditingController();
-  final List<ChatMessage> _messages = [
-    ChatMessage(
-      text: "Didn't Solve your question?\nDirect to support Agent",
-      isBot: true,
-      timestamp: "11:32 am",
-    ),
-  ];
+  late final List<ChatMessage> _messages;
+
+  @override
+  void initState() {
+    super.initState();
+    _messages = [
+      ChatMessage(
+        text: "Hello! I'm here to help you with any questions about your bookings or our services. How can I assist you today?",
+        isBot: true,
+        timestamp: _formatTime(DateTime.now()),
+      ),
+    ];
+  }
+
+  String _formatTime(DateTime time) {
+    final hour = time.hour > 12 ? time.hour - 12 : (time.hour == 0 ? 12 : time.hour);
+    final minute = time.minute.toString().padLeft(2, '0');
+    final period = time.hour >= 12 ? 'pm' : 'am';
+    return '$hour:$minute $period';
+  }
 
   void _sendMessage() {
     if (_messageController.text.isEmpty) return;
@@ -26,7 +39,7 @@ class _ChatbotChatDialogState extends State<ChatbotChatDialog> {
       _messages.add(ChatMessage(
         text: _messageController.text,
         isBot: false,
-        timestamp: DateTime.now().toString().split(' ')[1].substring(0, 5),
+        timestamp: _formatTime(DateTime.now()),
       ));
       _messageController.clear();
 
@@ -35,9 +48,9 @@ class _ChatbotChatDialogState extends State<ChatbotChatDialog> {
         if (mounted) {
           setState(() {
             _messages.add(ChatMessage(
-              text: "Thank you for your message! Our support team will assist you shortly.",
+              text: "Thank you for your message! Our support team will assist you shortly. We typically respond within 1-2 hours during business hours.",
               isBot: true,
-              timestamp: DateTime.now().toString().split(' ')[1].substring(0, 5),
+              timestamp: _formatTime(DateTime.now()),
             ));
           });
         }

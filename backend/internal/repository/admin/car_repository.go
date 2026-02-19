@@ -173,3 +173,40 @@ func (r *CarRepository) Count(ctx context.Context) (int64, error) {
 func (r *CarRepository) CountByStatus(ctx context.Context, status admin.CarStatus) (int64, error) {
 	return r.collection.CountDocuments(ctx, bson.M{"status": status})
 }
+
+// SearchCars searches for available cars based on filters
+func (r *CarRepository) SearchCars(ctx context.Context, pickupLocation, dropoffLocation string, pickupTime, dropoffTime time.Time, carType string, passengers int) ([]admin.Car, error) {
+	filter := bson.M{
+		"status": bson.M{"$in": []admin.CarStatus{admin.CarStatusActive}},
+	}
+
+	// Filter by pickup location if provided
+	if pickupLocation != "" {
+		filter["pickup_location"] = bson.M{"$regex": pickupLocation, "$options": "i"}
+	}
+
+	// Filter by car type if provided
+	if carType != "" {
+		filter["car_type"] = bson.M{"$regex": carType, "$options": "i"}
+	}
+
+	// Filter by passengers if provided
+	if passengers > 0 {
+		filter["passengers"] = bson.M{"$gte": passengers}
+	}
+
+	// Find cars matching the criteria
+	opts := options.Find().SetSort(bson.D{{Key: "cost", Value: 1}}) // Sort by cost ascending
+	cursor, err := r.collection.Find(ctx, filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var cars []admin.Car
+	if err := cursor.All(ctx, &cars); err != nil {
+		return nil, err
+	}
+
+	return cars, nil
+}

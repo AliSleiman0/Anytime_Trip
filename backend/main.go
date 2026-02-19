@@ -20,12 +20,19 @@ import (
 	appRoutes "Anytime_Travel/backend/internal/routes/app"
 	superAdminRoutes "Anytime_Travel/backend/internal/routes/superadmin"
 	"Anytime_Travel/backend/internal/ws"
+	"Anytime_Travel/backend/services"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load .env file
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: .env file not found, using environment variables")
+	}
+
 	// Load configuration
 	cfg := config.LoadConfig()
 
@@ -50,6 +57,8 @@ func main() {
 	transferBookingRepository := apprepo.NewTransferBookingRepository(dbConn.DB)
 	// Support ticket repository
 	supportTicketRepository := apprepo.NewSupportTicketRepository(dbConn.DB)
+	// Chatbot rating repository
+	chatbotRatingRepository := apprepo.NewChatbotRatingRepository(dbConn.DB)
 	// Payments repository
 	paymentRepository := apprepo.NewPaymentRepository(dbConn.DB)
 	// Payment methods repository
@@ -60,11 +69,29 @@ func main() {
 	transferRepository := adminrepo.NewTransferRepository(dbConn.DB)
 	bannerRepository := adminrepo.NewBannerRepository(dbConn.DB)
 	travelRepository := adminrepo.NewTravelRepository(dbConn.DB)
+	searchBannerRepository := adminrepo.NewSearchBannerRepository(dbConn.DB)
 	popularRepository := adminrepo.NewPopularRepository(dbConn.DB)
 	predefinedAnswerRepository := superadminrepo.NewPredefinedAnswerRepository(dbConn.DB)
 
+	// Initialize email service and notification helper
+	emailService := utils.NewEmailService()
+	notificationHelper := utils.NewNotificationHelper(
+		emailService,
+		notificationPrefsRepository,
+		appRepository,
+	)
+
 	if err := ensureDefaultAdmin(adminRepository); err != nil {
 		log.Printf("warning: unable to seed default admin user: %v", err)
+	}
+
+	// Initialize and start reminder service
+	reminderService := services.NewReminderService(dbConn.DB)
+	if err := reminderService.Start(); err != nil {
+		log.Printf("warning: unable to start reminder service: %v", err)
+	} else {
+		// Ensure reminder service stops gracefully on shutdown
+		defer reminderService.Stop()
 	}
 
 	// Initialize WebSocket hub
@@ -75,8 +102,26 @@ func main() {
 	go notifyHub.Run()
 
 	// Initialize handlers
-	appHandler := apphandlers.NewAppHandler(appRepository, otpRepository, paymentMethodRepository, cfg.JWTSecret)
-	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, passwordResetRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, supportTicketRepository, paymentRepository, flightRepository, carRepository, hotelRepository, bannerRepository, travelRepository, popularRepository, predefinedAnswerRepository, loginAttemptRepository, cfg.JWTSecret, chatHub, notifyHub)
+	appHandler := apphandlers.NewAppHandler(
+		appRepository,
+		otpRepository,
+		paymentMethodRepository,
+		travelRepository,
+		bannerRepository,
+		searchBannerRepository,
+		popularRepository,
+		carRepository,
+		hotelBookingRepository,
+		flightBookingRepository,
+		carBookingRepository,
+		transferBookingRepository,
+		supportTicketRepository,
+		chatbotRatingRepository,
+		notificationHelper,
+		emailService,
+		cfg.JWTSecret,
+	)
+	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, passwordResetRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, transferBookingRepository, supportTicketRepository, paymentRepository, flightRepository, carRepository, hotelRepository, transferRepository, bannerRepository, travelRepository, popularRepository, predefinedAnswerRepository, loginAttemptRepository, cfg.JWTSecret, chatHub, notifyHub)
 	superAdminHandler := superadminhandlers.NewSuperAdminHandler(superAdminRepository, predefinedAnswerRepository)
 
 	// Initialize Fiber app

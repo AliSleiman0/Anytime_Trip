@@ -2,10 +2,21 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/widgets/global_chatbot_overlay.dart';
+import '../../../core/network/endpoints.dart';
+import '../service/banner_service.dart';
+import '../model/banner_model.dart';
+import '../model/popular_location_model.dart';
 import 'cars_search_results.dart';
 
 class CarsTab extends StatefulWidget {
-  const CarsTab({super.key});
+  final List<PopularLocationModel> popularLocations;
+  final bool popularLocationsLoading;
+  
+  const CarsTab({
+    super.key,
+    this.popularLocations = const [],
+    this.popularLocationsLoading = false,
+  });
 
   @override
   State<CarsTab> createState() => _CarsTabState();
@@ -31,12 +42,21 @@ class _CarsTabState extends State<CarsTab> {
   late PageController _carouselController;
   int _currentCarouselIndex = 0;
   Timer? _carouselTimer;
-  final List<String> _carouselImages = [
+  final BannerService _bannerService = BannerService();
+  List<BannerModel> _banners = [];
+  bool _bannersLoading = true;
+  
+  // Homepage banners (ads)
+  List<BannerModel> _homepageBanners = [];
+  bool _homepageBannersLoading = true;
+  
+  // Fallback images if no banners from backend
+  final List<String> _fallbackCarouselImages = [
     'assets/images/barcelona.jpg',
     'assets/images/paris.jpg',
     'assets/images/london.jpg',
   ];
-  final List<String> _carouselTitles = [
+  final List<String> _fallbackCarouselTitles = [
     'Barcelona, Spain',
     'Paris, France',
     'London, UK',
@@ -88,13 +108,16 @@ class _CarsTabState extends State<CarsTab> {
   void initState() {
     super.initState();
     _carouselController = PageController();
+    _loadBanners();
+    _loadHomepageBanners();
     _startCarouselTimer();
   }
 
   void _startCarouselTimer() {
     _carouselTimer?.cancel();
     _carouselTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      if (_currentCarouselIndex < _carouselImages.length - 1) {
+      final imageCount = _banners.isNotEmpty ? _banners.length : _fallbackCarouselImages.length;
+      if (_currentCarouselIndex < imageCount - 1) {
         _currentCarouselIndex++;
       } else {
         _currentCarouselIndex = 0;
@@ -107,6 +130,44 @@ class _CarsTabState extends State<CarsTab> {
         );
       }
     });
+  }
+
+  Future<void> _loadBanners() async {
+    try {
+      final banners = await _bannerService.getBanners();
+      if (mounted) {
+        setState(() {
+          _banners = banners;
+          _bannersLoading = false;
+        });
+      }
+    } catch (e) {
+      print('[CARS_TAB] Failed to load banners: $e');
+      if (mounted) {
+        setState(() {
+          _bannersLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadHomepageBanners() async {
+    try {
+      final banners = await _bannerService.getHomepageBanners();
+      if (mounted) {
+        setState(() {
+          _homepageBanners = banners;
+          _homepageBannersLoading = false;
+        });
+      }
+    } catch (e) {
+      print('[CARS_TAB] Failed to load homepage banners: $e');
+      if (mounted) {
+        setState(() {
+          _homepageBannersLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -1255,8 +1316,15 @@ class _CarsTabState extends State<CarsTab> {
                 _currentCarouselIndex = index;
               });
             },
-            itemCount: _carouselImages.length,
+            itemCount: _banners.isNotEmpty ? _banners.length : _fallbackCarouselImages.length,
             itemBuilder: (context, index) {
+              // Use backend banners if available, otherwise use fallback images
+              final imageUrl = _banners.isNotEmpty
+                  ? '${Endpoints.baseUrl.replaceAll('/api', '')}${_banners[index].imagePath}'
+                  : null;
+              final assetImage = _banners.isEmpty ? _fallbackCarouselImages[index] : null;
+              final title = _banners.isNotEmpty ? _banners[index].title : _fallbackCarouselTitles[index];
+
               return Padding(
                 padding: const EdgeInsets.only(right: 12),
                 child: ClipRRect(
@@ -1264,22 +1332,63 @@ class _CarsTabState extends State<CarsTab> {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Image.asset(
-                        _carouselImages[index],
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[300],
-                            child: Center(
-                              child: Icon(
-                                Icons.image,
-                                size: 60,
-                                color: Colors.grey[500],
+                      // Image - either from network (backend) or assets (fallback)
+                      if (imageUrl != null)
+                        Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              color: Colors.grey[300],
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            // Fallback to asset if network image fails
+                            return Image.asset(
+                              _fallbackCarouselImages[index % _fallbackCarouselImages.length],
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.grey[300],
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.image,
+                                      size: 60,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        )
+                      else if (assetImage != null)
+                        Image.asset(
+                          assetImage,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey[300],
+                              child: Center(
+                                child: Icon(
+                                  Icons.image,
+                                  size: 60,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      // Gradient overlay
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -1292,11 +1401,12 @@ class _CarsTabState extends State<CarsTab> {
                           ),
                         ),
                       ),
+                      // Title
                       Positioned(
                         bottom: 16,
                         left: 16,
                         child: Text(
-                          _carouselTitles[index],
+                          title,
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
@@ -1315,7 +1425,7 @@ class _CarsTabState extends State<CarsTab> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
-            _carouselImages.length,
+            _banners.isNotEmpty ? _banners.length : _fallbackCarouselImages.length,
             (index) => Container(
               width: _currentCarouselIndex == index ? 24 : 8,
               height: 8,
@@ -1334,6 +1444,66 @@ class _CarsTabState extends State<CarsTab> {
   }
 
   Widget _buildAdvertisement() {
+    // Display first homepage banner if available, otherwise show fallback ad
+    if (_homepageBanners.isNotEmpty) {
+      final banner = _homepageBanners[0];
+      final imageUrl = '${Endpoints.baseUrl.replaceAll('/api', '')}${banner.imagePath}';
+      
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Image.network(
+          imageUrl,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              width: double.infinity,
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            // Fallback to static ad if network image fails
+            return Image.asset(
+              'assets/images/Ad.png',
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: double.infinity,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.image,
+                      size: 40,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      );
+    }
+    
+    // Fallback to static ad
     return ClipRRect(
       borderRadius: BorderRadius.circular(15),
       child: Image.asset(
@@ -1362,23 +1532,22 @@ class _CarsTabState extends State<CarsTab> {
   }
 
   Widget _buildPopularLocations() {
-    final List<Map<String, String>> popularCities = [
-      {
-        'name': 'London, UK',
-        'image': 'assets/images/london.jpg',
-        'temp': '28',
-      },
-      {
-        'name': 'Paris, France',
-        'image': 'assets/images/paris.jpg',
-        'temp': '25',
-      },
-      {
-        'name': 'Barcelona, Spain',
-        'image': 'assets/images/barcelona.jpg',
-        'temp': '30',
-      },
-    ];
+    // Show loading indicator while fetching data
+    if (widget.popularLocationsLoading) {
+      return const SizedBox(
+        height: 220,
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1e5a8e)),
+          ),
+        ),
+      );
+    }
+
+    // Show empty state if no locations available
+    if (widget.popularLocations.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1398,13 +1567,13 @@ class _CarsTabState extends State<CarsTab> {
           height: 220,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: popularCities.length,
+            itemCount: widget.popularLocations.length,
             itemBuilder: (context, index) {
-              final city = popularCities[index];
+              final location = widget.popularLocations[index];
               return Container(
                 width: 240,
                 margin: EdgeInsets.only(
-                  right: index < popularCities.length - 1 ? 16 : 0,
+                  right: index < widget.popularLocations.length - 1 ? 16 : 0,
                 ),
                 child: Stack(
                   children: [
@@ -1413,8 +1582,8 @@ class _CarsTabState extends State<CarsTab> {
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          Image.asset(
-                            city['image']!,
+                          Image.network(
+                            '${Endpoints.baseUrl.replaceAll('/api', '')}${location.imagePath}',
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
@@ -1423,6 +1592,21 @@ class _CarsTabState extends State<CarsTab> {
                                   Icons.image,
                                   size: 60,
                                   color: Colors.grey[500],
+                                ),
+                              );
+                            },
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                color: Colors.grey[200],
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                        : null,
+                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF1e5a8e)),
+                                  ),
                                 ),
                               );
                             },
@@ -1442,39 +1626,29 @@ class _CarsTabState extends State<CarsTab> {
                         ],
                       ),
                     ),
-                    Positioned(
-                      top: 12,
-                      left: 12,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.wb_sunny,
-                              size: 16,
+                    if (location.title.isNotEmpty)
+                      Positioned(
+                        top: 12,
+                        left: 12,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            location.title,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
                               color: Color(0xFF1e5a8e),
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${city['temp']}°C',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
                     Positioned(
                       bottom: 12,
                       left: 12,
@@ -1482,24 +1656,30 @@ class _CarsTabState extends State<CarsTab> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.location_on,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                city['name']!,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
+                          Expanded(
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.location_on,
                                   color: Colors.white,
+                                  size: 18,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    location.location,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                          const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,

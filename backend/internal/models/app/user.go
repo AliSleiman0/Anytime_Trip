@@ -4,16 +4,9 @@ import "time"
 
 // NotificationPreferences represents user notification settings
 type NotificationPreferences struct {
-	AllNotifications     bool `json:"all_notifications" bson:"all_notifications"`
-	PushNotifications    bool `json:"push_notifications" bson:"push_notifications"`
-	EmailAlerts          bool `json:"email_alerts" bson:"email_alerts"`
-	SMSUpdates           bool `json:"sms_updates" bson:"sms_updates"`
-	InAppMessages        bool `json:"in_app_messages" bson:"in_app_messages"`
-	SocialMediaAlerts    bool `json:"social_media_alerts" bson:"social_media_alerts"`
-	WebhookNotifications bool `json:"webhook_notifications" bson:"webhook_notifications"`
-	BrowserNotifications bool `json:"browser_notifications" bson:"browser_notifications"`
-	RSSFeedUpdates       bool `json:"rss_feed_updates" bson:"rss_feed_updates"`
-	ChatbotMessages      bool `json:"chatbot_messages" bson:"chatbot_messages"`
+	Email   bool `json:"Email" bson:"Email"`
+	SMS     bool `json:"SMS" bson:"SMS"`
+	Chatbot bool `json:"Chatbot" bson:"Chatbot"`
 }
 
 // SecurityPreferences represents user security settings

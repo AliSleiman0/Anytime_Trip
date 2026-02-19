@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/helpers.dart';
 import '../controller/auth_controller.dart';
@@ -15,9 +14,9 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   String selectedLanguage = 'en';
   final authController = Get.find<AuthController>();
-  final phoneController = TextEditingController();
+  final emailController = TextEditingController();
   
-  String userPhone = '';
+  String userEmail = '';
 
   @override
   void initState() {
@@ -26,7 +25,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   
   @override
   void dispose() {
-    phoneController.dispose();
+    emailController.dispose();
     super.dispose();
   }
 
@@ -82,17 +81,35 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 
-  void _resendPhoneOtp() {
-    if (userPhone.isEmpty) {
-      Helpers.showSnackbar('Error', 'Please enter phone number first', isError: true);
+  void _resendEmailOtp() {
+    if (userEmail.isEmpty) {
+      Helpers.showSnackbar('Error', 'Please enter email address first', isError: true);
       return;
     }
-    authController.sendOTP('', userPhone, 'phone');
+    authController.forgotPassword(userEmail);
   }
   
   Future<void> _sendOTP() async {
-    // Navigate to set password page
-    Get.toNamed(AppRoutes.SET_NEW_PASSWORD);
+    if (emailController.text.isEmpty) {
+      Helpers.showSnackbar('Required Field', 'Please enter your email address', isError: true);
+      return;
+    }
+
+    // Validate email format
+    if (!GetUtils.isEmail(emailController.text)) {
+      Helpers.showSnackbar('Invalid Email', 'Please enter a valid email address', isError: true);
+      return;
+    }
+
+    userEmail = emailController.text;
+    bool success = await authController.forgotPassword(userEmail);
+    
+    if (success) {
+      // Navigate to set password page with email
+      Get.toNamed(AppRoutes.SET_NEW_PASSWORD, arguments: {
+        'email': userEmail,
+      });
+    }
   }
 
   @override
@@ -165,7 +182,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ),
                       SizedBox(height: 12),
                       Text(
-                        'Enter your phone number on the next screen to reset your password',
+                        'Enter your email address to receive a verification code',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.white70,
@@ -175,7 +192,41 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     ],
                   ),
                 ),
-                SizedBox(height: size.height * 0.08),
+                SizedBox(height: size.height * 0.04),
+                // Email Input Field
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        hintText: 'Email Address',
+                        border: InputBorder.none,
+                        prefixIcon: const Icon(
+                          Icons.email,
+                          color: Color(0xFF1e5a8e),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                      ),
+                      onChanged: (value) {
+                        userEmail = value;
+                      },
+                    ),
+                  ),
+                ),
+                SizedBox(height: size.height * 0.04),
                 // Continue Button
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),

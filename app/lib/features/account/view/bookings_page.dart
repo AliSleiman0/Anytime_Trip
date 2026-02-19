@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/storage/storage_service.dart';
 import '../../../core/network/endpoints.dart';
+import '../../../core/services/booking_service.dart';
 
 class BookingsPage extends StatefulWidget {
   const BookingsPage({super.key});
@@ -11,191 +12,16 @@ class BookingsPage extends StatefulWidget {
 
 class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-
-  final List<Map<String, dynamic>> _bookings = [
-    {
-      'type': 'flights',
-      'status': 'Upcoming',
-      'from': 'Bey',
-      'to': 'DXB',
-      'departureTime': '8:15 am',
-      'arrivalTime': '10:25 am',
-      'duration': '1 hr',
-      'stops': 'One way',
-      'airline': 'Emirates',
-      'cabin': 'Cabin: Economy',
-      'bags': '1 carry-on bag included (7 kg)\n2 checked bags (23 kg each)',
-      'cancellationFee': '\$250',
-      'ticketPrice': '\$1,300',
-      'changeFee': '\$250',
-      'upgradeFee': '\$250',
-      'totalPrice': '\$1,800',
-    },
-    {
-      'type': 'flights',
-      'status': 'Upcoming',
-      'from': 'Bey',
-      'to': 'DXB',
-      'departureTime': '7:21 am',
-      'arrivalTime': '9:35 am',
-      'duration': '1 hr',
-      'stops': 'One way',
-      'airline': 'Middle East Airlines',
-      'cabin': 'Cabin: Economy',
-      'bags': '1 carry-on bag included (7 kg)\n1 checked bag (23 kg each)',
-      'cancellationFee': '\$195',
-      'ticketPrice': '\$1,195',
-      'changeFee': '\$195',
-      'upgradeFee': '\$195',
-      'totalPrice': '\$1,595',
-    },
-    {
-      'type': 'flights',
-      'status': 'Cancelled',
-      'from': 'Bey',
-      'to': 'DOH',
-      'departureTime': '6:00 am',
-      'arrivalTime': '8:00 am',
-      'duration': '2 hr',
-      'stops': 'One way',
-      'airline': 'Qatar Airways',
-      'cabin': 'Cabin: Economy',
-      'bags': '1 carry-on bag included (10 kg)\n2 checked bags (23 kg each)',
-      'cancellationFee': '\$200',
-      'ticketPrice': '\$1,300',
-      'changeFee': '\$200',
-      'upgradeFee': '\$200',
-      'totalPrice': '\$1,400',
-    },
-    {
-      'type': 'flights',
-      'status': 'Postponed',
-      'from': 'Bey',
-      'to': 'DOH',
-      'departureTime': '9:00 am',
-      'arrivalTime': '11:15 am',
-      'duration': '2 hr',
-      'stops': 'One way',
-      'airline': 'Qatar Airways',
-      'cabin': 'Cabin: Economy',
-      'bags': '1 carry-on bag included (10 kg)\n2 checked bags (23 kg each)',
-      'cancellationFee': '\$200',
-      'ticketPrice': '\$1,300',
-      'changeFee': '\$200',
-      'upgradeFee': '\$200',
-      'totalPrice': '\$1,400',
-    },
-    {
-      'type': 'cars',
-      'status': 'Upcoming',
-      'category': 'Midsize SUV',
-      'name': 'Toyota RAV 4 or similar',
-      'passengers': '5 Passengers',
-      'transmission': 'Automatic',
-      'mileage': 'Unlimited mileage',
-      'shuttle': 'Shuttle to counter and car',
-      'price': '\$3,200',
-    },
-    {
-      'type': 'cars',
-      'status': 'Voided',
-      'category': 'Midsize SUV',
-      'name': 'Toyota RAV 4 or similar',
-      'passengers': '5 Passengers',
-      'transmission': 'Automatic',
-      'mileage': 'Unlimited mileage',
-      'shuttle': 'Shuttle to counter and car',
-      'price': '\$3,200',
-    },
-    {
-      'type': 'cars',
-      'status': 'Cancelled',
-      'category': 'Midsize SUV',
-      'name': 'Toyota RAV 4 or similar',
-      'passengers': '5 Passengers',
-      'transmission': 'Automatic',
-      'mileage': 'Unlimited mileage',
-      'shuttle': 'Shuttle to counter and car',
-      'price': '\$3,200',
-    },
-    {
-      'type': 'cars',
-      'status': 'Cancelled',
-      'category': 'Midsize SUV',
-      'name': 'Toyota RAV 4 or similar',
-      'passengers': '5 Passengers',
-      'transmission': 'Automatic',
-      'mileage': 'Unlimited mileage',
-      'shuttle': 'Shuttle to counter and car',
-      'price': '\$3,200',
-    },
-    {
-      'type': 'hotels',
-      'status': 'Upcoming',
-      'hotelName': 'Beirut Hotel',
-      'location': 'Beirut, Lebanon',
-      'amenities': 'Breakfast + Pool Included',
-      'bookedDate': 'Booked for 11/11/2025',
-      'price': '\$603 total',
-    },
-    {
-      'type': 'hotels',
-      'status': 'Voided',
-      'hotelName': 'Beirut Hotel',
-      'location': 'Beirut, Lebanon',
-      'amenities': 'Breakfast + Pool Included',
-      'bookedDate': 'Booked for 11/11/2025',
-      'price': '\$603 total',
-    },
-    {
-      'type': 'hotels',
-      'status': 'Cancelled',
-      'hotelName': 'Beirut Hotel',
-      'location': 'Beirut, Lebanon',
-      'amenities': 'Breakfast + Pool Included',
-      'bookedDate': 'Booked for 11/11/2025',
-      'price': '\$603 total',
-    },
-    {
-      'type': 'hotels',
-      'status': 'Cancelled',
-      'hotelName': 'Beirut Hotel',
-      'location': 'Beirut, Lebanon',
-      'amenities': 'Breakfast + Pool Included',
-      'bookedDate': 'Booked for 11/11/2025',
-      'price': '\$603 total',
-    },
-    {
-      'type': 'transfers',
-      'status': 'Upcoming',
-      'category': 'Midsize SUV',
-      'name': 'Toyota RAV 4 or similar',
-      'passengers': '5 Passengers',
-      'estimatedTime': 'Estimated time: 40 min',
-      'meetGreet': 'Meet & Greet availability',
-      'price': '\$50',
-    },
-    {
-      'type': 'transfers',
-      'status': 'Upcoming',
-      'category': 'Midsize SUV',
-      'name': 'Toyota RAV 4 or similar',
-      'passengers': '5 Passengers',
-      'estimatedTime': 'Estimated time: 40 min',
-      'meetGreet': 'Meet & Greet availability',
-      'price': '\$50',
-    },
-    {
-      'type': 'transfers',
-      'status': 'Cancelled',
-      'category': 'Midsize SUV',
-      'name': 'Toyota RAV 4 or similar',
-      'passengers': '5 Passengers',
-      'estimatedTime': 'Estimated time: 40 min',
-      'meetGreet': 'Meet & Greet availability',
-      'price': '\$50',
-    },
-  ];
+  final BookingService _bookingService = BookingService();
+  
+  // Real data from API
+  List<dynamic> _carBookings = [];
+  List<dynamic> _flightBookings = [];
+  List<dynamic> _hotelBookings = [];
+  List<dynamic> _transferBookings = [];
+  
+  bool _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
@@ -204,6 +30,37 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
     _tabController.addListener(() {
       setState(() {});
     });
+    _loadBookings();
+  }
+
+  Future<void> _loadBookings() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+
+      final allBookings = await _bookingService.getAllBookings();
+      
+      print('[DEBUG] Car bookings count: ${(allBookings['car_bookings'] as List?)?.length ?? 0}');
+      print('[DEBUG] Flight bookings count: ${(allBookings['flight_bookings'] as List?)?.length ?? 0}');
+      print('[DEBUG] Hotel bookings count: ${(allBookings['hotel_bookings'] as List?)?.length ?? 0}');
+      print('[DEBUG] Transfer bookings count: ${(allBookings['transfer_bookings'] as List?)?.length ?? 0}');
+      
+      setState(() {
+        _carBookings = allBookings['car_bookings'] ?? [];
+        _flightBookings = allBookings['flight_bookings'] ?? [];
+        _hotelBookings = allBookings['hotel_bookings'] ?? [];
+        _transferBookings = allBookings['transfer_bookings'] ?? [];
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+      print('Error loading bookings: $e');
+    }
   }
 
   @override
@@ -370,49 +227,1116 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
   }
 
   Widget _buildFlightsTab() {
-    final flights = _bookings.where((b) => b['type'] == 'flights').toList();
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    
+    if (_error != null) {
+      return Center(
         child: Column(
-          children: flights.map((flight) => _buildBookingCard(flight)).toList(),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 16),
+            Text('Error: $_error'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _loadBookings,
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_flightBookings.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.flight_outlined, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text('No flight bookings yet', style: TextStyle(fontSize: 16, color: Colors.grey)),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadBookings,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: _flightBookings.map((flight) => _buildFlightBookingCard(flight)).toList(),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildCarsTab() {
-    final cars = _bookings.where((b) => b['type'] == 'cars').toList();
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    
+    if (_carBookings.isEmpty) {
+      return const Center(
         child: Column(
-          children: cars.map((car) => _buildCarBookingCard(car)).toList(),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.directions_car_outlined, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text('No car bookings yet', style: TextStyle(fontSize: 16, color: Colors.grey)),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadBookings,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: _carBookings.map((car) => _buildCarBookingCardFromDB(car)).toList(),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildHotelsTab() {
-    final hotels = _bookings.where((b) => b['type'] == 'hotels').toList();
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    
+    if (_hotelBookings.isEmpty) {
+      return const Center(
         child: Column(
-          children: hotels.map((hotel) => _buildHotelBookingCard(hotel)).toList(),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.hotel_outlined, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text('No hotel bookings yet', style: TextStyle(fontSize: 16, color: Colors.grey)),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadBookings,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: _hotelBookings.map((hotel) => _buildHotelBookingCardFromDB(hotel)).toList(),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildTransfersTab() {
-    final transfers = _bookings.where((b) => b['type'] == 'transfers').toList();
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    
+    if (_transferBookings.isEmpty) {
+      return const Center(
         child: Column(
-          children: transfers.map((transfer) => _buildTransferBookingCard(transfer)).toList(),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.airport_shuttle_outlined, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text('No transfer bookings yet', style: TextStyle(fontSize: 16, color: Colors.grey)),
+          ],
         ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadBookings,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: _transferBookings.map((transfer) => _buildTransferBookingCardFromDB(transfer)).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Build car booking card from database data
+  Widget _buildCarBookingCardFromDB(Map<String, dynamic> booking) {
+    final status = booking['status'] ?? 'confirmed';
+    final statusDisplay = status[0].toUpperCase() + status.substring(1);
+    Color statusColor = _getStatusColor(statusDisplay);
+    
+    final carType = booking['car_type'] ?? 'Car';
+    final passengers = booking['passengers']?.toString() ?? '4';
+    final pickupLocation = booking['pickup']?['location'] ?? 'Location';
+    final pickupDate = booking['pickup']?['date'] ?? '';
+    final pickupTime = booking['pickup']?['time'] ?? '';
+    final pricing = booking['pricing'] ?? {};
+    final total = pricing['total'] ?? 0.0;
+    final bookingId = booking['booking_id'] ?? '';
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16, top: 8),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F0F7),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        carType,
+                        style: const TextStyle(
+                          color: Color(0xFFD32F2F),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        bookingId,
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$passengers passengers',
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Pickup: $pickupLocation',
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$pickupDate at $pickupTime',
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Buttons
+                      if (status == 'cancelled')
+                        // Only show Request Refund for cancelled bookings
+                        ElevatedButton(
+                          onPressed: () => _showRefundDialog(this.context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFD32F2F),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            minimumSize: const Size(double.infinity, 36),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: const Text(
+                            'Request refund',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        )
+                      else if (status == 'confirmed' || statusDisplay == 'Upcoming')
+                        // Show both buttons for upcoming/confirmed bookings
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: ElevatedButton(
+                                onPressed: () => _showRefundDialog(this.context),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFD32F2F),
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Request refund',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 1,
+                              child: OutlinedButton(
+                                onPressed: () => _cancelBooking('car', booking['booking_id']),
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: Color(0xFFD32F2F), width: 2),
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Color(0xFFD32F2F),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.asset(
+                        'assets/images/urus.jpeg',
+                        width: 80,
+                        height: 60,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 80,
+                            height: 60,
+                            color: Colors.grey.shade300,
+                            child: const Icon(Icons.directions_car, size: 30),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '\$${total.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Status Badge - positioned on the border
+          Positioned(
+            top: -8,
+            right: 12,
+            child: Container(
+              decoration: BoxDecoration(
+                color: statusColor,
+                borderRadius: BorderRadius.circular(6),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: Text(
+                statusDisplay,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build flight booking card from database data  
+  Widget _buildFlightBookingCard(Map<String, dynamic> booking) {
+    final firstSegment = (booking['outbound_flights'] as List?)?.first;
+    Color statusColor = _getStatusColor(booking['status']);
+    
+    if (firstSegment == null) {
+      return const SizedBox();
+    }
+
+    // Extract pricing info
+    final pricing = booking['pricing'] ?? {};
+    final ticketPrice = pricing['base_price'] ?? 0.0;
+    final total = pricing['total'] ?? 0.0;
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16, top: 8),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Stack(
+                children: [
+                  // Background Image
+                  Positioned.fill(
+                    child: Image.asset(
+                      'assets/images/ccl.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+
+                  // Content
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Top row: Routes and details
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${firstSegment['departure_code']}-${firstSegment['arrival_code']}',
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${firstSegment['departure_time']} - ${firstSegment['arrival_time']} (${firstSegment['duration'] ?? 'N/A'})',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  firstSegment['airline'] ?? '',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  firstSegment['cabin'] ?? '',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Bags section
+                        const Text(
+                          'Bags',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1e5a8e),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          firstSegment['bags'] ?? 'Not specified',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black87,
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Fees section
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Cancellation Fee',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFFD32F2F),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  '\$0.00',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Change Fee',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFFD32F2F),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  '\$0.00',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Prices section
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Ticket Price',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFFD32F2F),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  '\$${ticketPrice.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Upgrade Fee',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFFD32F2F),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  '\$0.00',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Total Price
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Total Price',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            Text(
+                              '\$${total.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Buttons
+                        if (booking['status'] == 'cancelled')
+                          // Only show Request Refund for cancelled bookings
+                          ElevatedButton(
+                            onPressed: () => _showRefundDialog(this.context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFD32F2F),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              minimumSize: const Size(double.infinity, 40),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: const Text(
+                              'Request refund',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          )
+                        else
+                          // Show both buttons for other statuses
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () => _showRefundDialog(this.context),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFD32F2F),
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Request refund',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () => _cancelBooking('flight', booking['booking_id']),
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(color: Color(0xFFD32F2F), width: 2),
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      color: Color(0xFFD32F2F),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Status Badge - positioned on the border
+          Positioned(
+            top: -8,
+            right: 16,
+            child: Container(
+              decoration: BoxDecoration(
+                color: statusColor,
+                borderRadius: BorderRadius.circular(6),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: Text(
+                (booking['status'] ?? 'unknown')[0].toUpperCase() +
+                    (booking['status'] ?? 'unknown').substring(1),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build hotel booking card from database data
+  Widget _buildHotelBookingCardFromDB(Map<String, dynamic> booking) {
+    Color statusColor = _getStatusColor(booking['status']);
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16, top: 8),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F0F7),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        booking['hotel_name'] ?? 'Hotel',
+                        style: const TextStyle(
+                          color: Color(0xFFD32F2F),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        booking['location'] ?? 'Location not specified',
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${booking['room_type'] ?? 'Room'} • ${booking['nights'] ?? 0} nights',
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Check-in: ${booking['check_in_date'] ?? 'N/A'}',
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        '\$${booking['pricing']?['total']?.toStringAsFixed(2) ?? '0.00'}',
+                        style: const TextStyle(
+                          color: Color(0xFF2196F3),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Buttons
+                      if (booking['status'] == 'cancelled')
+                        // Only show Request Refund for cancelled bookings
+                        ElevatedButton(
+                          onPressed: () => _showRefundDialog(this.context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFD32F2F),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            minimumSize: const Size(double.infinity, 36),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: const Text(
+                            'Request refund',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        )
+                      else
+                        // Show both buttons for other statuses
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: ElevatedButton(
+                                onPressed: () => _showRefundDialog(this.context),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFD32F2F),
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Request refund',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 1,
+                              child: OutlinedButton(
+                                onPressed: () => _cancelBooking('hotel', booking['booking_id']),
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: Color(0xFFD32F2F), width: 2),
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Color(0xFFD32F2F),
+                                    fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    'assets/images/hotel2.jpg',
+                    width: 100,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 100,
+                        height: 80,
+                        color: Colors.grey.shade300,
+                        child: const Icon(Icons.hotel, size: 30),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Status Badge - positioned on the border
+          Positioned(
+            top: -8,
+            right: 12,
+            child: Container(
+              decoration: BoxDecoration(
+                color: statusColor,
+                borderRadius: BorderRadius.circular(6),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: Text(
+                (booking['status'] ?? 'unknown')[0].toUpperCase() +
+                    (booking['status'] ?? 'unknown').substring(1),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Build transfer booking card from database data
+  Widget _buildTransferBookingCardFromDB(Map<String, dynamic> booking) {
+    Color statusColor = _getStatusColor(booking['status']);
+    final vehicle = booking['vehicle'] ?? {};
+    final pickup = booking['pickup'] ?? {};
+    final dropoff = booking['dropoff'] ?? {};
+    final pricing = booking['pricing'] ?? {};
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16, top: 8),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F0F7),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        vehicle['type'] ?? 'Transfer',
+                        style: const TextStyle(
+                          color: Color(0xFFD32F2F),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${pickup['name'] ?? 'N/A'} → ${dropoff['name'] ?? 'N/A'}',
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${vehicle['passengers'] ?? 0} passengers',
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Pickup: ${pickup['date'] ?? 'N/A'} at ${pickup['time'] ?? 'N/A'}',
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Meet & Greet included',
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Buttons
+                      if (booking['status'] == 'cancelled')
+                        // Only show Request Refund for cancelled bookings
+                        ElevatedButton(
+                          onPressed: () => _showRefundDialog(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFD32F2F),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            minimumSize: const Size(double.infinity, 36),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: const Text(
+                            'Request refund',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        )
+                      else
+                        // Show both buttons for other statuses
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: ElevatedButton(
+                                onPressed: () => _showRefundDialog(context),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFD32F2F),
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Request refund',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 1,
+                              child: OutlinedButton(
+                                onPressed: () => _cancelBooking('transfer', booking['booking_id']),
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: Color(0xFFD32F2F), width: 2),
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Color(0xFFD32F2F),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.asset(
+                        'assets/images/urus.jpeg',
+                        width: 80,
+                        height: 60,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 80,
+                            height: 60,
+                            color: Colors.grey.shade300,
+                            child: const Icon(Icons.directions_car, size: 30),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '\$${pricing['total']?.toStringAsFixed(2) ?? '0.00'}',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Status Badge - positioned on the border
+          Positioned(
+            top: -8,
+            right: 12,
+            child: Container(
+              decoration: BoxDecoration(
+                color: statusColor,
+                borderRadius: BorderRadius.circular(6),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: Text(
+                (booking['status'] ?? 'unknown')[0].toUpperCase() +
+                    (booking['status'] ?? 'unknown').substring(1),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1416,6 +2340,40 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
         );
       },
     );
+  }
+
+  Future<void> _cancelBooking(String type, String bookingId) async {
+    try {
+      final response = await _bookingService.cancelBooking(type, bookingId);
+      
+      if (response['success'] == true) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Booking cancelled successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        
+        // Reload bookings
+        _loadBookings();
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? 'Failed to cancel booking'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _showRefundDialog(BuildContext context) {

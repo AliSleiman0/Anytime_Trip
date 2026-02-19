@@ -21,9 +21,12 @@ func (h *AdminHandler) HandleChatWebSocket(c *websocket.Conn) {
 	userID := c.Query("user_id")
 	userName := c.Query("user_name")
 
+	log.Printf("[WebSocket] Connection request - ticket_id=%s, admin_id=%s, user_id=%s, user_name=%s",
+		ticketID, adminID, userID, userName)
+
 	// Require ticket and at least one identity (admin or user)
 	if ticketID == "" || (adminID == "" && userID == "") {
-		log.Printf("[WebSocket] Missing ticket_id or admin_id/user_id")
+		log.Printf("[WebSocket] REJECTED: Missing ticket_id or admin_id/user_id")
 		return
 	}
 
@@ -33,9 +36,11 @@ func (h *AdminHandler) HandleChatWebSocket(c *websocket.Conn) {
 	if userID != "" {
 		isAdmin = false
 		clientID = userID
+		log.Printf("[WebSocket] User connection: userID=%s, userName=%s", userID, userName)
 	} else {
 		isAdmin = true
 		clientID = adminID
+		log.Printf("[WebSocket] Admin connection: adminID=%s, adminName=%s", adminID, adminName)
 	}
 
 	// Create client

@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"log"
 	"time"
 
 	appmodels "Anytime_Travel/backend/internal/models/app"
@@ -90,4 +91,53 @@ func (r *SupportTicketRepository) UpdateTicketPriority(ctx context.Context, tick
 	update := bson.M{"$set": bson.M{"priority": priority, "updated_at": time.Now()}}
 	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": ticketID}, update)
 	return err
+}
+
+// Create creates a new support ticket
+func (r *SupportTicketRepository) Create(ctx context.Context, ticket *appmodels.SupportTicket) (primitive.ObjectID, error) {
+	ticket.CreatedAt = time.Now()
+	ticket.UpdatedAt = time.Now()
+	result, err := r.collection.InsertOne(ctx, ticket)
+	if err != nil {
+		return primitive.NilObjectID, err
+	}
+	return result.InsertedID.(primitive.ObjectID), nil
+}
+
+// GetTicketsByEmail returns all tickets for a given customer email
+func (r *SupportTicketRepository) GetTicketsByEmail(ctx context.Context, email string) ([]appmodels.SupportTicket, error) {
+	log.Printf("[SupportTicketRepo] Querying tickets for email: %s", email)
+	opts := options.Find().SetSort(bson.D{{Key: "created_at", Value: -1}})
+	cursor, err := r.collection.Find(ctx, bson.M{"customer_email": email}, opts)
+	if err != nil {
+		log.Printf("[SupportTicketRepo] Query error: %v", err)
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+	var tickets []appmodels.SupportTicket
+	if err := cursor.All(ctx, &tickets); err != nil {
+		log.Printf("[SupportTicketRepo] Decode error: %v", err)
+		return nil, err
+	}
+	log.Printf("[SupportTicketRepo] Found %d tickets", len(tickets))
+	return tickets, nil
+}
+
+// GetTicketsByUserID returns all tickets for a given user ID
+func (r *SupportTicketRepository) GetTicketsByUserID(ctx context.Context, userID string) ([]appmodels.SupportTicket, error) {
+	log.Printf("[SupportTicketRepo] Querying tickets for user_id: %s", userID)
+	opts := options.Find().SetSort(bson.D{{Key: "created_at", Value: -1}})
+	cursor, err := r.collection.Find(ctx, bson.M{"user_id": userID}, opts)
+	if err != nil {
+		log.Printf("[SupportTicketRepo] Query error: %v", err)
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+	var tickets []appmodels.SupportTicket
+	if err := cursor.All(ctx, &tickets); err != nil {
+		log.Printf("[SupportTicketRepo] Decode error: %v", err)
+		return nil, err
+	}
+	log.Printf("[SupportTicketRepo] Found %d tickets", len(tickets))
+	return tickets, nil
 }

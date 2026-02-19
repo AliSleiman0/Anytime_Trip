@@ -9,7 +9,9 @@ import (
 	"time"
 
 	"Anytime_Travel/backend/core/utils"
+	adminmodels "Anytime_Travel/backend/internal/models/admin"
 	appmodels "Anytime_Travel/backend/internal/models/app"
+	adminrepo "Anytime_Travel/backend/internal/repository/admin"
 	"Anytime_Travel/backend/internal/repository/app"
 
 	"github.com/gofiber/fiber/v2"
@@ -21,18 +23,62 @@ import (
 
 // AppHandler handles app-level requests
 type AppHandler struct {
-	userRepo          *app.UserRepository
-	otpRepo           *app.OTPRepository
-	paymentMethodRepo *app.PaymentMethodRepository
-	jwtSecret         string
+	userRepo            *app.UserRepository
+	otpRepo             *app.OTPRepository
+	paymentMethodRepo   *app.PaymentMethodRepository
+	travelRepo          *adminrepo.TravelRepository
+	bannerRepo          *adminrepo.BannerRepository
+	searchBannerRepo    *adminrepo.SearchBannerRepository
+	popularRepo         *adminrepo.PopularRepository
+	carRepo             *adminrepo.CarRepository
+	hotelBookingRepo    *app.HotelBookingRepository
+	flightBookingRepo   *app.FlightBookingRepository
+	carBookingRepo      *app.CarBookingRepository
+	transferBookingRepo *app.TransferBookingRepository
+	supportTicketRepo   *app.SupportTicketRepository
+	chatbotRatingRepo   *app.ChatbotRatingRepository
+	notificationHelper  *utils.NotificationHelper
+	emailService        *utils.EmailService
+	jwtSecret           string
 }
 
-func NewAppHandler(userRepo *app.UserRepository, otpRepo *app.OTPRepository, paymentMethodRepo *app.PaymentMethodRepository, jwtSecret string) *AppHandler {
+func NewAppHandler(
+	userRepo *app.UserRepository,
+	otpRepo *app.OTPRepository,
+	paymentMethodRepo *app.PaymentMethodRepository,
+	travelRepo *adminrepo.TravelRepository,
+	bannerRepo *adminrepo.BannerRepository,
+	searchBannerRepo *adminrepo.SearchBannerRepository,
+	popularRepo *adminrepo.PopularRepository,
+	carRepo *adminrepo.CarRepository,
+	hotelBookingRepo *app.HotelBookingRepository,
+	flightBookingRepo *app.FlightBookingRepository,
+	carBookingRepo *app.CarBookingRepository,
+	transferBookingRepo *app.TransferBookingRepository,
+	supportTicketRepo *app.SupportTicketRepository,
+	chatbotRatingRepo *app.ChatbotRatingRepository,
+	notificationHelper *utils.NotificationHelper,
+	emailService *utils.EmailService,
+	jwtSecret string,
+) *AppHandler {
 	return &AppHandler{
-		userRepo:          userRepo,
-		otpRepo:           otpRepo,
-		paymentMethodRepo: paymentMethodRepo,
-		jwtSecret:         jwtSecret,
+		userRepo:            userRepo,
+		otpRepo:             otpRepo,
+		paymentMethodRepo:   paymentMethodRepo,
+		travelRepo:          travelRepo,
+		bannerRepo:          bannerRepo,
+		searchBannerRepo:    searchBannerRepo,
+		popularRepo:         popularRepo,
+		carRepo:             carRepo,
+		hotelBookingRepo:    hotelBookingRepo,
+		flightBookingRepo:   flightBookingRepo,
+		carBookingRepo:      carBookingRepo,
+		transferBookingRepo: transferBookingRepo,
+		supportTicketRepo:   supportTicketRepo,
+		chatbotRatingRepo:   chatbotRatingRepo,
+		notificationHelper:  notificationHelper,
+		emailService:        emailService,
+		jwtSecret:           jwtSecret,
 	}
 }
 
@@ -179,21 +225,21 @@ func (h *AppHandler) Signup(c *fiber.Ctx) error {
 		})
 	}
 
-	// Generate and send OTP to phone (4 digits for signup)
-	code := utils.GenerateOTP(4)
+	// Generate and send OTP to email (6 digits for signup)
+	code := utils.GenerateOTP(6)
 	otp := &appmodels.OTP{
 		ID:        uuid.New().String(),
 		UserID:    user.ID,
-		Phone:     user.PhoneNumber,
+		Email:     user.Email,
 		Code:      code,
-		Type:      appmodels.OTPTypePhone,
+		Type:      appmodels.OTPTypeEmail,
 		Verified:  false,
 		ExpiresAt: time.Now().Add(10 * time.Minute),
 		CreatedAt: time.Now(),
 	}
 
 	// Delete any existing OTPs for this user
-	if err := h.otpRepo.DeleteByUserAndType(ctx, user.ID, appmodels.OTPTypePhone); err != nil {
+	if err := h.otpRepo.DeleteByUserAndType(ctx, user.ID, appmodels.OTPTypeEmail); err != nil {
 		// Log error but continue
 	}
 
@@ -204,9 +250,13 @@ func (h *AppHandler) Signup(c *fiber.Ctx) error {
 		})
 	}
 
-	// Send OTP via SMS (for now just log it)
-	utils.SendSMSOTP(user.PhoneNumber, code)
-	fmt.Printf("[Signup] Created OTP for user %s: Phone=%s, Code=%s\n", user.ID, user.PhoneNumber, code)
+	// Send OTP via email
+	if err := h.emailService.SendOTPEmail(user.Email, code, "verify your account"); err != nil {
+		fmt.Printf("[Signup] Failed to send OTP email: %v\n", err)
+		// Continue even if email fails - user can request resend
+	}
+
+	fmt.Printf("[Signup] Created OTP for user %s: Email=%s, Code=%s\n", user.ID, user.Email, code)
 
 	// Generate JWT token
 	token, err := h.generateToken(user)
@@ -218,7 +268,7 @@ func (h *AppHandler) Signup(c *fiber.Ctx) error {
 
 	// Return success response with OTP code (remove in production)
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message":  "User registered successfully. OTP sent to phone.",
+		"message":  "User registered successfully. OTP sent to email.",
 		"token":    token,
 		"otp_code": code, // TODO: Remove in production
 		"user": fiber.Map{
@@ -326,9 +376,11 @@ func (h *AppHandler) Login(c *fiber.Ctx) error {
 // generateToken creates a JWT token for the user
 func (h *AppHandler) generateToken(user *appmodels.User) (string, error) {
 	claims := jwt.MapClaims{
-		"user_id": user.ID,
+		"sub":     user.ID, // Standard JWT subject field
+		"user_id": user.ID, // Keep for backward compatibility
 		"email":   user.Email,
 		"name":    user.Name,
+		"role":    "user",                                    // Add role for middleware
 		"exp":     time.Now().Add(time.Hour * 24 * 7).Unix(), // Token expires in 7 days
 		"iat":     time.Now().Unix(),
 	}
@@ -587,19 +639,14 @@ func (h *AppHandler) ResetPassword(c *fiber.Ctx) error {
 	var req struct {
 		Phone       string `json:"phone"`
 		OTP         string `json:"otp"`
+		Email       string `json:"email"`
+		Code        string `json:"code"`
 		NewPassword string `json:"new_password"`
 	}
 
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request format",
-		})
-	}
-
-	// Validate required fields
-	if req.Phone == "" || req.OTP == "" || req.NewPassword == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Phone, OTP, and new password are required",
 		})
 	}
 
@@ -613,12 +660,219 @@ func (h *AppHandler) ResetPassword(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// Verify OTP
-	otp, err := h.otpRepo.FindByPhoneAndCode(ctx, req.Phone, req.OTP)
+	var user *appmodels.User
+	var otp *appmodels.OTP
+	var err error
+	var otpType appmodels.OTPType
+
+	// Prioritize email-based reset over phone-based
+	if req.Email != "" && req.Code != "" {
+		// Email-based password reset
+		email := strings.ToLower(req.Email)
+
+		// Verify OTP
+		otp, err = h.otpRepo.FindByEmailAndCode(ctx, email, req.Code)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"error": "Invalid or expired verification code",
+				})
+			}
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to verify code",
+			})
+		}
+
+		// Find user by email
+		user, err = h.userRepo.FindByEmail(ctx, email)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+					"error": "User not found",
+				})
+			}
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to find user",
+			})
+		}
+		otpType = appmodels.OTPTypeEmail
+	} else if req.Phone != "" && req.OTP != "" {
+		// Phone-based password reset (legacy support)
+		// Verify OTP
+		otp, err = h.otpRepo.FindByPhoneAndCode(ctx, req.Phone, req.OTP)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+					"error": "Invalid or expired OTP",
+				})
+			}
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to verify OTP",
+			})
+		}
+
+		// Find user by phone
+		user, err = h.userRepo.FindByPhoneNumber(ctx, req.Phone)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+					"error": "User not found",
+				})
+			}
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to find user",
+			})
+		}
+		otpType = appmodels.OTPTypePhone
+	} else {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Email and code, or phone and OTP are required",
+		})
+	}
+
+	// Check if OTP is expired
+	if time.Now().After(otp.ExpiresAt) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Verification code has expired",
+		})
+	}
+
+	// Hash new password
+	hashedPassword, err := utils.HashPassword(req.NewPassword)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to hash password",
+		})
+	}
+
+	// Update user password
+	user.PasswordHash = hashedPassword
+	if err := h.userRepo.Update(ctx, user.ID, user); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to update password",
+		})
+	}
+
+	// Delete the used OTP
+	if err := h.otpRepo.DeleteByUserAndType(ctx, user.ID, otpType); err != nil {
+		fmt.Printf("Warning: Failed to delete OTP: %v\n", err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Password reset successfully",
+	})
+}
+
+// ForgotPassword handles the forgot password request by sending OTP via email
+func (h *AppHandler) ForgotPassword(c *fiber.Ctx) error {
+	var req struct {
+		Email string `json:"email"`
+	}
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request format",
+		})
+	}
+
+	// Validate email
+	if req.Email == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Email is required",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Normalize email
+	email := strings.ToLower(req.Email)
+
+	// Check if user exists
+	user, err := h.userRepo.FindByEmail(ctx, email)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "No account found with this email",
+			})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to find user",
+		})
+	}
+
+	// Delete any existing OTPs for this user's email
+	if err := h.otpRepo.DeleteByUserAndType(ctx, user.ID, appmodels.OTPTypeEmail); err != nil {
+		fmt.Printf("Warning: Failed to delete existing OTPs: %v\n", err)
+	}
+
+	// Generate 6-digit OTP code
+	code := utils.GenerateOTP(6)
+
+	// Create OTP record
+	otp := &appmodels.OTP{
+		ID:        uuid.New().String(),
+		UserID:    user.ID,
+		Email:     email,
+		Code:      code,
+		Type:      appmodels.OTPTypeEmail,
+		Verified:  false,
+		ExpiresAt: time.Now().Add(10 * time.Minute), // OTP expires in 10 minutes
+		CreatedAt: time.Now(),
+	}
+
+	// Save OTP to database
+	if err := h.otpRepo.Create(ctx, otp); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to create OTP",
+		})
+	}
+
+	// Send OTP via email
+	if err := h.emailService.SendPasswordResetCodeEmail(email, code); err != nil {
+		fmt.Printf("Error sending password reset email: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to send password reset email",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Password reset code has been sent to your email",
+	})
+}
+
+// VerifyResetOTP verifies the OTP for password reset
+func (h *AppHandler) VerifyResetOTP(c *fiber.Ctx) error {
+	var req struct {
+		Email string `json:"email"`
+		Code  string `json:"code"`
+	}
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request format",
+		})
+	}
+
+	// Validate required fields
+	if req.Email == "" || req.Code == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Email and code are required",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Normalize email
+	email := strings.ToLower(req.Email)
+
+	// Find OTP by email and code
+	otp, err := h.otpRepo.FindByEmailAndCode(ctx, email, req.Code)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Invalid or expired OTP",
+				"error": "Invalid or expired OTP code",
 			})
 		}
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -629,19 +883,85 @@ func (h *AppHandler) ResetPassword(c *fiber.Ctx) error {
 	// Check if OTP is expired
 	if time.Now().After(otp.ExpiresAt) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "OTP has expired",
+			"error": "OTP code has expired",
+		})
+	}
+
+	// Mark OTP as verified
+	if err := h.otpRepo.MarkAsVerified(ctx, otp.ID); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to verify OTP",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "OTP verified successfully",
+	})
+}
+
+// ResetPasswordWithEmail handles password reset using email-based OTP
+func (h *AppHandler) ResetPasswordWithEmail(c *fiber.Ctx) error {
+	var req struct {
+		Email       string `json:"email"`
+		Code        string `json:"code"`
+		NewPassword string `json:"new_password"`
+	}
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request format",
+		})
+	}
+
+	// Validate required fields
+	if req.Email == "" || req.Code == "" || req.NewPassword == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Email, code, and new password are required",
+		})
+	}
+
+	// Validate password length
+	if len(req.NewPassword) < 6 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Password must be at least 6 characters",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Normalize email
+	email := strings.ToLower(req.Email)
+
+	// Verify OTP
+	otp, err := h.otpRepo.FindByEmailAndCode(ctx, email, req.Code)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid or expired OTP code",
+			})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to verify OTP",
+		})
+	}
+
+	// Check if OTP is expired
+	if time.Now().After(otp.ExpiresAt) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "OTP code has expired",
 		})
 	}
 
 	// Check if OTP is verified
 	if !otp.Verified {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "OTP not verified",
+			"error": "OTP code not verified. Please verify the code first.",
 		})
 	}
 
-	// Find user by phone
-	user, err := h.userRepo.FindByPhoneNumber(ctx, req.Phone)
+	// Find user by email
+	user, err := h.userRepo.FindByEmail(ctx, email)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
@@ -670,12 +990,12 @@ func (h *AppHandler) ResetPassword(c *fiber.Ctx) error {
 	}
 
 	// Delete the used OTP
-	if err := h.otpRepo.DeleteByUserAndType(ctx, user.ID, appmodels.OTPTypePhone); err != nil {
+	if err := h.otpRepo.DeleteByUserAndType(ctx, user.ID, appmodels.OTPTypeEmail); err != nil {
 		fmt.Printf("Warning: Failed to delete OTP: %v\n", err)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Password reset successfully",
+		"message": "Password reset successfully. You can now login with your new password.",
 	})
 }
 
@@ -782,6 +1102,150 @@ func (h *AppHandler) GoogleSignIn(c *fiber.Ctx) error {
 	fmt.Printf("[SUCCESS] JWT token generated successfully\n")
 	fmt.Printf("[INFO] Returning response - isNewUser: %v\n", isNewUser)
 	fmt.Println("========== GOOGLE SIGN-IN COMPLETED ==========")
+
+	// Return user data and token
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":   "Sign-in successful",
+		"token":     tokenString,
+		"isNewUser": isNewUser,
+		"user": fiber.Map{
+			"id":             existingUser.ID,
+			"name":           existingUser.Name,
+			"email":          existingUser.Email,
+			"phone_number":   existingUser.PhoneNumber,
+			"profile_image":  existingUser.ProfileImage,
+			"sex":            existingUser.Sex,
+			"country":        existingUser.Country,
+			"total_bookings": existingUser.TotalBookings,
+			"is_active":      existingUser.IsActive,
+			"created_at":     existingUser.CreatedAt,
+			"last_login":     existingUser.LastLogin,
+		},
+	})
+}
+
+// AppleSignIn handles Apple sign-in/signup for app users
+func (h *AppHandler) AppleSignIn(c *fiber.Ctx) error {
+	fmt.Println("========== APPLE SIGN-IN REQUEST RECEIVED ==========")
+
+	var req struct {
+		UID         string `json:"uid"`
+		Email       string `json:"email"`
+		Name        string `json:"name"`
+		PhotoURL    string `json:"photo_url"`
+		AppleUserID string `json:"apple_user_id"`
+	}
+
+	// Parse request body
+	if err := c.BodyParser(&req); err != nil {
+		fmt.Printf("[ERROR] Failed to parse request body: %v\n", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request format",
+		})
+	}
+
+	fmt.Printf("[INFO] Request data: UID=%s, Email=%s, Name=%s, AppleUserID=%s\n", req.UID, req.Email, req.Name, req.AppleUserID)
+
+	// Validate required fields
+	if req.UID == "" {
+		fmt.Println("[ERROR] Missing required field: UID")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "UID is required",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Normalize email to lowercase if provided
+	email := ""
+	if req.Email != "" {
+		email = strings.ToLower(req.Email)
+		fmt.Printf("[INFO] Normalized email: %s\n", email)
+	}
+
+	// Check if user exists by email (if email is available)
+	fmt.Println("[INFO] Checking if user exists in database...")
+	var existingUser *appmodels.User
+	var err error
+	isNewUser := false
+
+	if email != "" {
+		existingUser, err = h.userRepo.FindByEmail(ctx, email)
+	} else {
+		// Apple sign-in may not provide email, so we mark it as new user
+		err = mongo.ErrNoDocuments
+	}
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			// New user - create account
+			fmt.Println("[INFO] User not found - creating new user")
+			isNewUser = true
+
+			// Use Apple User ID as email if email is not provided
+			userEmail := email
+			if userEmail == "" {
+				userEmail = req.AppleUserID + "@privaterelay.appleid.com"
+			}
+
+			user := &appmodels.User{
+				ID:            uuid.New().String(),
+				Name:          req.Name,
+				Email:         userEmail,
+				PhoneNumber:   "", // To be filled in profile completion
+				PasswordHash:  "", // No password for Apple sign-in
+				Sex:           "", // To be filled in profile completion
+				Country:       "", // To be filled in profile completion
+				IsActive:      true,
+				IsFreezed:     false,
+				TotalBookings: 0,
+				CreatedAt:     time.Now(),
+				LastLogin:     time.Now(),
+			}
+
+			fmt.Printf("[INFO] Creating new user with ID: %s\n", user.ID)
+
+			// Save user to database
+			if err := h.userRepo.Create(ctx, user); err != nil {
+				fmt.Printf("[ERROR] Failed to create user in database: %v\n", err)
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+					"error": "Failed to create user",
+				})
+			}
+
+			fmt.Println("[SUCCESS] New user created successfully")
+			existingUser = user
+		} else {
+			fmt.Printf("[ERROR] Database error while finding user: %v\n", err)
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Database error",
+			})
+		}
+	} else {
+		// Existing user - update last login
+		fmt.Printf("[INFO] Existing user found: %s (ID: %s)\n", existingUser.Email, existingUser.ID)
+		existingUser.LastLogin = time.Now()
+		if err := h.userRepo.Update(ctx, existingUser.ID, existingUser); err != nil {
+			fmt.Printf("[WARNING] Failed to update last login: %v\n", err)
+		} else {
+			fmt.Println("[INFO] Last login updated successfully")
+		}
+	}
+
+	// Generate JWT token
+	fmt.Println("[INFO] Generating JWT token...")
+	tokenString, err := utils.GenerateJWT(existingUser.ID, "user", h.jwtSecret, 24*7*time.Hour)
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to generate JWT token: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to generate token",
+		})
+	}
+
+	fmt.Printf("[SUCCESS] JWT token generated successfully\n")
+	fmt.Printf("[INFO] Returning response - isNewUser: %v\n", isNewUser)
+	fmt.Println("========== APPLE SIGN-IN COMPLETED ==========")
 
 	// Return user data and token
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -1414,5 +1878,303 @@ func (h *AppHandler) SaveSecurityPreferences(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message":     "Security preferences saved successfully",
 		"preferences": user.SecurityPreferences,
+	})
+}
+
+// GetBanners retrieves all homepage banners for the app
+func (h *AppHandler) GetBanners(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	travelExperiences, err := h.travelRepo.ListAll(ctx)
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to fetch travel experiences: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to fetch banners",
+		})
+	}
+
+	if travelExperiences == nil {
+		travelExperiences = []*adminmodels.TravelExperience{}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Banners retrieved successfully",
+		"data":    travelExperiences,
+	})
+}
+
+// GetHomepageBanners retrieves all homepage banner images (ads) for the app
+func (h *AppHandler) GetHomepageBanners(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	banners, err := h.bannerRepo.ListAll(ctx)
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to fetch homepage banners: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to fetch homepage banners",
+		})
+	}
+
+	if banners == nil {
+		banners = []*adminmodels.Banner{}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Homepage banners retrieved successfully",
+		"data":    banners,
+	})
+}
+
+// GetSearchBanners retrieves all search results page banner images for the app
+func (h *AppHandler) GetSearchBanners(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	banners, err := h.searchBannerRepo.ListAll(ctx)
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to fetch search banners: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to fetch search banners",
+		})
+	}
+
+	if banners == nil {
+		banners = []*adminmodels.SearchBanner{}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Search banners retrieved successfully",
+		"data":    banners,
+	})
+}
+
+// GetPopularLocations retrieves all popular locations for the app
+func (h *AppHandler) GetPopularLocations(c *fiber.Ctx) error {
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	locations, err := h.popularRepo.ListAll(ctx)
+	if err != nil {
+		fmt.Printf("[ERROR] Failed to fetch popular locations: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to fetch popular locations",
+		})
+	}
+
+	if locations == nil {
+		locations = []*adminmodels.PopularLocation{}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Popular locations retrieved successfully",
+		"data":    locations,
+	})
+}
+
+// CreateHotelBooking creates a new hotel booking with email notification
+func (h *AppHandler) CreateHotelBooking(c *fiber.Ctx) error {
+	var booking appmodels.HotelBooking
+
+	// Parse request body
+	if err := c.BodyParser(&booking); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request format",
+		})
+	}
+
+	// Get user ID from JWT token
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	userIDStr := userID.(string)
+	fmt.Printf("[BOOKING] Creating hotel booking for user: %s\n", userIDStr)
+
+	// Set booking details
+	booking.ID = uuid.New().String()
+	booking.UserID = userIDStr
+	booking.BookingID = fmt.Sprintf("HBK-%s", uuid.New().String()[:8])
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	// Create booking in database
+	if err := h.hotelBookingRepo.Create(ctx, &booking); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to create booking",
+		})
+	}
+
+	// Send email notification (non-blocking)
+	// Create a copy of the booking to avoid race conditions in the goroutine
+	bookingCopy := booking
+	go func() {
+		notifyCtx, notifyCancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer notifyCancel()
+
+		fmt.Printf("[BOOKING] Sending notification for booking %s, user: %s\n", bookingCopy.BookingID, bookingCopy.UserID)
+		if err := h.notificationHelper.SendHotelBookingEmail(notifyCtx, &bookingCopy); err != nil {
+			fmt.Printf("[BOOKING] Warning: Failed to send booking notification: %v\n", err)
+		}
+	}()
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "Hotel booking created successfully",
+		"booking": booking,
+	})
+}
+
+// CreateFlightBooking creates a new flight booking with email notification
+func (h *AppHandler) CreateFlightBooking(c *fiber.Ctx) error {
+	var booking appmodels.FlightBooking
+
+	// Parse request body
+	if err := c.BodyParser(&booking); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request format",
+		})
+	}
+
+	// Get user ID from JWT token
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	// Set booking details
+	booking.ID = uuid.New().String()
+	booking.UserID = userID.(string)
+	booking.BookingID = fmt.Sprintf("FBK-%s", uuid.New().String()[:8])
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	// Create booking in database
+	if err := h.flightBookingRepo.Create(ctx, &booking); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to create booking",
+		})
+	}
+
+	// Send email notification (non-blocking)
+	go func() {
+		notifyCtx, notifyCancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer notifyCancel()
+
+		if err := h.notificationHelper.SendFlightBookingEmail(notifyCtx, &booking); err != nil {
+			fmt.Printf("[BOOKING] Warning: Failed to send booking notification: %v\n", err)
+		}
+	}()
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "Flight booking created successfully",
+		"booking": booking,
+	})
+}
+
+// CreateCarBooking creates a new car booking with email notification
+func (h *AppHandler) CreateCarBooking(c *fiber.Ctx) error {
+	var booking appmodels.CarBooking
+
+	// Parse request body
+	if err := c.BodyParser(&booking); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request format",
+		})
+	}
+
+	// Get user ID from JWT token
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	// Set booking details
+	booking.ID = uuid.New().String()
+	booking.UserID = userID.(string)
+	booking.BookingID = fmt.Sprintf("CBK-%s", uuid.New().String()[:8])
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	// Create booking in database
+	if err := h.carBookingRepo.Create(ctx, &booking); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to create booking",
+		})
+	}
+
+	// Send email notification (non-blocking)
+	go func() {
+		notifyCtx, notifyCancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer notifyCancel()
+
+		if err := h.notificationHelper.SendCarBookingEmail(notifyCtx, &booking); err != nil {
+			fmt.Printf("[BOOKING] Warning: Failed to send booking notification: %v\n", err)
+		}
+	}()
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "Car booking created successfully",
+		"booking": booking,
+	})
+}
+
+// CreateTransferBooking creates a new transfer booking with email notification
+func (h *AppHandler) CreateTransferBooking(c *fiber.Ctx) error {
+	var booking appmodels.TransferBooking
+
+	// Parse request body
+	if err := c.BodyParser(&booking); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request format",
+		})
+	}
+
+	// Get user ID from JWT token
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	// Set booking details
+	booking.ID = uuid.New().String()
+	booking.UserID = userID.(string)
+	booking.BookingID = fmt.Sprintf("TBK-%s", uuid.New().String()[:8])
+
+	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
+	defer cancel()
+
+	// Create booking in database
+	if err := h.transferBookingRepo.Create(ctx, &booking); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to create booking",
+		})
+	}
+
+	// Send email notification (non-blocking)
+	go func() {
+		notifyCtx, notifyCancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer notifyCancel()
+
+		if err := h.notificationHelper.SendTransferBookingEmail(notifyCtx, &booking); err != nil {
+			fmt.Printf("[BOOKING] Warning: Failed to send booking notification: %v\n", err)
+		}
+	}()
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "Transfer booking created successfully",
+		"booking": booking,
 	})
 }

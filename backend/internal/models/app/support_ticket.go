@@ -21,7 +21,8 @@ type TicketReply struct {
 // Field names are exported to match template usage (e.g. CustomerName, TicketID, Replies)
 type SupportTicket struct {
 	ID            primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	TicketID      string             `bson:"ticket_id" json:"ticket_id"` // short id (<=6 chars) for display
+	TicketID      string             `bson:"ticket_id" json:"ticket_id"`                 // short id (<=6 chars) for display
+	UserID        string             `bson:"user_id,omitempty" json:"user_id,omitempty"` // User UUID for fast lookups
 	CustomerName  string             `bson:"customer_name" json:"customer_name"`
 	CustomerEmail string             `bson:"customer_email" json:"customer_email"`
 	Category      string             `bson:"category" json:"category"`

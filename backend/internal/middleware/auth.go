@@ -116,6 +116,7 @@ func AuthMiddleware(jwtSecret string) fiber.Handler {
 		// Store claims in context for use in handlers
 		c.Locals("user_id", claims.Subject)
 		c.Locals("user_role", claims.Role)
+		c.Locals("user_email", claims.Subject) // For backward compatibility
 		c.Locals("claims", claims)
 
 		return c.Next()

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/utils/helpers.dart';
 import '../controller/auth_controller.dart';
@@ -15,11 +14,11 @@ class SetNewPasswordPage extends StatefulWidget {
 class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
   String selectedLanguage = 'en';
   final authController = Get.find<AuthController>();
-  final phoneController = TextEditingController();
+  final emailController = TextEditingController();
   final newPasswordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
   
-  String userPhone = '';
+  String userEmail = '';
   List<String> otpDigits = ['', '', '', '', '', ''];
   
   bool newPasswordVisible = false;
@@ -28,17 +27,17 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
   @override
   void initState() {
     super.initState();
-    // Get phone from navigation arguments if provided
+    // Get email from navigation arguments if provided
     final args = Get.arguments as Map<String, dynamic>?;
     if (args != null) {
-      userPhone = args['phone'] ?? '';
-      phoneController.text = userPhone;
+      userEmail = args['email'] ?? '';
+      emailController.text = userEmail;
     }
   }
 
   @override
   void dispose() {
-    phoneController.dispose();
+    emailController.dispose();
     newPasswordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
@@ -97,17 +96,17 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
   }
 
   void _resendOtp() {
-    if (phoneController.text.isEmpty) {
-      Helpers.showSnackbar('Required Field', 'Please enter your phone number first', isError: true);
+    if (emailController.text.isEmpty) {
+      Helpers.showSnackbar('Required Field', 'Please enter your email address first', isError: true);
       return;
     }
-    userPhone = phoneController.text;
-    authController.sendOTP('', userPhone, 'phone');
+    userEmail = emailController.text;
+    authController.forgotPassword(userEmail);
   }
 
   Future<void> _changePassword() async {
-    if (phoneController.text.isEmpty) {
-      Helpers.showSnackbar('Required Field', 'Please enter your phone number', isError: true);
+    if (emailController.text.isEmpty) {
+      Helpers.showSnackbar('Required Field', 'Please enter your email address', isError: true);
       return;
     }
     
@@ -137,14 +136,8 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
       return;
     }
 
-    // Verify OTP first, then reset password
-    bool otpVerified = await authController.verifyOTP('', phoneController.text, otp, 'phone');
-    if (!otpVerified) {
-      return; // Error message already shown by verifyOTP
-    }
-
-    // Reset password with verified OTP
-    bool success = await authController.resetPassword(phoneController.text, otp, newPasswordController.text);
+    // Verify code and reset password
+    bool success = await authController.resetPasswordWithEmail(emailController.text, otp, newPasswordController.text);
     if (success) {
       Get.offAllNamed(AppRoutes.LOGIN);
     }
@@ -231,25 +224,37 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                // Phone Number Input
+                // Email Input
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: IntlPhoneField(
-                    controller: phoneController,
-                    initialCountryCode: 'LB',
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: BorderSide.none,
-                      ),
-                      hintText: 'Phone Number',
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    onChanged: (phone) {
-                      userPhone = phone.completeNumber;
-                    },
+                    child: TextField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        hintText: 'Email Address',
+                        border: InputBorder.none,
+                        prefixIcon: const Icon(
+                          Icons.email,
+                          color: Color(0xFF1e5a8e),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                      ),
+                      onChanged: (value) {
+                        userEmail = value;
+                      },
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),

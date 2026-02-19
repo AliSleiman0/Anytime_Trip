@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -23,6 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   bool passwordError = false;
   final _authService = AuthService();
   bool _isGoogleLoading = false;
+  bool _isAppleLoading = false;
 
   @override
   void dispose() {
@@ -350,55 +352,108 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Continue with Apple Button
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: OutlinedButton(
-                      onPressed: () {},
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: const BorderSide(
-                          color: Colors.black,
-                          width: 1.5,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/apple.png',
-                            width: 24,
-                            height: 24,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'continue_with_apple'.tr,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
+                // Continue with Apple Button - Only show on iOS/macOS
+                if (Platform.isIOS || Platform.isMacOS)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
+                      child: OutlinedButton(
+                        onPressed: _isAppleLoading ? null : () async {
+                          setState(() => _isAppleLoading = true);
+                          try {
+                            final result = await _authService.signInWithApple();
+                            
+                            if (!mounted) return;
+                            
+                            if (result == null) {
+                              Helpers.showSnackbar(
+                                'Cancelled',
+                                'Apple sign-in was cancelled',
+                                isError: false,
+                              );
+                            } else {
+                              final user = result['user'];
+                              final isNewUser = result['isNewUser'] as bool;
+                              
+                              Helpers.showSnackbar(
+                                'Welcome!',
+                                'Signed in as ${user.email ?? "Apple User"}',
+                                isError: false,
+                              );
+                              
+                              // Navigate based on user status
+                              if (isNewUser) {
+                                // New user - go to complete profile
+                                Get.offAllNamed(AppRoutes.COMPLETE_PROFILE);
+                              } else {
+                                // Existing user - go to home
+                                Get.offAllNamed(AppRoutes.HOME);
+                              }
+                            }
+                          } catch (e) {
+                            if (!mounted) return;
+                            Helpers.showSnackbar(
+                              'Error',
+                              'Apple sign-in failed: $e',
+                              isError: true,
+                            );
+                          } finally {
+                            if (mounted) setState(() => _isAppleLoading = false);
+                          }
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          side: const BorderSide(
+                            color: Colors.black,
+                            width: 1.5,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                        child: _isAppleLoading
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                                ),
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/apple.png',
+                                    width: 24,
+                                    height: 24,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'continue_with_apple'.tr,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
+                if (Platform.isIOS || Platform.isMacOS)
+                  const SizedBox(height: 12),
                 // Continue with Google Button
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),

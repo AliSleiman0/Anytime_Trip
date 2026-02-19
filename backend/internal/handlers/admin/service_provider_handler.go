@@ -657,7 +657,7 @@ func getFlightBookingsForProvider(ctx context.Context, flightBookingRepo *app.Fl
 			StatusClass: statusBadge(string(b.Status)),
 			Destination: "-",
 			BookingDate: b.CreatedAt.Format("02 Jan, 2006"),
-			Amount:      fmt.Sprintf("%s %.2f", strings.ToUpper(b.Currency), b.Amount),
+			Amount:      fmt.Sprintf("%s %.2f", strings.ToUpper(b.Pricing.Currency), b.Pricing.Total),
 		})
 	}
 

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:get/get.dart';
 import '../core/network/api_client.dart';
 import '../core/network/endpoints.dart';
@@ -61,6 +62,71 @@ class AuthService {
       'isNewUser': isNewUser,
       'userData': userData,
     };
+  }
+
+  /// Signs in (or signs up) the user using Apple on iOS.
+  /// Returns a map with user data and isNewUser flag.
+  Future<Map<String, dynamic>?> signInWithApple() async {
+    try {
+      // Request Apple ID credential
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      // Create OAuth credential for Firebase
+      final oAuthProvider = OAuthProvider('apple.com');
+      final credential = oAuthProvider.credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      // Sign in to Firebase
+      final UserCredential userCred =
+          await _auth.signInWithCredential(credential);
+
+      final User? firebaseUser = userCred.user;
+      
+      if (firebaseUser == null) return null;
+
+      // Get user's name from Apple credential (only available on first sign-in)
+      String? displayName;
+      if (appleCredential.givenName != null || appleCredential.familyName != null) {
+        displayName = '${appleCredential.givenName ?? ''} ${appleCredential.familyName ?? ''}'.trim();
+      }
+
+      // Send Apple user data to backend
+      final response = await _apiClient.post(
+        Endpoints.appleSignIn,
+        data: {
+          'uid': firebaseUser.uid,
+          'email': appleCredential.email ?? firebaseUser.email,
+          'name': displayName ?? firebaseUser.displayName,
+          'photo_url': firebaseUser.photoURL,
+          'apple_user_id': appleCredential.userIdentifier,
+        },
+      );
+
+      // Backend returns: { message, token, user: {...}, isNewUser: true/false }
+      final userData = response.data['user'] as Map<String, dynamic>;
+      final token = response.data['token'] as String;
+      final isNewUser = response.data['isNewUser'] as bool? ?? false;
+      
+      // Save token and user data
+      await _storage.saveToken(token);
+      await _storage.saveUser(userData);
+
+      return {
+        'user': firebaseUser,
+        'isNewUser': isNewUser,
+        'userData': userData,
+      };
+    } catch (e) {
+      print('Apple Sign-In Error: $e');
+      rethrow;
+    }
   }
 
   Future<void> signOut() async {

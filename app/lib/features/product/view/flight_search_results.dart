@@ -3,6 +3,9 @@ import 'package:get/get.dart';
 import 'flight_departure_selection.dart';
 import 'flight_return_selection_screen.dart';
 import '../../../core/widgets/unified_ui_components.dart';
+import '../../../core/network/endpoints.dart';
+import '../service/banner_service.dart';
+import '../model/banner_model.dart';
 
 class FlightSearchResults extends StatefulWidget {
   final String from;
@@ -33,6 +36,37 @@ class _FlightSearchResultsState extends State<FlightSearchResults> {
   Map<String, bool> _filterStops = {};
   Map<String, bool> _filterAirlines = {};
   Map<String, bool> _filterBaggage = {};
+  
+  // Search banners
+  final BannerService _bannerService = BannerService();
+  List<BannerModel> _searchBanners = [];
+  bool _searchBannersLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSearchBanners();
+  }
+
+  Future<void> _loadSearchBanners() async {
+    try {
+      final banners = await _bannerService.getHomepageBanners();
+      if (mounted) {
+        setState(() {
+          // Use second banner (index 1) for search results
+          _searchBanners = banners.length > 1 ? [banners[1]] : [];
+          _searchBannersLoading = false;
+        });
+      }
+    } catch (e) {
+      print('[FLIGHT_SEARCH] Failed to load search banners: $e');
+      if (mounted) {
+        setState(() {
+          _searchBannersLoading = false;
+        });
+      }
+    }
+  }
   
   final List<Map<String, dynamic>> _datePrices = [
     {'date': 'Thu, Sep 25', 'price': '1,200\$'},
@@ -381,15 +415,8 @@ class _FlightSearchResultsState extends State<FlightSearchResults> {
                         // Ad Banner after 2nd flight
                         if (_flightResults.length > 2)
                           Container(
-                            height: 100,
                             margin: const EdgeInsets.only(bottom: 16),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              image: const DecorationImage(
-                                image: AssetImage('assets/images/Ad.png'),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                            child: _buildSearchBanner(),
                           ),
                         
                         // Remaining flights
@@ -407,6 +434,78 @@ class _FlightSearchResultsState extends State<FlightSearchResults> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBanner() {
+    if (_searchBanners.isNotEmpty) {
+      final banner = _searchBanners[0];
+      final imageUrl = '${Endpoints.baseUrl.replaceAll('/api', '')}${banner.imagePath}';
+      
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.network(
+          imageUrl,
+          width: double.infinity,
+          height: 100,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              'assets/images/Ad.png',
+              width: double.infinity,
+              height: 100,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Center(
+                    child: Text('Advertisement'),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      );
+    }
+    
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.asset(
+        'assets/images/Ad.png',
+        width: double.infinity,
+        height: 100,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            height: 100,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Center(
+              child: Text('Advertisement'),
+            ),
+          );
+        },
       ),
     );
   }
