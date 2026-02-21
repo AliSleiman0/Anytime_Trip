@@ -146,7 +146,7 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
       final response = await _authApi.verifyOTP(email, phone, code, type);
-      Helpers.showSnackbar('Verified', 'Phone number verified successfully', isError: false);
+      Helpers.showSnackbar('Verified', 'Account verified successfully', isError: false);
       return true;
     } catch (e) {
       Helpers.showSnackbar('Error', e.toString(), isError: true);
@@ -203,7 +203,7 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
       final response = await _authApi.verifyResetCode(email, code);
-      Helpers.showSnackbar('Success', 'Code verified successfully', isError: false);
+      Helpers.showSnackbar('Success', 'Account verified successfully', isError: false);
       return true;
     } catch (e) {
       String errorMessage = e.toString().replaceAll('Exception: ', '');

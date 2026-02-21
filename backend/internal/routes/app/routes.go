@@ -59,6 +59,7 @@ func SetupRoutes(router fiber.Router, handler *app.AppHandler, jwtSecret string)
 
 	// Car search route (public - no auth required)
 	router.Get("/search-cars", handler.SearchCars)
+	router.Get("/available-car-locations", handler.GetAvailableCarLocations)
 
 	// Booking routes (authentication required)
 	router.Post("/bookings/hotel", middleware.AuthMiddleware(jwtSecret), handler.CreateHotelBooking)
@@ -76,6 +77,7 @@ func SetupRoutes(router fiber.Router, handler *app.AppHandler, jwtSecret string)
 	// Get specific booking and cancel
 	router.Get("/bookings/:type/:id", middleware.AuthMiddleware(jwtSecret), handler.GetBookingByID)
 	router.Post("/bookings/:type/:id/cancel", middleware.AuthMiddleware(jwtSecret), handler.CancelBooking)
+	router.Post("/bookings/:type/:id/request-refund", middleware.AuthMiddleware(jwtSecret), handler.RequestRefund)
 
 	// Support ticket routes
 	router.Post("/support/tickets", middleware.AuthMiddleware(jwtSecret), handler.CreateSupportTicket)

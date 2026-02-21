@@ -11,18 +11,60 @@ class ChatbotChatDialog extends StatefulWidget {
 
 class _ChatbotChatDialogState extends State<ChatbotChatDialog> {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   late final List<ChatMessage> _messages;
+  
+  // Predefined FAQ questions and answers
+  final List<Map<String, String>> _faqItems = [
+    {
+      'question': 'How can I cancel or modify my booking?',
+      'answer': 'You can cancel or modify your booking through the "My Bookings" section in the app. For flights and hotels, free cancellation is available up to 24 hours before departure. Car rentals and transfers can be cancelled up to 48 hours in advance without any charges.',
+    },
+    {
+      'question': 'What payment methods do you accept?',
+      'answer': 'We accept all major credit cards (Visa, Mastercard, American Express), debit cards, and digital wallets. All payments are securely processed and encrypted. You can save your payment method for faster checkout on future bookings.',
+    },
+    {
+      'question': 'How long until I receive my confirmation email?',
+      'answer': 'Confirmation emails are typically sent within 5-10 minutes after completing your booking. Please check your spam folder if you don\'t see it in your inbox. You can also view all your bookings in the app under "My Bookings" section.',
+    },
+    {
+      'question': 'How do I track my booking status?',
+      'answer': 'Go to the "My Bookings" section in the app to see all your reservations. Each booking shows its current status (Confirmed, Pending, Completed, or Cancelled). You\'ll also receive email and in-app notifications for any status updates.',
+    },
+    {
+      'question': 'What documents do I need for travel?',
+      'answer': 'For international flights, you need a valid passport (with at least 6 months validity) and any required visas for your destination. For domestic flights, a government-issued ID is sufficient. Check your destination\'s entry requirements as they may vary.',
+    },
+    {
+      'question': 'Is travel insurance included in my booking?',
+      'answer': 'Travel insurance is optional and can be added during checkout. We highly recommend it for international trips. Our insurance covers trip cancellations, medical emergencies, lost baggage, and flight delays. You can add it to existing bookings within 24 hours.',
+    },
+    {
+      'question': 'Can I get a refund if I cancel my booking?',
+      'answer': 'Refund policies vary by booking type. Flights and hotels with "Free Cancellation" offer full refunds if cancelled within the allowed timeframe. Non-refundable bookings may incur cancellation fees. Check your booking details for specific terms and conditions.',
+    },
+  ];
 
   @override
   void initState() {
     super.initState();
     _messages = [
       ChatMessage(
-        text: "Hello! I'm here to help you with any questions about your bookings or our services. How can I assist you today?",
+        text: _buildWelcomeMessage(),
         isBot: true,
         timestamp: _formatTime(DateTime.now()),
       ),
     ];
+  }
+
+  String _buildWelcomeMessage() {
+    String message = "Hello! I'm here to help you. Please select a question by typing its number:\n\n";
+    for (int i = 0; i < _faqItems.length; i++) {
+      message += "${i + 1}. ${_faqItems[i]['question']}\n";
+    }
+    message += "\nOr type your own question and I'll try to help!";
+    return message;
   }
 
   String _formatTime(DateTime time) {
@@ -32,35 +74,69 @@ class _ChatbotChatDialogState extends State<ChatbotChatDialog> {
     return '$hour:$minute $period';
   }
 
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
   void _sendMessage() {
     if (_messageController.text.isEmpty) return;
 
+    final userInput = _messageController.text.trim();
+    
     setState(() {
       _messages.add(ChatMessage(
-        text: _messageController.text,
+        text: userInput,
         isBot: false,
         timestamp: _formatTime(DateTime.now()),
       ));
       _messageController.clear();
+    });
+    
+    _scrollToBottom();
 
-      // Simulate bot response
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          setState(() {
-            _messages.add(ChatMessage(
-              text: "Thank you for your message! Our support team will assist you shortly. We typically respond within 1-2 hours during business hours.",
-              isBot: true,
-              timestamp: _formatTime(DateTime.now()),
-            ));
-          });
-        }
-      });
+    // Check if user typed a number corresponding to FAQ
+    final number = int.tryParse(userInput);
+    String botResponse;
+    
+    if (number != null && number >= 1 && number <= _faqItems.length) {
+      // User selected a FAQ question
+      final selectedFaq = _faqItems[number - 1];
+      botResponse = "📌 ${selectedFaq['question']}\n\n${selectedFaq['answer']}\n\n---\nWould you like to ask another question? Type a number (1-${_faqItems.length}) or your own question.";
+    } else {
+      // Custom question - provide a generic response
+      botResponse = "Thank you for your question! Our support team will assist you shortly. In the meantime, you can select from our FAQ by typing a number:\n\n";
+      for (int i = 0; i < _faqItems.length; i++) {
+        botResponse += "${i + 1}. ${_faqItems[i]['question']}\n";
+      }
+    }
+
+    // Simulate bot response with delay
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(
+            text: botResponse,
+            isBot: true,
+            timestamp: _formatTime(DateTime.now()),
+          ));
+        });
+        _scrollToBottom();
+      }
     });
   }
 
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -153,6 +229,7 @@ class _ChatbotChatDialogState extends State<ChatbotChatDialog> {
             // Messages
             Expanded(
               child: ListView.builder(
+                controller: _scrollController,
                 padding: const EdgeInsets.all(16),
                 itemCount: _messages.length,
                 itemBuilder: (context, index) {

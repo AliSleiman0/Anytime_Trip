@@ -90,6 +90,11 @@
     </div>
 
     <!-- Refund Amount and Buttons -->
+    {{if .RefundRequested}}
+    <div class="mt-4 flex justify-center">
+      <p class="text-red-600 font-semibold text-sm">⚠️ User requested a refund</p>
+    </div>
+    {{end}}
     <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
           <div class="relative flex items-center">
             <label class="absolute -top-2 left-3 px-1 text-[11px] font-medium text-[#336891] bg-[#eef5fa]">Refund Amount</label>

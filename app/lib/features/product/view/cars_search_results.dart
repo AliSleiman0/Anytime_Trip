@@ -53,6 +53,7 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
   
   // Car results
   List<dynamic> _carResults = [];
+  List<dynamic> _filteredCarResults = [];
   bool _carResultsLoading = true;
   String? _errorMessage;
 
@@ -90,17 +91,20 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
         _errorMessage = null;
       });
 
-      // For now, we don't send pickup/dropoff times since the backend search
-      // doesn't filter by time yet. We'll add this when implementing availability checking.
+      // Search with date and time parameters for availability checking and cost calculation
       final cars = await _carService.searchCars(
         pickupLocation: widget.pickupLocation,
         dropoffLocation: widget.dropoffLocation,
-        // pickupTime and dropoffTime omitted for now
+        pickupDate: widget.pickupDate,
+        dropoffDate: widget.dropoffDate,
+        pickupTime: widget.pickupTime,
+        dropoffTime: widget.dropoffTime,
       );
 
       if (mounted) {
         setState(() {
           _carResults = cars;
+          _filteredCarResults = cars;
           _carResultsLoading = false;
         });
       }
@@ -235,7 +239,7 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
                     ],
                   ),
                 )
-              : _carResults.isEmpty
+              : _filteredCarResults.isEmpty
                   ? const Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -260,7 +264,7 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
                     )
                   : ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: _carResults.length + 1, // +1 for the "Results" header
+        itemCount: _filteredCarResults.length + 1, // +1 for the "Results" header
         itemBuilder: (context, index) {
           if (index == 0) {
             // Results header
@@ -279,11 +283,11 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
 
           final carIndex = index - 1;
 
-          // Add ad banner after 2nd car
-          if (carIndex == 2) {
+          // Add ad banner after 1st car (if there's at least 1 result)
+          if (carIndex == 0) {
             return Column(
               children: [
-                _buildCarCard(_carResults[carIndex]),
+                _buildCarCard(_filteredCarResults[carIndex]),
                 const SizedBox(height: 16),
                 // Ad Banner from database
                 _buildSearchBanner(),
@@ -294,7 +298,7 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
 
           return Column(
             children: [
-              _buildCarCard(_carResults[carIndex]),
+              _buildCarCard(_filteredCarResults[carIndex]),
               const SizedBox(height: 16),
             ],
           );
@@ -386,11 +390,20 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
     final passengers = carMap['passengers']?.toString() ?? '4';
     final transmission = carMap['transmission'] ?? 'Automatic';
     final mileage = carMap['mileage'] ?? 'Unlimited mileage';
-    final cost = carMap['cost']?.toString() ?? carMap['price'] ?? '0';
+    
+    // Use calculated_cost if available, otherwise fallback to cost or price
+    final calculatedCost = carMap['calculated_cost'];
+    final costPerDay = carMap['cost_per_day'] ?? carMap['cost'] ?? 0;
+    final displayCost = calculatedCost != null ? calculatedCost.toString() : costPerDay.toString();
     final currency = carMap['currency'] ?? '\$';
+    
     final shuttle = carMap['shuttle_to_counter'] == true 
         ? 'Shuttle to counter and car' 
         : (carMap['shuttle'] ?? 'Walk to counter');
+    
+    // Determine if showing total or per-day price
+    final isPriceTotal = calculatedCost != null;
+    final priceLabel = isPriceTotal ? 'Total' : 'Per day';
     
     return GestureDetector(
       onTap: () {
@@ -486,13 +499,25 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
-                '$currency$cost',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black,
-                ),
+              Column(
+                children: [
+                  Text(
+                    '$currency${double.parse(displayCost).toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    priceLabel,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -500,6 +525,83 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
       ),
     ),
     );
+  }
+
+  void _clearFilters() {
+    setState(() {
+      _sortBy = 'Cheapest';
+      _selectedCarType = '';
+      _selectedRentalCompany = '';
+      _features = {
+        'Automatic Transmission': false,
+        'Manual Transmission': false,
+        'Air Conditioning': false,
+        'Unlimited Mileage': false,
+        'Free Cancellation': false,
+        'Child Seat Available': false,
+        'GPS Included': false,
+        'Additional Driver Included': false,
+      };
+      _filteredCarResults = _carResults;
+    });
+  }
+
+  void _applyFilters() {
+    setState(() {
+      _filteredCarResults = _carResults.where((car) {
+        final Map<String, dynamic> carMap = car is Map<String, dynamic> 
+            ? car 
+            : (car is Map ? Map<String, dynamic>.from(car as Map) : {});
+        
+        // Filter by car type
+        if (_selectedCarType.isNotEmpty) {
+          final carType = (carMap['car_type'] ?? carMap['category'] ?? '').toString().toLowerCase();
+          if (!carType.contains(_selectedCarType.toLowerCase())) {
+            return false;
+          }
+        }
+        
+        // Filter by transmission (from features)
+        if (_features['Automatic Transmission'] == true) {
+          final transmission = (carMap['transmission'] ?? '').toString().toLowerCase();
+          if (!transmission.contains('automatic')) {
+            return false;
+          }
+        }
+        
+        if (_features['Manual Transmission'] == true) {
+          final transmission = (carMap['transmission'] ?? '').toString().toLowerCase();
+          if (!transmission.contains('manual')) {
+            return false;
+          }
+        }
+        
+        return true;
+      }).toList();
+      
+      // Apply sorting
+      if (_sortBy == 'Cheapest') {
+        _filteredCarResults.sort((a, b) {
+          final aMap = a is Map<String, dynamic> ? a : Map<String, dynamic>.from(a as Map);
+          final bMap = b is Map<String, dynamic> ? b : Map<String, dynamic>.from(b as Map);
+          
+          final aPrice = (aMap['calculated_cost'] ?? aMap['cost_per_day'] ?? aMap['cost'] ?? 0).toDouble();
+          final bPrice = (bMap['calculated_cost'] ?? bMap['cost_per_day'] ?? bMap['cost'] ?? 0).toDouble();
+          
+          return aPrice.compareTo(bPrice);
+        });
+      } else if (_sortBy == 'Most Expensive') {
+        _filteredCarResults.sort((a, b) {
+          final aMap = a is Map<String, dynamic> ? a : Map<String, dynamic>.from(a as Map);
+          final bMap = b is Map<String, dynamic> ? b : Map<String, dynamic>.from(b as Map);
+          
+          final aPrice = (aMap['calculated_cost'] ?? aMap['cost_per_day'] ?? aMap['cost'] ?? 0).toDouble();
+          final bPrice = (bMap['calculated_cost'] ?? bMap['cost_per_day'] ?? bMap['cost'] ?? 0).toDouble();
+          
+          return bPrice.compareTo(aPrice);
+        });
+      }
+    });
   }
 
   void _showFilterBottomSheet() {
@@ -559,21 +661,50 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
                               color: Color(0xFFD32F2F),
                             ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade300),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  _sortBy,
-                                  style: const TextStyle(fontSize: 14),
+                          GestureDetector(
+                            onTap: () {
+                              showMenu(
+                                context: context,
+                                position: RelativeRect.fromLTRB(
+                                  MediaQuery.of(context).size.width - 200,
+                                  150,
+                                  20,
+                                  0,
                                 ),
-                                const SizedBox(width: 8),
-                                const Icon(Icons.arrow_drop_down, size: 20),
-                              ],
+                                items: [
+                                  PopupMenuItem(
+                                    value: 'Cheapest',
+                                    child: Text('Cheapest'),
+                                  ),
+                                  PopupMenuItem(
+                                    value: 'Most Expensive',
+                                    child: Text('Most Expensive'),
+                                  ),
+                                ],
+                              ).then((value) {
+                                if (value != null) {
+                                  setModalState(() {
+                                    _sortBy = value;
+                                  });
+                                }
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey.shade300),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    _sortBy,
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.arrow_drop_down, size: 20),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -731,7 +862,7 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
                   ),
                 ),
 
-                // Done button
+                // Buttons (Clear Filters and Done)
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -744,29 +875,73 @@ class _CarsSearchResultsState extends State<CarsSearchResults> {
                       ),
                     ],
                   ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        setState(() {});
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1e5a8e),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 50,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              setModalState(() {
+                                _sortBy = 'Cheapest';
+                                _selectedCarType = '';
+                                _selectedRentalCompany = '';
+                                _features = {
+                                  'Automatic Transmission': false,
+                                  'Manual Transmission': false,
+                                  'Air Conditioning': false,
+                                  'Unlimited Mileage': false,
+                                  'Free Cancellation': false,
+                                  'Child Seat Available': false,
+                                  'GPS Included': false,
+                                  'Additional Driver Included': false,
+                                };
+                              });
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFF1e5a8e), width: 2),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                            child: const Text(
+                              'Clear Filters',
+                              style: TextStyle(
+                                color: Color(0xFF1e5a8e),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                      child: const Text(
-                        'Done',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              _applyFilters();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF1e5a8e),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                            child: const Text(
+                              'Done',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ],

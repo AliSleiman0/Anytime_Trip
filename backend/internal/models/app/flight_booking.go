@@ -88,6 +88,8 @@ type FlightBooking struct {
 	BookingDate     time.Time           `json:"booking_date" bson:"booking_date"`
 	PaymentStatus   FlightPaymentStatus `json:"payment_status" bson:"payment_status"`
 	PaymentMethod   string              `json:"payment_method,omitempty" bson:"payment_method,omitempty"`
+	RefundRequested bool                `json:"refund_requested" bson:"refund_requested"`
+	RefundAmount    float64             `json:"refund_amount,omitempty" bson:"refund_amount,omitempty"`
 	CreatedAt       time.Time           `json:"created_at" bson:"created_at"`
 	UpdatedAt       time.Time           `json:"updated_at" bson:"updated_at"`
 }

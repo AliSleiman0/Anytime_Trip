@@ -253,47 +253,48 @@ class _HomePageState extends State<HomePage>
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        extendBodyBehindAppBar: true,
+        extendBodyBehindAppBar: false,
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor: const Color(0xFF1e5a8e),
           elevation: 0,
           leadingWidth: 0,
           leading: const SizedBox.shrink(),
           titleSpacing: 0,
           actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Center(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const NotificationsPage()),
-                    );
-                  },
-                  child: const Icon(
-                    Icons.notifications,
-                    color: Color(0xFF1e5a8e),
-                    size: 24,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: Center(
-                child: GestureDetector(
-                  onTap: () => Get.toNamed(AppRoutes.ACCOUNT),
-                  child: CircleAvatar(
-                    radius: 18,
-                    backgroundColor: Colors.grey[300],
-                    child: const Icon(
-                      Icons.person,
-                      color: Color(0xFF1e5a8e),
-                      size: 20,
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const NotificationsPage()),
+                        );
+                      },
+                      child: const Icon(
+                        Icons.notifications,
+                        color: Colors.white,
+                        size: 24,
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 16),
+                    GestureDetector(
+                      onTap: () => Get.toNamed(AppRoutes.ACCOUNT),
+                      child: const CircleAvatar(
+                        radius: 18,
+                        backgroundColor: Colors.white24,
+                        child: Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -301,7 +302,7 @@ class _HomePageState extends State<HomePage>
         ),
         body: Column(
           children: [
-            SizedBox(height: size.height * 0.12),
+            SizedBox(height: size.height * 0.02),
 
             // Tab Bar (custom pills) - horizontally scrollable
             Padding(

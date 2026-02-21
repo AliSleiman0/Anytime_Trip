@@ -694,8 +694,10 @@ class _HotelsTabState extends State<HotelsTab> {
   }
 
   void _showDateBottomSheet(BuildContext context) {
-    DateTime tempCheckinDate = _checkinDate ?? DateTime.now();
-    DateTime tempCheckoutDate = _checkoutDate ?? DateTime.now().add(const Duration(days: 7));
+    DateTime? tempCheckinDate = _checkinDate;
+    DateTime? tempCheckoutDate = _checkoutDate;
+    DateTime currentMonth = tempCheckinDate ?? DateTime.now();
+    bool isSelectingCheckout = false;
     
     isModalOpenNotifier.value = true;
     
@@ -757,6 +759,72 @@ class _HotelsTabState extends State<HotelsTab> {
                           ],
                         ),
                       ),
+                      // Check-in / Check-out header display
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Check-in',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      tempCheckinDate != null
+                                          ? '${tempCheckinDate!.day} ${_getMonthAbbr(tempCheckinDate!.month)}'
+                                          : 'Select',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFFD32F2F),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(Icons.arrow_forward, color: Color(0xFF1e5a8e)),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Check-out',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      tempCheckoutDate != null
+                                          ? '${tempCheckoutDate!.day} ${_getMonthAbbr(tempCheckoutDate!.month)}'
+                                          : 'Select',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFFD32F2F),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       Expanded(
                         child: SingleChildScrollView(
                           controller: scrollController,
@@ -765,46 +833,37 @@ class _HotelsTabState extends State<HotelsTab> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Check-in',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF1e5a8e),
-                                  ),
-                                ),
                                 const SizedBox(height: 12),
-                                _buildCalendar(
+                                _buildDateRangeCalendar(
                                   context,
+                                  currentMonth,
                                   tempCheckinDate,
+                                  tempCheckoutDate,
+                                  (newMonth) {
+                                    setModalState(() {
+                                      currentMonth = newMonth;
+                                    });
+                                  },
                                   (date) {
                                     setModalState(() {
-                                      tempCheckinDate = date;
-                                      if (tempCheckoutDate.isBefore(tempCheckinDate)) {
-                                        tempCheckoutDate = tempCheckinDate.add(const Duration(days: 1));
+                                      if (tempCheckinDate == null || (tempCheckoutDate != null)) {
+                                        // First selection or reset
+                                        tempCheckinDate = date;
+                                        tempCheckoutDate = null;
+                                        isSelectingCheckout = true;
+                                      } else if (date.isBefore(tempCheckinDate!) || date.isAtSameMomentAs(tempCheckinDate!)) {
+                                        // Selected before or same as check-in, reset
+                                        tempCheckinDate = date;
+                                        tempCheckoutDate = null;
+                                        isSelectingCheckout = true;
+                                      } else {
+                                        // Second selection, set as check-out
+                                        tempCheckoutDate = date;
+                                        isSelectingCheckout = false;
                                       }
                                     });
                                   },
-                                ),
-                                const SizedBox(height: 24),
-                                const Text(
-                                  'Check-out',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF1e5a8e),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                _buildCalendar(
-                                  context,
-                                  tempCheckoutDate,
-                                  (date) {
-                                    setModalState(() {
-                                      tempCheckoutDate = date;
-                                    });
-                                  },
-                                  minDate: tempCheckinDate,
+                                  isSelectingCheckout: isSelectingCheckout,
                                 ),
                                 const SizedBox(height: 24),
                               ],
@@ -818,7 +877,9 @@ class _HotelsTabState extends State<HotelsTab> {
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
-                            onPressed: () {
+                            onPressed: (tempCheckinDate == null || tempCheckoutDate == null)
+                                ? null
+                                : () {
                               setState(() {
                                 _checkinDate = tempCheckinDate;
                                 _checkoutDate = tempCheckoutDate;
@@ -827,6 +888,7 @@ class _HotelsTabState extends State<HotelsTab> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF1e5a8e),
+                              disabledBackgroundColor: Colors.grey[300],
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(25),
                               ),
@@ -1266,6 +1328,160 @@ class _HotelsTabState extends State<HotelsTab> {
       'July', 'August', 'September', 'October', 'November', 'December'
     ];
     return months[month - 1];
+  }
+
+  // Date range calendar for selecting check-in and check-out dates
+  Widget _buildDateRangeCalendar(
+    BuildContext context,
+    DateTime currentMonth,
+    DateTime? checkinDate,
+    DateTime? checkoutDate,
+    Function(DateTime) onMonthChanged,
+    Function(DateTime) onDateTap, {
+    bool isSelectingCheckout = false,
+  }) {
+    final now = DateTime.now();
+    final daysInMonth = DateTime(currentMonth.year, currentMonth.month + 1, 0).day;
+    final firstDayOfWeek = DateTime(currentMonth.year, currentMonth.month, 1).weekday;
+    final currentMonthNormalized = DateTime(now.year, now.month);
+    final isPreviousMonthDisabled = currentMonth.year == currentMonthNormalized.year && 
+        currentMonth.month == currentMonthNormalized.month;
+    
+    return Column(
+      children: [
+        // Month/Year header with navigation
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.chevron_left,
+                color: isPreviousMonthDisabled ? Colors.grey[300] : Colors.black,
+              ),
+              onPressed: isPreviousMonthDisabled ? null : () {
+                final newDate = DateTime(currentMonth.year, currentMonth.month - 1);
+                onMonthChanged(newDate);
+              },
+            ),
+            Text(
+              '${_getMonthName(currentMonth.month)} ${currentMonth.year}',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.chevron_right),
+              onPressed: () {
+                final newDate = DateTime(currentMonth.year, currentMonth.month + 1);
+                onMonthChanged(newDate);
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // Weekday headers
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) {
+            return SizedBox(
+              width: 40,
+              child: Center(
+                child: Text(
+                  day,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 8),
+        // Calendar grid
+        ...List.generate((daysInMonth + firstDayOfWeek % 7 + 6) ~/ 7, (weekIndex) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(7, (dayIndex) {
+                final dayNumber = weekIndex * 7 + dayIndex - (firstDayOfWeek % 7) + 1;
+                
+                if (dayNumber < 1 || dayNumber > daysInMonth) {
+                  return const SizedBox(width: 40, height: 40);
+                }
+                
+                final date = DateTime(currentMonth.year, currentMonth.month, dayNumber);
+                final normalizedDate = DateTime(date.year, date.month, date.day);
+                final normalizedCheckin = checkinDate != null ? DateTime(checkinDate.year, checkinDate.month, checkinDate.day) : null;
+                final normalizedCheckout = checkoutDate != null ? DateTime(checkoutDate.year, checkoutDate.month, checkoutDate.day) : null;
+                
+                final isCheckinDate = normalizedCheckin != null && normalizedDate.isAtSameMomentAs(normalizedCheckin);
+                final isCheckoutDate = normalizedCheckout != null && normalizedDate.isAtSameMomentAs(normalizedCheckout);
+                final isInRange = normalizedCheckin != null && normalizedCheckout != null &&
+                    normalizedDate.isAfter(normalizedCheckin) && normalizedDate.isBefore(normalizedCheckout);
+                final isDisabled = date.isBefore(DateTime(now.year, now.month, now.day));
+                
+                Color? bgColor;
+                Color? textColor;
+                BorderRadius? borderRadius;
+                
+                if (isCheckinDate || isCheckoutDate) {
+                  bgColor = const Color(0xFFD32F2F);
+                  textColor = Colors.white;
+                  if (isCheckinDate && isCheckoutDate) {
+                    borderRadius = BorderRadius.circular(8);
+                  } else if (isCheckinDate) {
+                    borderRadius = const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      bottomLeft: Radius.circular(8),
+                    );
+                  } else {
+                    borderRadius = const BorderRadius.only(
+                      topRight: Radius.circular(8),
+                      bottomRight: Radius.circular(8),
+                    );
+                  }
+                } else if (isInRange) {
+                  bgColor = const Color(0xFFD32F2F).withOpacity(0.15);
+                  textColor = Colors.black;
+                  borderRadius = BorderRadius.zero;
+                } else {
+                  bgColor = Colors.transparent;
+                  textColor = isDisabled ? Colors.grey[400] : Colors.black;
+                  borderRadius = BorderRadius.circular(8);
+                }
+                
+                return GestureDetector(
+                  onTap: isDisabled ? null : () => onDateTap(date),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      borderRadius: borderRadius,
+                    ),
+                    child: Center(
+                      child: Text(
+                        dayNumber.toString(),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: (isCheckinDate || isCheckoutDate) ? FontWeight.w700 : FontWeight.w500,
+                          color: textColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          );
+        }),
+      ],
+    );
   }
 
   Widget _buildDestinationCarousel() {

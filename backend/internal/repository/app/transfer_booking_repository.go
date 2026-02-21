@@ -205,3 +205,15 @@ func (r *TransferBookingRepository) UpdateCustomerEmail(ctx context.Context, id 
 	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
 	return err
 }
+
+// UpdateRefundRequested updates the refund requested status for a transfer booking
+func (r *TransferBookingRepository) UpdateRefundRequested(ctx context.Context, id string, requested bool) error {
+	update := bson.M{
+		"$set": bson.M{
+			"refund_requested": requested,
+			"updated_at":       time.Now(),
+		},
+	}
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	return err
+}

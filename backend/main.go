@@ -85,8 +85,8 @@ func main() {
 		log.Printf("warning: unable to seed default admin user: %v", err)
 	}
 
-	// Initialize and start reminder service
-	reminderService := services.NewReminderService(dbConn.DB)
+	// Initialize and start reminder service with notification helper
+	reminderService := services.NewReminderService(dbConn.DB, notificationHelper)
 	if err := reminderService.Start(); err != nil {
 		log.Printf("warning: unable to start reminder service: %v", err)
 	} else {

@@ -15,17 +15,17 @@ import (
 
 // ReminderService handles sending reminder emails for upcoming bookings
 type ReminderService struct {
-	db           *mongo.Database
-	emailService *utils.EmailService
-	cron         *cron.Cron
+	db                 *mongo.Database
+	notificationHelper *utils.NotificationHelper
+	cron               *cron.Cron
 }
 
 // NewReminderService creates a new reminder service
-func NewReminderService(db *mongo.Database) *ReminderService {
+func NewReminderService(db *mongo.Database, notificationHelper *utils.NotificationHelper) *ReminderService {
 	return &ReminderService{
-		db:           db,
-		emailService: utils.NewEmailService(),
-		cron:         cron.New(),
+		db:                 db,
+		notificationHelper: notificationHelper,
+		cron:               cron.New(),
 	}
 }
 
@@ -115,8 +115,9 @@ func (rs *ReminderService) processCarBookingReminders(ctx context.Context, windo
 			booking.BookingID,
 			booking.Pickup.Date.Format("2006-01-02 15:04:05 MST"))
 
-		// Send reminder email
-		err = rs.emailService.SendCarBookingReminder(
+		// Send reminder email with preference checking
+		err = rs.notificationHelper.SendCarBookingReminder(
+			ctx,
 			booking.Customer.Email,
 			booking.Customer.Name,
 			booking.BookingID,
@@ -184,7 +185,8 @@ func (rs *ReminderService) processFlightBookingReminders(ctx context.Context, wi
 
 			// Check if departure is in the reminder window
 			if departureTime.After(windowStart) && departureTime.Before(windowEnd) {
-				err = rs.emailService.SendFlightBookingReminder(
+				err = rs.notificationHelper.SendFlightBookingReminder(
+					ctx,
 					booking.Customer.Email,
 					booking.Customer.Name,
 					booking.BookingID,
@@ -240,8 +242,9 @@ func (rs *ReminderService) processHotelBookingReminders(ctx context.Context, win
 			continue
 		}
 
-		// Send reminder email
-		err = rs.emailService.SendHotelBookingReminder(
+		// Send reminder email with preference checking
+		err = rs.notificationHelper.SendHotelBookingReminder(
+			ctx,
 			booking.Customer.Email,
 			booking.Customer.Name,
 			booking.BookingID,
@@ -292,8 +295,9 @@ func (rs *ReminderService) processTransferBookingReminders(ctx context.Context, 
 			continue
 		}
 
-		// Send reminder email
-		err = rs.emailService.SendTransferBookingReminder(
+		// Send reminder email with preference checking
+		err = rs.notificationHelper.SendTransferBookingReminder(
+			ctx,
 			booking.Customer.Email,
 			booking.Customer.Name,
 			booking.BookingID,

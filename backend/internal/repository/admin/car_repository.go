@@ -210,3 +210,71 @@ func (r *CarRepository) SearchCars(ctx context.Context, pickupLocation, dropoffL
 
 	return cars, nil
 }
+
+// GetAvailableLocations returns all unique pickup and dropoff locations from active cars
+func (r *CarRepository) GetAvailableLocations(ctx context.Context) (map[string][]string, error) {
+	// Get distinct pickup locations
+	pickupLocations, err := r.collection.Distinct(ctx, "pickup_location", bson.M{
+		"status":          admin.CarStatusActive,
+		"pickup_location": bson.M{"$exists": true, "$ne": ""},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Get distinct dropoff locations
+	dropoffLocations, err := r.collection.Distinct(ctx, "drop_off_location", bson.M{
+		"status":            admin.CarStatusActive,
+		"drop_off_location": bson.M{"$exists": true, "$ne": ""},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert interface{} to string slices
+	var pickupLocs, dropoffLocs []string
+	for _, loc := range pickupLocations {
+		if locStr, ok := loc.(string); ok {
+			pickupLocs = append(pickupLocs, locStr)
+		}
+	}
+	for _, loc := range dropoffLocations {
+		if locStr, ok := loc.(string); ok {
+			dropoffLocs = append(dropoffLocs, locStr)
+		}
+	}
+
+	return map[string][]string{
+		"pickup_locations":  pickupLocs,
+		"dropoff_locations": dropoffLocs,
+	}, nil
+}
+
+// CheckCarAvailability checks if a car is available for a given date range
+func (r *CarRepository) CheckCarAvailability(ctx context.Context, carID string, pickupTime, dropoffTime time.Time) (bool, error) {
+	// Get the car booking repository (passed via handler)
+	// This check would typically be done in the handler by injecting the booking repository
+	return true, nil
+}
+
+// CalculateRentalCost calculates the rental cost based on pickup and dropoff times
+// Cost is per day, calculated with consideration for fractional days
+func CalculateRentalCost(costPerDay float64, pickupTime, dropoffTime time.Time) float64 {
+	if dropoffTime.Before(pickupTime) {
+		return 0
+	}
+
+	// Calculate total hours
+	totalHours := dropoffTime.Sub(pickupTime).Hours()
+
+	// Calculate number of full days
+	days := int(totalHours / 24)
+	remainingHours := totalHours - float64(days*24)
+
+	// Calculate cost: full days + hourly rate for remaining hours
+	// Hourly rate is cost per day divided by 24
+	hourlyRate := costPerDay / 24
+	totalCost := (float64(days) * costPerDay) + (remainingHours * hourlyRate)
+
+	return totalCost
+}

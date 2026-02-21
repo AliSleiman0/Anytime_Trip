@@ -53,23 +53,25 @@ type CarPricing struct {
 
 // CarBooking represents a user's car rental booking
 type CarBooking struct {
-	ID            string           `json:"id" bson:"_id"`
-	BookingID     string           `json:"booking_id" bson:"booking_id"` // e.g., "CBK-12345678"
-	UserID        string           `json:"user_id" bson:"user_id"`
-	CarID         string           `json:"car_id" bson:"car_id"` // Reference to car in admin collection
-	Status        CarBookingStatus `json:"status" bson:"status"`
-	Customer      CarCustomer      `json:"customer" bson:"customer"`
-	CarType       string           `json:"car_type" bson:"car_type"` // e.g., "SUV", "Sedan"
-	Passengers    int              `json:"passengers" bson:"passengers"`
-	Pickup        CarPickupDropoff `json:"pickup" bson:"pickup"`
-	Dropoff       CarPickupDropoff `json:"dropoff" bson:"dropoff"`
-	Driver        CarDriver        `json:"driver" bson:"driver"`
-	Pricing       CarPricing       `json:"pricing" bson:"pricing"`
-	Details       string           `json:"details,omitempty" bson:"details,omitempty"`
-	BookingDate   time.Time        `json:"booking_date" bson:"booking_date"`
-	Amount        float64          `json:"amount" bson:"amount"`
-	Currency      string           `json:"currency" bson:"currency"`
-	PaymentStatus CarPaymentStatus `json:"payment_status" bson:"payment_status"`
-	CreatedAt     time.Time        `json:"created_at" bson:"created_at"`
-	UpdatedAt     time.Time        `json:"updated_at" bson:"updated_at"`
+	ID              string           `json:"id" bson:"_id"`
+	BookingID       string           `json:"booking_id" bson:"booking_id"` // e.g., "CBK-12345678"
+	UserID          string           `json:"user_id" bson:"user_id"`
+	CarID           string           `json:"car_id" bson:"car_id"` // Reference to car in admin collection
+	Status          CarBookingStatus `json:"status" bson:"status"`
+	Customer        CarCustomer      `json:"customer" bson:"customer"`
+	CarType         string           `json:"car_type" bson:"car_type"` // e.g., "SUV", "Sedan"
+	Passengers      int              `json:"passengers" bson:"passengers"`
+	Pickup          CarPickupDropoff `json:"pickup" bson:"pickup"`
+	Dropoff         CarPickupDropoff `json:"dropoff" bson:"dropoff"`
+	Driver          CarDriver        `json:"driver" bson:"driver"`
+	Pricing         CarPricing       `json:"pricing" bson:"pricing"`
+	Details         string           `json:"details,omitempty" bson:"details,omitempty"`
+	BookingDate     time.Time        `json:"booking_date" bson:"booking_date"`
+	Amount          float64          `json:"amount" bson:"amount"`
+	Currency        string           `json:"currency" bson:"currency"`
+	PaymentStatus   CarPaymentStatus `json:"payment_status" bson:"payment_status"`
+	RefundRequested bool             `json:"refund_requested" bson:"refund_requested"`
+	RefundAmount    float64          `json:"refund_amount,omitempty" bson:"refund_amount,omitempty"`
+	CreatedAt       time.Time        `json:"created_at" bson:"created_at"`
+	UpdatedAt       time.Time        `json:"updated_at" bson:"updated_at"`
 }

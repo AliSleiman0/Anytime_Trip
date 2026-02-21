@@ -217,3 +217,41 @@ func (r *CarBookingRepository) UpdateRefundAmount(ctx context.Context, id string
 	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
 	return err
 }
+
+// UpdateRefundRequested updates the refund requested status for a car booking
+func (r *CarBookingRepository) UpdateRefundRequested(ctx context.Context, id string, requested bool) error {
+	update := bson.M{
+		"$set": bson.M{
+			"refund_requested": requested,
+			"updated_at":       time.Now(),
+		},
+	}
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": id}, update)
+	return err
+}
+
+// CheckCarBooked checks if a car is booked during the specified date range
+// Returns true if there's any overlapping booking for the car during pickup and dropoff times
+func (r *CarBookingRepository) CheckCarBooked(ctx context.Context, carID string, pickupTime, dropoffTime time.Time) (bool, error) {
+	// Find bookings that overlap with the requested time period
+	// A booking overlaps if:
+	// - Booking pickup < requested dropoff AND
+	// - Booking dropoff > requested pickup
+	filter := bson.M{
+		"car_id": carID,
+		"status": bson.M{"$in": []string{"confirmed", "pending"}}, // Only check active bookings
+		"pickup.date": bson.M{
+			"$lt": dropoffTime, // Booking starts before we want to drop off
+		},
+		"dropoff.date": bson.M{
+			"$gt": pickupTime, // Booking ends after we want to pick up
+		},
+	}
+
+	count, err := r.collection.CountDocuments(ctx, filter)
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}

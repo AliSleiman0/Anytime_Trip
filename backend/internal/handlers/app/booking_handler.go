@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"Anytime_Travel/backend/core/utils"
 	appmodels "Anytime_Travel/backend/internal/models/app"
 
 	"github.com/gofiber/fiber/v2"
@@ -237,7 +236,6 @@ func (h *AppHandler) CancelBooking(c *fiber.Ctx) error {
 	defer cancel()
 
 	userIDStr := userID.(string)
-	emailService := utils.NewEmailService()
 
 	fmt.Printf("[CANCEL] Type: %s, BookingID: %s, UserID: %s\n", bookingType, bookingID, userIDStr)
 
@@ -265,17 +263,21 @@ func (h *AppHandler) CancelBooking(c *fiber.Ctx) error {
 			})
 		}
 
-		// Send cancellation email
-		go emailService.SendCarBookingCancellation(
-			booking.Customer.Email,
-			booking.Customer.Name,
-			booking.BookingID,
-			booking.CarType,
-			booking.Pickup.Location,
-			booking.Pickup.Date.Format("Monday, January 2, 2006"),
-			booking.Pickup.Time,
-			booking.Pricing.Total,
-		)
+		// Send cancellation email with preference checking (use background context for async operation)
+		go func() {
+			notifyCtx := context.Background()
+			h.notificationHelper.SendCarBookingCancellation(
+				notifyCtx,
+				booking.Customer.Email,
+				booking.Customer.Name,
+				booking.BookingID,
+				booking.CarType,
+				booking.Pickup.Location,
+				booking.Pickup.Date.Format("Monday, January 2, 2006"),
+				booking.Pickup.Time,
+				booking.Pricing.Total,
+			)
+		}()
 
 	case "flight":
 		booking, err := h.flightBookingRepo.FindByBookingID(ctx, bookingID)
@@ -299,21 +301,25 @@ func (h *AppHandler) CancelBooking(c *fiber.Ctx) error {
 			})
 		}
 
-		// Send cancellation email
+		// Send cancellation email with preference checking (use background context for async operation)
 		if len(booking.OutboundFlights) > 0 {
 			firstSegment := booking.OutboundFlights[0]
-			go emailService.SendFlightBookingCancellation(
-				booking.Customer.Email,
-				booking.Customer.Name,
-				booking.BookingID,
-				firstSegment.Airline,
-				firstSegment.FlightNumber,
-				firstSegment.DepartureCity,
-				firstSegment.ArrivalCity,
-				firstSegment.DepartureDate,
-				firstSegment.DepartureTime,
-				booking.Pricing.Total,
-			)
+			go func() {
+				notifyCtx := context.Background()
+				h.notificationHelper.SendFlightBookingCancellation(
+					notifyCtx,
+					booking.Customer.Email,
+					booking.Customer.Name,
+					booking.BookingID,
+					firstSegment.Airline,
+					firstSegment.FlightNumber,
+					firstSegment.DepartureCity,
+					firstSegment.ArrivalCity,
+					firstSegment.DepartureDate,
+					firstSegment.DepartureTime,
+					booking.Pricing.Total,
+				)
+			}()
 		}
 
 	case "hotel":
@@ -338,16 +344,20 @@ func (h *AppHandler) CancelBooking(c *fiber.Ctx) error {
 			})
 		}
 
-		// Send cancellation email
-		go emailService.SendHotelBookingCancellation(
-			booking.Customer.Email,
-			booking.Customer.Name,
-			booking.BookingID,
-			booking.HotelName,
-			booking.CheckInDate.Format("Monday, January 2, 2006"),
-			booking.Nights,
-			booking.Pricing.Total,
-		)
+		// Send cancellation email with preference checking (use background context for async operation)
+		go func() {
+			notifyCtx := context.Background()
+			h.notificationHelper.SendHotelBookingCancellation(
+				notifyCtx,
+				booking.Customer.Email,
+				booking.Customer.Name,
+				booking.BookingID,
+				booking.HotelName,
+				booking.CheckInDate.Format("Monday, January 2, 2006"),
+				booking.Nights,
+				booking.Pricing.Total,
+			)
+		}()
 
 	case "transfer":
 		booking, err := h.transferBookingRepo.FindByBookingID(ctx, bookingID)
@@ -371,18 +381,22 @@ func (h *AppHandler) CancelBooking(c *fiber.Ctx) error {
 			})
 		}
 
-		// Send cancellation email
-		go emailService.SendTransferBookingCancellation(
-			booking.Customer.Email,
-			booking.Customer.Name,
-			booking.BookingID,
-			booking.Vehicle.Type,
-			booking.Pickup.Name,
-			booking.Pickup.Address,
-			booking.Pickup.Date.Format("Monday, January 2, 2006"),
-			booking.Pickup.Time,
-			booking.Pricing.Total,
-		)
+		// Send cancellation email with preference checking (use background context for async operation)
+		go func() {
+			notifyCtx := context.Background()
+			h.notificationHelper.SendTransferBookingCancellation(
+				notifyCtx,
+				booking.Customer.Email,
+				booking.Customer.Name,
+				booking.BookingID,
+				booking.Vehicle.Type,
+				booking.Pickup.Name,
+				booking.Pickup.Address,
+				booking.Pickup.Date.Format("Monday, January 2, 2006"),
+				booking.Pickup.Time,
+				booking.Pricing.Total,
+			)
+		}()
 
 	default:
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -393,5 +407,117 @@ func (h *AppHandler) CancelBooking(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"success": true,
 		"message": "Booking cancelled successfully",
+	})
+}
+
+// RequestRefund marks a booking as having a refund requested
+func (h *AppHandler) RequestRefund(c *fiber.Ctx) error {
+	userID := c.Locals("user_id")
+	if userID == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	bookingType := c.Params("type")
+	bookingID := c.Params("id")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	userIDStr := userID.(string)
+
+	fmt.Printf("[REFUND-REQUEST] Type: %s, BookingID: %s, UserID: %s\n", bookingType, bookingID, userIDStr)
+
+	switch bookingType {
+	case "car":
+		booking, err := h.carBookingRepo.FindByBookingID(ctx, bookingID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Booking not found",
+			})
+		}
+
+		if booking.UserID != userIDStr {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Booking not found",
+			})
+		}
+
+		if err := h.carBookingRepo.UpdateRefundRequested(ctx, booking.ID, true); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to request refund",
+			})
+		}
+
+	case "flight":
+		booking, err := h.flightBookingRepo.FindByBookingID(ctx, bookingID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Booking not found",
+			})
+		}
+
+		if booking.UserID != userIDStr {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Booking not found",
+			})
+		}
+
+		if err := h.flightBookingRepo.UpdateRefundRequested(ctx, booking.ID, true); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to request refund",
+			})
+		}
+
+	case "hotel":
+		booking, err := h.hotelBookingRepo.FindByBookingID(ctx, bookingID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Booking not found",
+			})
+		}
+
+		if booking.UserID != userIDStr {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Booking not found",
+			})
+		}
+
+		if err := h.hotelBookingRepo.UpdateRefundRequested(ctx, booking.ID, true); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to request refund",
+			})
+		}
+
+	case "transfer":
+		booking, err := h.transferBookingRepo.FindByBookingID(ctx, bookingID)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Booking not found",
+			})
+		}
+
+		if booking.UserID != userIDStr {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Booking not found",
+			})
+		}
+
+		if err := h.transferBookingRepo.UpdateRefundRequested(ctx, booking.ID, true); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to request refund",
+			})
+		}
+
+	default:
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid booking type",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "Refund request submitted successfully",
 	})
 }

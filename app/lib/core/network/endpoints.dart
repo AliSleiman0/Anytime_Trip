@@ -47,6 +47,8 @@ class Endpoints {
 
   // Car search endpoint
   static const String searchCars = '/app/search-cars';
+  static const String availableCarLocations = '/app/available-car-locations';
+  static const String createCarBooking = '/app/bookings/car';
 
   // Booking endpoints
   static const String myBookings = '/app/my-bookings';
@@ -56,6 +58,7 @@ class Endpoints {
   static const String myTransferBookings = '/app/my-bookings/transfer';
   static String bookingDetails(String type, String id) => '/app/bookings/$type/$id';
   static String cancelBooking(String type, String id) => '/app/bookings/$type/$id/cancel';
+  static String requestRefund(String type, String id) => '/app/bookings/$type/$id/request-refund';
 
   // Support endpoints
   static const String createSupportTicket = '/app/support/tickets';

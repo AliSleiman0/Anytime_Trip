@@ -383,20 +383,21 @@ func (h *AdminHandler) GetViewBookingFragment(c *fiber.Ctx) error {
 		}
 
 		data := fiber.Map{
-			"BookingID":     flightBooking.BookingID,
-			"FlightName":    "Flight Details",
-			"Type":          "Flight",
-			"Details":       flightBooking.Details,
-			"Amount":        flightBooking.Pricing.Total,
-			"Currency":      flightBooking.Pricing.Currency,
-			"PaymentStatus": string(flightBooking.PaymentStatus),
-			"Email":         flightBooking.Customer.Email,
-			"Phone":         "-",
-			"Seat":          "-",
-			"DepartureDate": flightBooking.BookingDate.Format("01/02/2006"),
-			"ArrivalDate":   flightBooking.BookingDate.Format("01/02/2006"),
-			"ReferenceID":   flightBooking.ID,
-			"RefundAmount":  0.0,
+			"BookingID":       flightBooking.BookingID,
+			"FlightName":      "Flight Details",
+			"Type":            "Flight",
+			"Details":         flightBooking.Details,
+			"Amount":          flightBooking.Pricing.Total,
+			"Currency":        flightBooking.Pricing.Currency,
+			"PaymentStatus":   string(flightBooking.PaymentStatus),
+			"Email":           flightBooking.Customer.Email,
+			"Phone":           "-",
+			"Seat":            "-",
+			"DepartureDate":   flightBooking.BookingDate.Format("01/02/2006"),
+			"ArrivalDate":     flightBooking.BookingDate.Format("01/02/2006"),
+			"ReferenceID":     flightBooking.ID,
+			"RefundAmount":    flightBooking.RefundAmount,
+			"RefundRequested": flightBooking.RefundRequested,
 		}
 
 		c.Set("Content-Type", "text/html")
@@ -412,20 +413,21 @@ func (h *AdminHandler) GetViewBookingFragment(c *fiber.Ctx) error {
 		}
 
 		data := fiber.Map{
-			"BookingID":     carBooking.BookingID,
-			"FlightName":    "Car Booking",
-			"Type":          "Car",
-			"Details":       carBooking.Details,
-			"Amount":        carBooking.Amount,
-			"Currency":      carBooking.Currency,
-			"PaymentStatus": string(carBooking.PaymentStatus),
-			"Email":         carBooking.Customer.Email,
-			"Phone":         "-",
-			"Seat":          "-",
-			"DepartureDate": carBooking.BookingDate.Format("01/02/2006"),
-			"ArrivalDate":   carBooking.BookingDate.Format("01/02/2006"),
-			"ReferenceID":   carBooking.ID,
-			"RefundAmount":  0.0,
+			"BookingID":       carBooking.BookingID,
+			"FlightName":      "Car Booking",
+			"Type":            "Car",
+			"Details":         carBooking.Details,
+			"Amount":          carBooking.Amount,
+			"Currency":        carBooking.Currency,
+			"PaymentStatus":   string(carBooking.PaymentStatus),
+			"Email":           carBooking.Customer.Email,
+			"Phone":           "-",
+			"Seat":            "-",
+			"DepartureDate":   carBooking.BookingDate.Format("01/02/2006"),
+			"ArrivalDate":     carBooking.BookingDate.Format("01/02/2006"),
+			"ReferenceID":     carBooking.ID,
+			"RefundAmount":    carBooking.RefundAmount,
+			"RefundRequested": carBooking.RefundRequested,
 		}
 
 		c.Set("Content-Type", "text/html")
@@ -441,20 +443,21 @@ func (h *AdminHandler) GetViewBookingFragment(c *fiber.Ctx) error {
 		}
 
 		data := fiber.Map{
-			"BookingID":     hotelBooking.BookingID,
-			"FlightName":    "Hotel Booking",
-			"Type":          "Hotel",
-			"Details":       hotelBooking.Details,
-			"Amount":        hotelBooking.Amount,
-			"Currency":      hotelBooking.Currency,
-			"PaymentStatus": string(hotelBooking.PaymentStatus),
-			"Email":         hotelBooking.Customer.Email,
-			"Phone":         "-",
-			"Seat":          "-",
-			"DepartureDate": hotelBooking.BookingDate.Format("01/02/2006"),
-			"ArrivalDate":   hotelBooking.BookingDate.Format("01/02/2006"),
-			"ReferenceID":   hotelBooking.ID,
-			"RefundAmount":  0.0,
+			"BookingID":       hotelBooking.BookingID,
+			"FlightName":      "Hotel Booking",
+			"Type":            "Hotel",
+			"Details":         hotelBooking.Details,
+			"Amount":          hotelBooking.Amount,
+			"Currency":        hotelBooking.Currency,
+			"PaymentStatus":   string(hotelBooking.PaymentStatus),
+			"Email":           hotelBooking.Customer.Email,
+			"Phone":           "-",
+			"Seat":            "-",
+			"DepartureDate":   hotelBooking.BookingDate.Format("01/02/2006"),
+			"ArrivalDate":     hotelBooking.BookingDate.Format("01/02/2006"),
+			"ReferenceID":     hotelBooking.ID,
+			"RefundAmount":    hotelBooking.RefundAmount,
+			"RefundRequested": hotelBooking.RefundRequested,
 		}
 
 		c.Set("Content-Type", "text/html")
@@ -470,20 +473,21 @@ func (h *AdminHandler) GetViewBookingFragment(c *fiber.Ctx) error {
 		}
 
 		data := fiber.Map{
-			"BookingID":     transferBooking.BookingID,
-			"FlightName":    "Transfer Booking",
-			"Type":          "Transfer",
-			"Details":       transferBooking.Details,
-			"Amount":        transferBooking.Amount,
-			"Currency":      transferBooking.Currency,
-			"PaymentStatus": string(transferBooking.PaymentStatus),
-			"Email":         transferBooking.Customer.Email,
-			"Phone":         "-",
-			"Seat":          "-",
-			"DepartureDate": transferBooking.BookingDate.Format("01/02/2006"),
-			"ArrivalDate":   transferBooking.BookingDate.Format("01/02/2006"),
-			"ReferenceID":   transferBooking.ID,
-			"RefundAmount":  0.0,
+			"BookingID":       transferBooking.BookingID,
+			"FlightName":      "Transfer Booking",
+			"Type":            "Transfer",
+			"Details":         transferBooking.Details,
+			"Amount":          transferBooking.Amount,
+			"Currency":        transferBooking.Currency,
+			"PaymentStatus":   string(transferBooking.PaymentStatus),
+			"Email":           transferBooking.Customer.Email,
+			"Phone":           "-",
+			"Seat":            "-",
+			"DepartureDate":   transferBooking.BookingDate.Format("01/02/2006"),
+			"ArrivalDate":     transferBooking.BookingDate.Format("01/02/2006"),
+			"ReferenceID":     transferBooking.ID,
+			"RefundAmount":    transferBooking.RefundAmount,
+			"RefundRequested": transferBooking.RefundRequested,
 		}
 
 		c.Set("Content-Type", "text/html")

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/widgets/global_chatbot_overlay.dart';
 import '../../../core/network/endpoints.dart';
+import '../../../core/services/car_service.dart';
 import '../service/banner_service.dart';
 import '../model/banner_model.dart';
 import '../model/popular_location_model.dart';
@@ -24,8 +25,13 @@ class CarsTab extends StatefulWidget {
 
 class _CarsTabState extends State<CarsTab> {
   // Location controllers
-  String _pickupLocation = 'Bey-Lebanon';
-  String _dropoffLocation = 'Bey-Lebanon';
+  String _pickupLocation = '';
+  String _dropoffLocation = '';
+  
+  // Available locations from database
+  List<String> _availablePickupLocations = [];
+  List<String> _availableDropoffLocations = [];
+  bool _locationsLoading = true;
   
   // Date controllers
   DateTime? _pickupDate;
@@ -43,6 +49,7 @@ class _CarsTabState extends State<CarsTab> {
   int _currentCarouselIndex = 0;
   Timer? _carouselTimer;
   final BannerService _bannerService = BannerService();
+  final CarService _carService = CarService();
   List<BannerModel> _banners = [];
   bool _bannersLoading = true;
   
@@ -60,17 +67,6 @@ class _CarsTabState extends State<CarsTab> {
     'Barcelona, Spain',
     'Paris, France',
     'London, UK',
-  ];
-
-  final List<Map<String, String>> _destinations = [
-    {'name': 'Beirut, Lebanon', 'airport': 'Rafic Hariri Intl.'},
-    {'name': 'Atlanta, USA', 'airport': 'Hartsfield–Jackson Atlanta Intl.'},
-    {'name': 'Madrid, Spain', 'airport': 'Madrid-Barajas Airport'},
-    {'name': 'New York, USA', 'airport': 'JFK International'},
-    {'name': 'Dubai, UAE', 'airport': 'Dubai International'},
-    {'name': 'London, UK', 'airport': 'Heathrow Airport'},
-    {'name': 'Paris, France', 'airport': 'Charles de Gaulle Airport'},
-    {'name': 'Tokyo, Japan', 'airport': 'Narita International'},
   ];
 
   final List<String> _nationalities = [
@@ -110,7 +106,35 @@ class _CarsTabState extends State<CarsTab> {
     _carouselController = PageController();
     _loadBanners();
     _loadHomepageBanners();
+    _loadAvailableLocations();
     _startCarouselTimer();
+  }
+
+  Future<void> _loadAvailableLocations() async {
+    try {
+      final locations = await _carService.getAvailableLocations();
+      if (mounted) {
+        setState(() {
+          _availablePickupLocations = locations['pickup_locations'] ?? [];
+          _availableDropoffLocations = locations['dropoff_locations'] ?? [];
+          // Set default values from available locations
+          if (_pickupLocation.isEmpty && _availablePickupLocations.isNotEmpty) {
+            _pickupLocation = _availablePickupLocations.first;
+          }
+          if (_dropoffLocation.isEmpty && _availableDropoffLocations.isNotEmpty) {
+            _dropoffLocation = _availableDropoffLocations.first;
+          }
+          _locationsLoading = false;
+        });
+      }
+    } catch (e) {
+      print('[CARS_TAB] Failed to load available locations: $e');
+      if (mounted) {
+        setState(() {
+          _locationsLoading = false;
+        });
+      }
+    }
   }
 
   void _startCarouselTimer() {
@@ -589,11 +613,10 @@ class _CarsTabState extends State<CarsTab> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
-            final filteredDestinations = _destinations.where((destination) {
-              final name = destination['name']!.toLowerCase();
-              final airport = destination['airport']!.toLowerCase();
+            final availableLocations = isPickup ? _availablePickupLocations : _availableDropoffLocations;
+            final filteredDestinations = availableLocations.where((location) {
               final query = searchController.text.toLowerCase();
-              return name.contains(query) || airport.contains(query);
+              return location.toLowerCase().contains(query);
             }).toList();
 
             return DraggableScrollableSheet(
@@ -700,17 +723,17 @@ class _CarsTabState extends State<CarsTab> {
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           itemCount: filteredDestinations.length,
                           itemBuilder: (context, index) {
-                            final destination = filteredDestinations[index];
+                            final location = filteredDestinations[index];
                             final currentLocation = isPickup ? _pickupLocation : _dropoffLocation;
-                            final isSelected = currentLocation == destination['name'];
+                            final isSelected = currentLocation == location;
 
                             return GestureDetector(
                               onTap: () {
                                 setState(() {
                                   if (isPickup) {
-                                    _pickupLocation = destination['name']!;
+                                    _pickupLocation = location;
                                   } else {
-                                    _dropoffLocation = destination['name']!;
+                                    _dropoffLocation = location;
                                   }
                                 });
                                 Navigator.pop(context);
@@ -750,28 +773,15 @@ class _CarsTabState extends State<CarsTab> {
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            destination['name']!,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: isSelected
-                                                  ? const Color(0xFF1e5a8e)
-                                                  : Colors.black,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            destination['airport']!,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey[600],
-                                            ),
-                                          ),
-                                        ],
+                                      child: Text(
+                                        location,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: isSelected
+                                              ? const Color(0xFF1e5a8e)
+                                              : Colors.black,
+                                        ),
                                       ),
                                     ),
                                     if (isSelected)
@@ -802,8 +812,10 @@ class _CarsTabState extends State<CarsTab> {
   }
 
   void _showDateBottomSheet(BuildContext context) {
-    DateTime tempPickupDate = _pickupDate ?? DateTime.now();
-    DateTime tempDropoffDate = _dropoffDate ?? DateTime.now().add(const Duration(days: 7));
+    DateTime? tempPickupDate = _pickupDate;
+    DateTime? tempDropoffDate = _dropoffDate;
+    DateTime currentMonth = tempPickupDate ?? DateTime.now();
+    bool isSelectingDropoff = false;
     
     isModalOpenNotifier.value = true;
     
@@ -865,6 +877,72 @@ class _CarsTabState extends State<CarsTab> {
                           ],
                         ),
                       ),
+                      // Pickup / Drop-off header display
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Pickup',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      tempPickupDate != null
+                                          ? '${tempPickupDate!.day} ${_getMonthAbbr(tempPickupDate!.month)}'
+                                          : 'Select',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFFD32F2F),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(Icons.arrow_forward, color: Color(0xFF1e5a8e)),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Drop-off',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      tempDropoffDate != null
+                                          ? '${tempDropoffDate!.day} ${_getMonthAbbr(tempDropoffDate!.month)}'
+                                          : 'Select',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFFD32F2F),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       Expanded(
                         child: SingleChildScrollView(
                           controller: scrollController,
@@ -873,46 +951,37 @@ class _CarsTabState extends State<CarsTab> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Pickup',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF1e5a8e),
-                                  ),
-                                ),
                                 const SizedBox(height: 12),
-                                _buildCalendar(
+                                _buildDateRangeCalendar(
                                   context,
+                                  currentMonth,
                                   tempPickupDate,
+                                  tempDropoffDate,
+                                  (newMonth) {
+                                    setModalState(() {
+                                      currentMonth = newMonth;
+                                    });
+                                  },
                                   (date) {
                                     setModalState(() {
-                                      tempPickupDate = date;
-                                      if (tempDropoffDate.isBefore(tempPickupDate)) {
-                                        tempDropoffDate = tempPickupDate.add(const Duration(days: 1));
+                                      if (tempPickupDate == null || (tempDropoffDate != null)) {
+                                        // First selection or reset
+                                        tempPickupDate = date;
+                                        tempDropoffDate = null;
+                                        isSelectingDropoff = true;
+                                      } else if (date.isBefore(tempPickupDate!) || date.isAtSameMomentAs(tempPickupDate!)) {
+                                        // Selected before or same as pickup, reset
+                                        tempPickupDate = date;
+                                        tempDropoffDate = null;
+                                        isSelectingDropoff = true;
+                                      } else {
+                                        // Second selection, set as drop-off
+                                        tempDropoffDate = date;
+                                        isSelectingDropoff = false;
                                       }
                                     });
                                   },
-                                ),
-                                const SizedBox(height: 24),
-                                const Text(
-                                  'Drop-off',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF1e5a8e),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                _buildCalendar(
-                                  context,
-                                  tempDropoffDate,
-                                  (date) {
-                                    setModalState(() {
-                                      tempDropoffDate = date;
-                                    });
-                                  },
-                                  minDate: tempPickupDate,
+                                  isSelectingDropoff: isSelectingDropoff,
                                 ),
                                 const SizedBox(height: 24),
                               ],
@@ -926,7 +995,9 @@ class _CarsTabState extends State<CarsTab> {
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
-                            onPressed: () {
+                            onPressed: (tempPickupDate == null || tempDropoffDate == null)
+                                ? null
+                                : () {
                               setState(() {
                                 _pickupDate = tempPickupDate;
                                 _dropoffDate = tempDropoffDate;
@@ -935,6 +1006,7 @@ class _CarsTabState extends State<CarsTab> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF1e5a8e),
+                              disabledBackgroundColor: Colors.grey[300],
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(25),
                               ),
@@ -1290,6 +1362,160 @@ class _CarsTabState extends State<CarsTab> {
       'July', 'August', 'September', 'October', 'November', 'December'
     ];
     return months[month - 1];
+  }
+
+  // Date range calendar for selecting pickup and drop-off dates
+  Widget _buildDateRangeCalendar(
+    BuildContext context,
+    DateTime currentMonth,
+    DateTime? pickupDate,
+    DateTime? dropoffDate,
+    Function(DateTime) onMonthChanged,
+    Function(DateTime) onDateTap, {
+    bool isSelectingDropoff = false,
+  }) {
+    final now = DateTime.now();
+    final daysInMonth = DateTime(currentMonth.year, currentMonth.month + 1, 0).day;
+    final firstDayOfWeek = DateTime(currentMonth.year, currentMonth.month, 1).weekday;
+    final currentMonthNormalized = DateTime(now.year, now.month);
+    final isPreviousMonthDisabled = currentMonth.year == currentMonthNormalized.year && 
+        currentMonth.month == currentMonthNormalized.month;
+    
+    return Column(
+      children: [
+        // Month/Year header with navigation
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: Icon(
+                Icons.chevron_left,
+                color: isPreviousMonthDisabled ? Colors.grey[300] : Colors.black,
+              ),
+              onPressed: isPreviousMonthDisabled ? null : () {
+                final newDate = DateTime(currentMonth.year, currentMonth.month - 1);
+                onMonthChanged(newDate);
+              },
+            ),
+            Text(
+              '${_getMonthName(currentMonth.month)} ${currentMonth.year}',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.chevron_right),
+              onPressed: () {
+                final newDate = DateTime(currentMonth.year, currentMonth.month + 1);
+                onMonthChanged(newDate);
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // Weekday headers
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) {
+            return SizedBox(
+              width: 40,
+              child: Center(
+                child: Text(
+                  day,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 8),
+        // Calendar grid
+        ...List.generate((daysInMonth + firstDayOfWeek % 7 + 6) ~/ 7, (weekIndex) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: List.generate(7, (dayIndex) {
+                final dayNumber = weekIndex * 7 + dayIndex - (firstDayOfWeek % 7) + 1;
+                
+                if (dayNumber < 1 || dayNumber > daysInMonth) {
+                  return const SizedBox(width: 40, height: 40);
+                }
+                
+                final date = DateTime(currentMonth.year, currentMonth.month, dayNumber);
+                final normalizedDate = DateTime(date.year, date.month, date.day);
+                final normalizedPickup = pickupDate != null ? DateTime(pickupDate.year, pickupDate.month, pickupDate.day) : null;
+                final normalizedDropoff = dropoffDate != null ? DateTime(dropoffDate.year, dropoffDate.month, dropoffDate.day) : null;
+                
+                final isPickupDate = normalizedPickup != null && normalizedDate.isAtSameMomentAs(normalizedPickup);
+                final isDropoffDate = normalizedDropoff != null && normalizedDate.isAtSameMomentAs(normalizedDropoff);
+                final isInRange = normalizedPickup != null && normalizedDropoff != null &&
+                    normalizedDate.isAfter(normalizedPickup) && normalizedDate.isBefore(normalizedDropoff);
+                final isDisabled = date.isBefore(DateTime(now.year, now.month, now.day));
+                
+                Color? bgColor;
+                Color? textColor;
+                BorderRadius? borderRadius;
+                
+                if (isPickupDate || isDropoffDate) {
+                  bgColor = const Color(0xFFD32F2F);
+                  textColor = Colors.white;
+                  if (isPickupDate && isDropoffDate) {
+                    borderRadius = BorderRadius.circular(8);
+                  } else if (isPickupDate) {
+                    borderRadius = const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      bottomLeft: Radius.circular(8),
+                    );
+                  } else {
+                    borderRadius = const BorderRadius.only(
+                      topRight: Radius.circular(8),
+                      bottomRight: Radius.circular(8),
+                    );
+                  }
+                } else if (isInRange) {
+                  bgColor = const Color(0xFFD32F2F).withOpacity(0.15);
+                  textColor = Colors.black;
+                  borderRadius = BorderRadius.zero;
+                } else {
+                  bgColor = Colors.transparent;
+                  textColor = isDisabled ? Colors.grey[400] : Colors.black;
+                  borderRadius = BorderRadius.circular(8);
+                }
+                
+                return GestureDetector(
+                  onTap: isDisabled ? null : () => onDateTap(date),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      borderRadius: borderRadius,
+                    ),
+                    child: Center(
+                      child: Text(
+                        dayNumber.toString(),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: (isPickupDate || isDropoffDate) ? FontWeight.w700 : FontWeight.w500,
+                          color: textColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          );
+        }),
+      ],
+    );
   }
 
   Widget _buildDestinationCarousel() {

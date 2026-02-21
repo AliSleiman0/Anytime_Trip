@@ -375,7 +375,7 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
   // Build car booking card from database data
   Widget _buildCarBookingCardFromDB(Map<String, dynamic> booking) {
     final status = booking['status'] ?? 'confirmed';
-    final statusDisplay = status[0].toUpperCase() + status.substring(1);
+    final statusDisplay = (status.isEmpty ? 'confirmed' : status[0].toUpperCase() + status.substring(1));
     Color statusColor = _getStatusColor(statusDisplay);
     
     final carType = booking['car_type'] ?? 'Car';
@@ -450,18 +450,18 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                       if (status == 'cancelled')
                         // Only show Request Refund for cancelled bookings
                         ElevatedButton(
-                          onPressed: () => _showRefundDialog(this.context),
+                          onPressed: booking['refund_requested'] == true ? null : () => _showRefundDialog(this.context, 'car', booking['booking_id'] ?? ''),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFD32F2F),
+                            backgroundColor: booking['refund_requested'] == true ? Colors.grey : const Color(0xFFD32F2F),
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             minimumSize: const Size(double.infinity, 36),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: const Text(
-                            'Request refund',
-                            style: TextStyle(
+                          child: Text(
+                            booking['refund_requested'] == true ? 'Refund Requested' : 'Request refund',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -475,17 +475,17 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                             Expanded(
                               flex: 1,
                               child: ElevatedButton(
-                                onPressed: () => _showRefundDialog(this.context),
+                                onPressed: booking['refund_requested'] == true ? null : () => _showRefundDialog(this.context, 'car', booking['booking_id'] ?? ''),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFD32F2F),
+                                  backgroundColor: booking['refund_requested'] == true ? Colors.grey : const Color(0xFFD32F2F),
                                   padding: const EdgeInsets.symmetric(vertical: 8),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                 ),
-                                child: const Text(
-                                  'Request refund',
-                                  style: TextStyle(
+                                child: Text(
+                                  booking['refund_requested'] == true ? 'Refund Requested' : 'Request refund',
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -837,18 +837,18 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                         if (booking['status'] == 'cancelled')
                           // Only show Request Refund for cancelled bookings
                           ElevatedButton(
-                            onPressed: () => _showRefundDialog(this.context),
+                            onPressed: booking['refund_requested'] == true ? null : () => _showRefundDialog(this.context, 'flight', booking['booking_id'] ?? ''),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFD32F2F),
+                              backgroundColor: booking['refund_requested'] == true ? Colors.grey : const Color(0xFFD32F2F),
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               minimumSize: const Size(double.infinity, 40),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
                             ),
-                            child: const Text(
-                              'Request refund',
-                              style: TextStyle(
+                            child: Text(
+                              booking['refund_requested'] == true ? 'Refund Requested' : 'Request refund',
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -861,17 +861,17 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                             children: [
                               Expanded(
                                 child: ElevatedButton(
-                                  onPressed: () => _showRefundDialog(this.context),
+                                  onPressed: booking['refund_requested'] == true ? null : () => _showRefundDialog(this.context, 'flight', booking['booking_id'] ?? ''),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFD32F2F),
+                                    backgroundColor: booking['refund_requested'] == true ? Colors.grey : const Color(0xFFD32F2F),
                                     padding: const EdgeInsets.symmetric(vertical: 10),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                   ),
-                                  child: const Text(
-                                    'Request refund',
-                                    style: TextStyle(
+                                  child: Text(
+                                    booking['refund_requested'] == true ? 'Refund Requested' : 'Request refund',
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
@@ -1011,18 +1011,18 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                       if (booking['status'] == 'cancelled')
                         // Only show Request Refund for cancelled bookings
                         ElevatedButton(
-                          onPressed: () => _showRefundDialog(this.context),
+                          onPressed: booking['refund_requested'] == true ? null : () => _showRefundDialog(this.context, 'hotel', booking['booking_id'] ?? ''),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFD32F2F),
+                            backgroundColor: booking['refund_requested'] == true ? Colors.grey : const Color(0xFFD32F2F),
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             minimumSize: const Size(double.infinity, 36),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: const Text(
-                            'Request refund',
-                            style: TextStyle(
+                          child: Text(
+                            booking['refund_requested'] == true ? 'Refund Requested' : 'Request refund',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -1036,17 +1036,17 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                             Expanded(
                               flex: 1,
                               child: ElevatedButton(
-                                onPressed: () => _showRefundDialog(this.context),
+                                onPressed: booking['refund_requested'] == true ? null : () => _showRefundDialog(this.context, 'hotel', booking['booking_id'] ?? ''),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFD32F2F),
+                                  backgroundColor: booking['refund_requested'] == true ? Colors.grey : const Color(0xFFD32F2F),
                                   padding: const EdgeInsets.symmetric(vertical: 8),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                 ),
-                                child: const Text(
-                                  'Request refund',
-                                  style: TextStyle(
+                                child: Text(
+                                  booking['refund_requested'] == true ? 'Refund Requested' : 'Request refund',
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -1205,18 +1205,18 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                       if (booking['status'] == 'cancelled')
                         // Only show Request Refund for cancelled bookings
                         ElevatedButton(
-                          onPressed: () => _showRefundDialog(context),
+                          onPressed: booking['refund_requested'] == true ? null : () => _showRefundDialog(context, 'transfer', booking['booking_id'] ?? ''),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFD32F2F),
+                            backgroundColor: booking['refund_requested'] == true ? Colors.grey : const Color(0xFFD32F2F),
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             minimumSize: const Size(double.infinity, 36),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: const Text(
-                            'Request refund',
-                            style: TextStyle(
+                          child: Text(
+                            booking['refund_requested'] == true ? 'Refund Requested' : 'Request refund',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -1230,17 +1230,17 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                             Expanded(
                               flex: 1,
                               child: ElevatedButton(
-                                onPressed: () => _showRefundDialog(context),
+                                onPressed: booking['refund_requested'] == true ? null : () => _showRefundDialog(context, 'transfer', booking['booking_id'] ?? ''),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFD32F2F),
+                                  backgroundColor: booking['refund_requested'] == true ? Colors.grey : const Color(0xFFD32F2F),
                                   padding: const EdgeInsets.symmetric(vertical: 8),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                 ),
-                                child: const Text(
-                                  'Request refund',
-                                  style: TextStyle(
+                                child: Text(
+                                  booking['refund_requested'] == true ? 'Refund Requested' : 'Request refund',
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -1583,7 +1583,7 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                             children: [
                               Expanded(
                                 child: ElevatedButton(
-                                  onPressed: () => _showRefundDialog(context),
+                                  onPressed: () => _showRefundDialog(context, 'flight', booking['booking_id'] ?? ''),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFFD32F2F),
                                     padding: const EdgeInsets.symmetric(vertical: 10),
@@ -1747,7 +1747,7 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                             Expanded(
                               flex: 1,
                               child: ElevatedButton(
-                                onPressed: () => _showRefundDialog(context),
+                                onPressed: () => _showRefundDialog(context, 'hotel', hotel['booking_id'] ?? ''),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFD32F2F),
                                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -1912,7 +1912,7 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                             Expanded(
                               flex: 1,
                               child: ElevatedButton(
-                                onPressed: () => _showRefundDialog(context),
+                                onPressed: () => _showRefundDialog(context, 'car', car['booking_id'] ?? ''),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFD32F2F),
                                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -2090,7 +2090,7 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
                             Expanded(
                               flex: 1,
                               child: ElevatedButton(
-                                onPressed: () => _showRefundDialog(context),
+                                onPressed: () => _showRefundDialog(context, 'transfer', transfer['booking_id'] ?? ''),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFD32F2F),
                                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -2376,122 +2376,172 @@ class _BookingsPageState extends State<BookingsPage> with SingleTickerProviderSt
     }
   }
 
-  void _showRefundDialog(BuildContext context) {
+  void _showRefundDialog(BuildContext context, String bookingType, String bookingId) {
+    bool _isSubmitting = false;
+    
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const SizedBox(height: 40),
-                    
-                    // Refund Icon
-                    Image.asset(
-                      'assets/images/refund.png',
-                      height: 60,
-                      width: 60,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 40),
+                        
+                        // Refund Icon
+                        Image.asset(
+                          'assets/images/refund.png',
                           height: 60,
                           width: 60,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF336891),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.currency_exchange,
-                            color: Colors.white,
-                            size: 36,
-                          ),
-                        );
-                      },
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    const Text(
-                      'Request A Refund?',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    
-                    const SizedBox(height: 8),
-                    
-                    const Text(
-                      'Your refund amount will be determined by our admin team based on the booking details and policy.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black54,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Request Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF336891),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              height: 60,
+                              width: 60,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF336891),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.currency_exchange,
+                                color: Colors.white,
+                                size: 36,
+                              ),
+                            );
+                          },
                         ),
-                        child: const Text(
-                          'Request',
+                        
+                        const SizedBox(height: 16),
+                        
+                        const Text(
+                          'Request A Refund?',
                           style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        
+                        const SizedBox(height: 8),
+                        
+                        const Text(
+                          'Your refund amount will be determined by our admin team based on the booking details and policy.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black54,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        // Request Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _isSubmitting ? null : () async {
+                              setDialogState(() {
+                                _isSubmitting = true;
+                              });
+                              
+                              try {
+                                final result = await _bookingService.requestRefund(bookingType, bookingId);
+                                
+                                Navigator.pop(dialogContext);
+                                
+                                if (result['success'] == true) {
+                                  // Reload bookings to reflect the change
+                                  await _loadBookings();
+                                  
+                                  ScaffoldMessenger.of(this.context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(result['message'] ?? 'Refund request submitted successfully'),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(this.context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(result['message'] ?? 'Failed to submit refund request'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                Navigator.pop(dialogContext);
+                                ScaffoldMessenger.of(this.context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Error: $e'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF336891),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: _isSubmitting 
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                )
+                              : const Text(
+                                  'Request',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                           ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Close Button
-              Positioned(
-                top: -12,
-                right: -12,
-                child: GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFD32F2F),
-                      shape: BoxShape.circle,
-                    ),
-                    padding: const EdgeInsets.all(8),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 20,
+                      ],
                     ),
                   ),
-                ),
+                  
+                  // Close Button
+                  Positioned(
+                    top: -12,
+                    right: -12,
+                    child: GestureDetector(
+                      onTap: () => Navigator.pop(dialogContext),
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFD32F2F),
+                          shape: BoxShape.circle,
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );

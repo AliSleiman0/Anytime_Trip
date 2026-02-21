@@ -15,7 +15,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
   Map<String, bool> notificationPreferences = {
     'Email': true,
     'SMS': true,
-    'Chatbot': true,
+    'Support': true,
   };
   final _storage = StorageService();
   final _api = AccountApi();
@@ -28,7 +28,17 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   Future<void> _loadNotificationPreferences() async {
     // Initialize with only 3 options
-    final allowedKeys = {'Email', 'SMS', 'Chatbot'};
+    final allowedKeys = {'Email', 'SMS', 'Support'};
+    
+    // Helper function to migrate old 'Chatbot' key to 'Support'
+    Map<String, bool> migratePreferences(Map<String, bool> prefs) {
+      final migrated = Map<String, bool>.from(prefs);
+      if (migrated.containsKey('Chatbot') && !migrated.containsKey('Support')) {
+        migrated['Support'] = migrated['Chatbot']!;
+        migrated.remove('Chatbot');
+      }
+      return migrated;
+    }
     
     try {
       // Try to load from API first
@@ -39,23 +49,25 @@ class _NotificationsPageState extends State<NotificationsPage> {
         notificationPreferences = {
           'Email': true,
           'SMS': true,
-          'Chatbot': true,
+          'Support': true,
         };
         
         // Merge saved values for only the allowed keys
         if (apiPrefs != null && apiPrefs.isNotEmpty) {
+          final migratedApiPrefs = migratePreferences(apiPrefs);
           for (var key in allowedKeys) {
-            if (apiPrefs.containsKey(key)) {
-              notificationPreferences[key] = apiPrefs[key]!;
+            if (migratedApiPrefs.containsKey(key)) {
+              notificationPreferences[key] = migratedApiPrefs[key]!;
             }
           }
         } else {
           // If no API data, check local storage
           final saved = _storage.getNotificationPreferences();
           if (saved != null && saved.isNotEmpty) {
+            final migratedSaved = migratePreferences(saved);
             for (var key in allowedKeys) {
-              if (saved.containsKey(key)) {
-                notificationPreferences[key] = saved[key]!;
+              if (migratedSaved.containsKey(key)) {
+                notificationPreferences[key] = migratedSaved[key]!;
               }
             }
           }
@@ -73,14 +85,15 @@ class _NotificationsPageState extends State<NotificationsPage> {
         notificationPreferences = {
           'Email': true,
           'SMS': true,
-          'Chatbot': true,
+          'Support': true,
         };
         
         // Merge saved values for only the allowed keys
         if (saved != null && saved.isNotEmpty) {
+          final migratedSaved = migratePreferences(saved);
           for (var key in allowedKeys) {
-            if (saved.containsKey(key)) {
-              notificationPreferences[key] = saved[key]!;
+            if (migratedSaved.containsKey(key)) {
+              notificationPreferences[key] = migratedSaved[key]!;
             }
           }
         }

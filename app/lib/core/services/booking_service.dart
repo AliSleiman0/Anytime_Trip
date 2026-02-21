@@ -98,4 +98,21 @@ class BookingService {
       };
     }
   }
+
+  // Request refund for a booking
+  Future<Map<String, dynamic>> requestRefund(String type, String id) async {
+    try {
+      final response = await _apiClient.post(Endpoints.requestRefund(type, id));
+      return {
+        'success': response.data['success'] == true,
+        'message': response.data['message'] ?? 'Refund request submitted successfully',
+        'data': response.data['data'],
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Error requesting refund: $e',
+      };
+    }
+  }
 }

@@ -37,6 +37,28 @@ class _CarDetailsState extends State<CarDetails> {
     {'name': 'No Extras', 'price': ''},
   ];
 
+  String _getPriceDisplay() {
+    final currency = widget.car['currency'] ?? '\$';
+    final calculatedCost = widget.car['calculated_cost'];
+    
+    if (calculatedCost != null) {
+      final cost = double.parse(calculatedCost.toString());
+      return '$currency${cost.toStringAsFixed(2)}';
+    }
+    
+    final price = widget.car['price'] ?? widget.car['cost'];
+    if (price != null) {
+      try {
+        final cost = double.parse(price.toString());
+        return '$currency${cost.toStringAsFixed(2)}';
+      } catch (e) {
+        return price.toString();
+      }
+    }
+    
+    return '\$0.00';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,7 +101,7 @@ class _CarDetailsState extends State<CarDetails> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              widget.car['passengers'] ?? '5 Passengers - Automatic',
+                              '${widget.car['passengers']?.toString() ?? '5'} Passengers - ${widget.car['transmission'] ?? 'Automatic'}',
                               style: const TextStyle(
                                 color: Colors.black87,
                                 fontSize: 13,
@@ -95,7 +117,9 @@ class _CarDetailsState extends State<CarDetails> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              widget.car['shuttle'] ?? 'Shuttle to counter and car',
+                              widget.car['shuttle_to_counter'] == true
+                                  ? 'Shuttle to counter and car'
+                                  : (widget.car['shuttle'] ?? 'Shuttle to counter and car'),
                               style: const TextStyle(
                                 color: Colors.black87,
                                 fontSize: 13,
@@ -126,7 +150,7 @@ class _CarDetailsState extends State<CarDetails> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            widget.car['price'] ?? '\$3,200',
+                            _getPriceDisplay(),
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,

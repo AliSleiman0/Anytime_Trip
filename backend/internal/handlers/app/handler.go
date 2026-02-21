@@ -2083,12 +2083,18 @@ func (h *AppHandler) CreateFlightBooking(c *fiber.Ctx) error {
 func (h *AppHandler) CreateCarBooking(c *fiber.Ctx) error {
 	var booking appmodels.CarBooking
 
+	// Log raw body for debugging
+	fmt.Printf("[CAR_BOOKING] Raw body: %s\n", string(c.Body()))
+
 	// Parse request body
 	if err := c.BodyParser(&booking); err != nil {
+		fmt.Printf("[CAR_BOOKING] BodyParser error: %v\n", err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request format",
+			"error": fmt.Sprintf("Invalid request format: %v", err),
 		})
 	}
+
+	fmt.Printf("[CAR_BOOKING] Parsed booking: %+v\n", booking)
 
 	// Get user ID from JWT token
 	userID := c.Locals("user_id")
@@ -2102,6 +2108,9 @@ func (h *AppHandler) CreateCarBooking(c *fiber.Ctx) error {
 	booking.ID = uuid.New().String()
 	booking.UserID = userID.(string)
 	booking.BookingID = fmt.Sprintf("CBK-%s", uuid.New().String()[:8])
+	booking.BookingDate = time.Now()
+	booking.CreatedAt = time.Now()
+	booking.UpdatedAt = time.Now()
 
 	ctx, cancel := context.WithTimeout(c.Context(), 10*time.Second)
 	defer cancel()

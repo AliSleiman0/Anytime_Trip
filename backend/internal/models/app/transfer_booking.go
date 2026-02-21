@@ -59,21 +59,23 @@ type TransferPricing struct {
 
 // TransferBooking represents a user's transfer booking
 type TransferBooking struct {
-	ID            string                `json:"id" bson:"_id"`
-	BookingID     string                `json:"booking_id" bson:"booking_id"` // e.g., "TBK-12345678"
-	UserID        string                `json:"user_id" bson:"user_id"`
-	TransferID    string                `json:"transfer_id" bson:"transfer_id"` // Reference to transfer in admin collection
-	Status        TransferBookingStatus `json:"status" bson:"status"`
-	Customer      TransferCustomer      `json:"customer" bson:"customer"`
-	Vehicle       TransferVehicle       `json:"vehicle" bson:"vehicle"`
-	Pickup        TransferLocation      `json:"pickup" bson:"pickup"`
-	Dropoff       TransferLocation      `json:"dropoff" bson:"dropoff"`
-	Pricing       TransferPricing       `json:"pricing" bson:"pricing"`
-	Details       string                `json:"details" bson:"details"` // e.g., "Airport pickup - Terminal 3"
-	BookingDate   time.Time             `json:"booking_date" bson:"booking_date"`
-	Amount        float64               `json:"amount" bson:"amount"`
-	Currency      string                `json:"currency" bson:"currency"`
-	PaymentStatus TransferPaymentStatus `json:"payment_status" bson:"payment_status"`
-	CreatedAt     time.Time             `json:"created_at" bson:"created_at"`
-	UpdatedAt     time.Time             `json:"updated_at" bson:"updated_at"`
+	ID              string                `json:"id" bson:"_id"`
+	BookingID       string                `json:"booking_id" bson:"booking_id"` // e.g., "TBK-12345678"
+	UserID          string                `json:"user_id" bson:"user_id"`
+	TransferID      string                `json:"transfer_id" bson:"transfer_id"` // Reference to transfer in admin collection
+	Status          TransferBookingStatus `json:"status" bson:"status"`
+	Customer        TransferCustomer      `json:"customer" bson:"customer"`
+	Vehicle         TransferVehicle       `json:"vehicle" bson:"vehicle"`
+	Pickup          TransferLocation      `json:"pickup" bson:"pickup"`
+	Dropoff         TransferLocation      `json:"dropoff" bson:"dropoff"`
+	Pricing         TransferPricing       `json:"pricing" bson:"pricing"`
+	Details         string                `json:"details" bson:"details"` // e.g., "Airport pickup - Terminal 3"
+	BookingDate     time.Time             `json:"booking_date" bson:"booking_date"`
+	Amount          float64               `json:"amount" bson:"amount"`
+	Currency        string                `json:"currency" bson:"currency"`
+	PaymentStatus   TransferPaymentStatus `json:"payment_status" bson:"payment_status"`
+	RefundRequested bool                  `json:"refund_requested" bson:"refund_requested"`
+	RefundAmount    float64               `json:"refund_amount,omitempty" bson:"refund_amount,omitempty"`
+	CreatedAt       time.Time             `json:"created_at" bson:"created_at"`
+	UpdatedAt       time.Time             `json:"updated_at" bson:"updated_at"`
 }

@@ -6,7 +6,7 @@ import "time"
 type NotificationPreferences struct {
 	Email   bool `json:"Email" bson:"Email"`
 	SMS     bool `json:"SMS" bson:"SMS"`
-	Chatbot bool `json:"Chatbot" bson:"Chatbot"`
+	Support bool `json:"Support" bson:"Support"`
 }
 
 // SecurityPreferences represents user security settings

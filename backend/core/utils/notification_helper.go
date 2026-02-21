@@ -274,6 +274,55 @@ func (nh *NotificationHelper) SendCarBookingEmail(
 	ctx context.Context,
 	booking *appmodels.CarBooking,
 ) error {
+	fmt.Printf("[NOTIFICATION] ====== Starting SendCarBookingEmail ======\n")
+	fmt.Printf("[NOTIFICATION] BookingID: %s, Email: %s\n", booking.BookingID, booking.Customer.Email)
+
+	// Get user information by email
+	user, err := nh.userRepo.FindByEmail(ctx, booking.Customer.Email)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: User with email %s not found, skipping email notification: %v\n", booking.Customer.Email, err)
+		return nil // Don't fail if user doesn't exist
+	}
+	fmt.Printf("[NOTIFICATION] Found user: %s (%s)\n", user.Email, user.Name)
+
+	// Priority 1: Check admin notification preferences
+	adminPrefs, err := nh.adminNotificationPrefsRepo.FindAll(ctx)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: Could not fetch admin preferences: %v\n", err)
+		// Continue anyway - don't block on admin prefs error
+	}
+
+	adminAllowsEmail := false
+	if len(adminPrefs) > 0 {
+		fmt.Printf("[NOTIFICATION] Checking %d admin preference(s)\n", len(adminPrefs))
+		for _, pref := range adminPrefs {
+			fmt.Printf("[NOTIFICATION] Admin pref - NewBooking enabled: %v\n", pref.Bookings.NewBooking)
+			if pref.Bookings.NewBooking {
+				adminAllowsEmail = true
+				break
+			}
+		}
+	} else {
+		adminAllowsEmail = true
+		fmt.Printf("[NOTIFICATION] No admin preferences found, defaulting to allow email\n")
+	}
+	fmt.Printf("[NOTIFICATION] Admin allows email: %v\n", adminAllowsEmail)
+
+	if !adminAllowsEmail {
+		fmt.Printf("[NOTIFICATION] Email blocked by admin preferences for booking %s\n", booking.BookingID)
+		return nil
+	}
+
+	// Priority 2: Check user notification preferences
+	fmt.Printf("[NOTIFICATION] User email preference enabled: %v\n", user.NotificationPreferences.Email)
+	if !user.NotificationPreferences.Email {
+		fmt.Printf("[NOTIFICATION] Email blocked by user preferences for user %s\n", user.Email)
+		return nil
+	}
+
+	// Both admin and user allow email - send it
+	fmt.Printf("[NOTIFICATION] Sending car booking email to %s for booking %s\n", user.Email, booking.BookingID)
+
 	// Use the detailed car booking email template
 	return nh.emailService.SendCarBookingEmail(
 		booking.Customer.Email,
@@ -330,5 +379,509 @@ func (nh *NotificationHelper) SendTransferBookingEmail(
 		booking.Pricing.Taxes,
 		booking.Pricing.TaxOnFees,
 		booking.Pricing.Total,
+	)
+}
+
+// SendCarBookingReminder sends a car booking reminder with preference checking
+func (nh *NotificationHelper) SendCarBookingReminder(
+	ctx context.Context,
+	userEmail string,
+	userName string,
+	bookingID string,
+	carType string,
+	pickupLocation string,
+	pickupAddress string,
+	pickupDate string,
+	pickupTime string,
+	totalPrice float64,
+) error {
+	fmt.Printf("[NOTIFICATION] ====== Starting SendCarBookingReminder ======\n")
+	fmt.Printf("[NOTIFICATION] Email: %s, BookingID: %s\n", userEmail, bookingID)
+
+	// Get user information by email
+	user, err := nh.userRepo.FindByEmail(ctx, userEmail)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: User with email %s not found, skipping reminder: %v\n", userEmail, err)
+		return nil
+	}
+
+	// Check admin preferences for reminders
+	adminPrefs, err := nh.adminNotificationPrefsRepo.FindAll(ctx)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: Could not fetch admin preferences: %v\n", err)
+	}
+
+	adminAllowsEmail := false
+	if len(adminPrefs) > 0 {
+		for _, pref := range adminPrefs {
+			fmt.Printf("[NOTIFICATION] Admin pref - BookingReminder enabled: %v\n", pref.Bookings.BookingReminder)
+			if pref.Bookings.BookingReminder {
+				adminAllowsEmail = true
+				break
+			}
+		}
+	} else {
+		adminAllowsEmail = true
+		fmt.Printf("[NOTIFICATION] No admin preferences found, defaulting to allow reminder\n")
+	}
+
+	if !adminAllowsEmail {
+		fmt.Printf("[NOTIFICATION] Reminder blocked by admin preferences for booking %s\n", bookingID)
+		return nil
+	}
+
+	// Check user notification preferences
+	if !user.NotificationPreferences.Email {
+		fmt.Printf("[NOTIFICATION] Reminder blocked by user preferences for user %s\n", userEmail)
+		return nil
+	}
+
+	// Both admin and user allow email - send reminder
+	fmt.Printf("[NOTIFICATION] Sending car booking reminder to %s for booking %s\n", userEmail, bookingID)
+	return nh.emailService.SendCarBookingReminder(
+		userEmail,
+		userName,
+		bookingID,
+		carType,
+		pickupLocation,
+		pickupAddress,
+		pickupDate,
+		pickupTime,
+		totalPrice,
+	)
+}
+
+// SendFlightBookingReminder sends a flight booking reminder with preference checking
+func (nh *NotificationHelper) SendFlightBookingReminder(
+	ctx context.Context,
+	userEmail string,
+	userName string,
+	bookingID string,
+	airlineName string,
+	flightNumber string,
+	departureAirport string,
+	arrivalAirport string,
+	departureDate string,
+	departureTime string,
+	totalPrice float64,
+) error {
+	fmt.Printf("[NOTIFICATION] ====== Starting SendFlightBookingReminder ======\n")
+	fmt.Printf("[NOTIFICATION] Email: %s, BookingID: %s\n", userEmail, bookingID)
+
+	user, err := nh.userRepo.FindByEmail(ctx, userEmail)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: User with email %s not found, skipping reminder: %v\n", userEmail, err)
+		return nil
+	}
+
+	adminPrefs, err := nh.adminNotificationPrefsRepo.FindAll(ctx)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: Could not fetch admin preferences: %v\n", err)
+	}
+
+	adminAllowsEmail := false
+	if len(adminPrefs) > 0 {
+		for _, pref := range adminPrefs {
+			if pref.Bookings.BookingReminder {
+				adminAllowsEmail = true
+				break
+			}
+		}
+	} else {
+		adminAllowsEmail = true
+	}
+
+	if !adminAllowsEmail {
+		fmt.Printf("[NOTIFICATION] Reminder blocked by admin preferences for booking %s\n", bookingID)
+		return nil
+	}
+
+	if !user.NotificationPreferences.Email {
+		fmt.Printf("[NOTIFICATION] Reminder blocked by user preferences for user %s\n", userEmail)
+		return nil
+	}
+
+	fmt.Printf("[NOTIFICATION] Sending flight booking reminder to %s for booking %s\n", userEmail, bookingID)
+	return nh.emailService.SendFlightBookingReminder(
+		userEmail,
+		userName,
+		bookingID,
+		airlineName,
+		flightNumber,
+		departureAirport,
+		arrivalAirport,
+		departureDate,
+		departureTime,
+		totalPrice,
+	)
+}
+
+// SendHotelBookingReminder sends a hotel booking reminder with preference checking
+func (nh *NotificationHelper) SendHotelBookingReminder(
+	ctx context.Context,
+	userEmail string,
+	userName string,
+	bookingID string,
+	hotelName string,
+	checkInDate string,
+	nights int,
+	totalPrice float64,
+) error {
+	fmt.Printf("[NOTIFICATION] ====== Starting SendHotelBookingReminder ======\n")
+	fmt.Printf("[NOTIFICATION] Email: %s, BookingID: %s\n", userEmail, bookingID)
+
+	user, err := nh.userRepo.FindByEmail(ctx, userEmail)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: User with email %s not found, skipping reminder: %v\n", userEmail, err)
+		return nil
+	}
+
+	adminPrefs, err := nh.adminNotificationPrefsRepo.FindAll(ctx)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: Could not fetch admin preferences: %v\n", err)
+	}
+
+	adminAllowsEmail := false
+	if len(adminPrefs) > 0 {
+		for _, pref := range adminPrefs {
+			if pref.Bookings.BookingReminder {
+				adminAllowsEmail = true
+				break
+			}
+		}
+	} else {
+		adminAllowsEmail = true
+	}
+
+	if !adminAllowsEmail {
+		fmt.Printf("[NOTIFICATION] Reminder blocked by admin preferences for booking %s\n", bookingID)
+		return nil
+	}
+
+	if !user.NotificationPreferences.Email {
+		fmt.Printf("[NOTIFICATION] Reminder blocked by user preferences for user %s\n", userEmail)
+		return nil
+	}
+
+	fmt.Printf("[NOTIFICATION] Sending hotel booking reminder to %s for booking %s\n", userEmail, bookingID)
+	return nh.emailService.SendHotelBookingReminder(
+		userEmail,
+		userName,
+		bookingID,
+		hotelName,
+		checkInDate,
+		nights,
+		totalPrice,
+	)
+}
+
+// SendTransferBookingReminder sends a transfer booking reminder with preference checking
+func (nh *NotificationHelper) SendTransferBookingReminder(
+	ctx context.Context,
+	userEmail string,
+	userName string,
+	bookingID string,
+	vehicleType string,
+	pickupLocation string,
+	pickupAddress string,
+	pickupDate string,
+	pickupTime string,
+	totalPrice float64,
+) error {
+	fmt.Printf("[NOTIFICATION] ====== Starting SendTransferBookingReminder ======\n")
+	fmt.Printf("[NOTIFICATION] Email: %s, BookingID: %s\n", userEmail, bookingID)
+
+	user, err := nh.userRepo.FindByEmail(ctx, userEmail)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: User with email %s not found, skipping reminder: %v\n", userEmail, err)
+		return nil
+	}
+
+	adminPrefs, err := nh.adminNotificationPrefsRepo.FindAll(ctx)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: Could not fetch admin preferences: %v\n", err)
+	}
+
+	adminAllowsEmail := false
+	if len(adminPrefs) > 0 {
+		for _, pref := range adminPrefs {
+			if pref.Bookings.BookingReminder {
+				adminAllowsEmail = true
+				break
+			}
+		}
+	} else {
+		adminAllowsEmail = true
+	}
+
+	if !adminAllowsEmail {
+		fmt.Printf("[NOTIFICATION] Reminder blocked by admin preferences for booking %s\n", bookingID)
+		return nil
+	}
+
+	if !user.NotificationPreferences.Email {
+		fmt.Printf("[NOTIFICATION] Reminder blocked by user preferences for user %s\n", userEmail)
+		return nil
+	}
+
+	fmt.Printf("[NOTIFICATION] Sending transfer booking reminder to %s for booking %s\n", userEmail, bookingID)
+	return nh.emailService.SendTransferBookingReminder(
+		userEmail,
+		userName,
+		bookingID,
+		vehicleType,
+		pickupLocation,
+		pickupAddress,
+		pickupDate,
+		pickupTime,
+		totalPrice,
+	)
+}
+
+// SendCarBookingCancellation sends a car booking cancellation email with preference checking
+func (nh *NotificationHelper) SendCarBookingCancellation(
+	ctx context.Context,
+	userEmail string,
+	userName string,
+	bookingID string,
+	carType string,
+	pickupLocation string,
+	pickupDate string,
+	pickupTime string,
+	totalPrice float64,
+) error {
+	fmt.Printf("[NOTIFICATION] ====== Starting SendCarBookingCancellation ======\n")
+	fmt.Printf("[NOTIFICATION] Email: %s, BookingID: %s\n", userEmail, bookingID)
+
+	user, err := nh.userRepo.FindByEmail(ctx, userEmail)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: User with email %s not found, skipping cancellation email: %v\n", userEmail, err)
+		return nil
+	}
+
+	adminPrefs, err := nh.adminNotificationPrefsRepo.FindAll(ctx)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: Could not fetch admin preferences: %v\n", err)
+	}
+
+	adminAllowsEmail := false
+	if len(adminPrefs) > 0 {
+		for _, pref := range adminPrefs {
+			if pref.Bookings.BookingCancelled {
+				adminAllowsEmail = true
+				break
+			}
+		}
+	} else {
+		adminAllowsEmail = true
+	}
+
+	if !adminAllowsEmail {
+		fmt.Printf("[NOTIFICATION] Cancellation email blocked by admin preferences for booking %s\n", bookingID)
+		return nil
+	}
+
+	if !user.NotificationPreferences.Email {
+		fmt.Printf("[NOTIFICATION] Cancellation email blocked by user preferences for user %s\n", userEmail)
+		return nil
+	}
+
+	fmt.Printf("[NOTIFICATION] Sending car booking cancellation email to %s for booking %s\n", userEmail, bookingID)
+	return nh.emailService.SendCarBookingCancellation(
+		userEmail,
+		userName,
+		bookingID,
+		carType,
+		pickupLocation,
+		pickupDate,
+		pickupTime,
+		totalPrice,
+	)
+}
+
+// SendFlightBookingCancellation sends a flight booking cancellation email with preference checking
+func (nh *NotificationHelper) SendFlightBookingCancellation(
+	ctx context.Context,
+	userEmail string,
+	userName string,
+	bookingID string,
+	airlineName string,
+	flightNumber string,
+	departureAirport string,
+	arrivalAirport string,
+	departureDate string,
+	departureTime string,
+	totalPrice float64,
+) error {
+	fmt.Printf("[NOTIFICATION] ====== Starting SendFlightBookingCancellation ======\n")
+	fmt.Printf("[NOTIFICATION] Email: %s, BookingID: %s\n", userEmail, bookingID)
+
+	user, err := nh.userRepo.FindByEmail(ctx, userEmail)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: User with email %s not found, skipping cancellation email: %v\n", userEmail, err)
+		return nil
+	}
+
+	adminPrefs, err := nh.adminNotificationPrefsRepo.FindAll(ctx)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: Could not fetch admin preferences: %v\n", err)
+	}
+
+	adminAllowsEmail := false
+	if len(adminPrefs) > 0 {
+		for _, pref := range adminPrefs {
+			if pref.Bookings.BookingCancelled {
+				adminAllowsEmail = true
+				break
+			}
+		}
+	} else {
+		adminAllowsEmail = true
+	}
+
+	if !adminAllowsEmail {
+		fmt.Printf("[NOTIFICATION] Cancellation email blocked by admin preferences for booking %s\n", bookingID)
+		return nil
+	}
+
+	if !user.NotificationPreferences.Email {
+		fmt.Printf("[NOTIFICATION] Cancellation email blocked by user preferences for user %s\n", userEmail)
+		return nil
+	}
+
+	fmt.Printf("[NOTIFICATION] Sending flight booking cancellation email to %s for booking %s\n", userEmail, bookingID)
+	return nh.emailService.SendFlightBookingCancellation(
+		userEmail,
+		userName,
+		bookingID,
+		airlineName,
+		flightNumber,
+		departureAirport,
+		arrivalAirport,
+		departureDate,
+		departureTime,
+		totalPrice,
+	)
+}
+
+// SendHotelBookingCancellation sends a hotel booking cancellation email with preference checking
+func (nh *NotificationHelper) SendHotelBookingCancellation(
+	ctx context.Context,
+	userEmail string,
+	userName string,
+	bookingID string,
+	hotelName string,
+	checkInDate string,
+	nights int,
+	totalPrice float64,
+) error {
+	fmt.Printf("[NOTIFICATION] ====== Starting SendHotelBookingCancellation ======\n")
+	fmt.Printf("[NOTIFICATION] Email: %s, BookingID: %s\n", userEmail, bookingID)
+
+	user, err := nh.userRepo.FindByEmail(ctx, userEmail)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: User with email %s not found, skipping cancellation email: %v\n", userEmail, err)
+		return nil
+	}
+
+	adminPrefs, err := nh.adminNotificationPrefsRepo.FindAll(ctx)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: Could not fetch admin preferences: %v\n", err)
+	}
+
+	adminAllowsEmail := false
+	if len(adminPrefs) > 0 {
+		for _, pref := range adminPrefs {
+			if pref.Bookings.BookingCancelled {
+				adminAllowsEmail = true
+				break
+			}
+		}
+	} else {
+		adminAllowsEmail = true
+	}
+
+	if !adminAllowsEmail {
+		fmt.Printf("[NOTIFICATION] Cancellation email blocked by admin preferences for booking %s\n", bookingID)
+		return nil
+	}
+
+	if !user.NotificationPreferences.Email {
+		fmt.Printf("[NOTIFICATION] Cancellation email blocked by user preferences for user %s\n", userEmail)
+		return nil
+	}
+
+	fmt.Printf("[NOTIFICATION] Sending hotel booking cancellation email to %s for booking %s\n", userEmail, bookingID)
+	return nh.emailService.SendHotelBookingCancellation(
+		userEmail,
+		userName,
+		bookingID,
+		hotelName,
+		checkInDate,
+		nights,
+		totalPrice,
+	)
+}
+
+// SendTransferBookingCancellation sends a transfer booking cancellation email with preference checking
+func (nh *NotificationHelper) SendTransferBookingCancellation(
+	ctx context.Context,
+	userEmail string,
+	userName string,
+	bookingID string,
+	vehicleType string,
+	pickupLocation string,
+	pickupAddress string,
+	pickupDate string,
+	pickupTime string,
+	totalPrice float64,
+) error {
+	fmt.Printf("[NOTIFICATION] ====== Starting SendTransferBookingCancellation ======\n")
+	fmt.Printf("[NOTIFICATION] Email: %s, BookingID: %s\n", userEmail, bookingID)
+
+	user, err := nh.userRepo.FindByEmail(ctx, userEmail)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: User with email %s not found, skipping cancellation email: %v\n", userEmail, err)
+		return nil
+	}
+
+	adminPrefs, err := nh.adminNotificationPrefsRepo.FindAll(ctx)
+	if err != nil {
+		fmt.Printf("[NOTIFICATION] Warning: Could not fetch admin preferences: %v\n", err)
+	}
+
+	adminAllowsEmail := false
+	if len(adminPrefs) > 0 {
+		for _, pref := range adminPrefs {
+			if pref.Bookings.BookingCancelled {
+				adminAllowsEmail = true
+				break
+			}
+		}
+	} else {
+		adminAllowsEmail = true
+	}
+
+	if !adminAllowsEmail {
+		fmt.Printf("[NOTIFICATION] Cancellation email blocked by admin preferences for booking %s\n", bookingID)
+		return nil
+	}
+
+	if !user.NotificationPreferences.Email {
+		fmt.Printf("[NOTIFICATION] Cancellation email blocked by user preferences for user %s\n", userEmail)
+		return nil
+	}
+
+	fmt.Printf("[NOTIFICATION] Sending transfer booking cancellation email to %s for booking %s\n", userEmail, bookingID)
+	return nh.emailService.SendTransferBookingCancellation(
+		userEmail,
+		userName,
+		bookingID,
+		vehicleType,
+		pickupLocation,
+		pickupAddress,
+		pickupDate,
+		pickupTime,
+		totalPrice,
 	)
 }
