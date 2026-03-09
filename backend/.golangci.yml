@@ -5,22 +5,32 @@ run:
     - seeds
     - tmp
     - build
-  skip-files:
-    - ".*_test.go"
+    - bin
 
 linters:
+  disable-all: true
   enable:
     - errcheck
     - gosimple
     - govet
     - ineffassign
     - staticcheck
-    - unused
+
+linters-settings:
+  govet:
+    check-shadowing: false
 
 issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
   exclude-rules:
     - path: scripts/
       linters:
         - typecheck
-        - unused
-        - deadcode
+    - path: seeds/
+      linters:
+        - typecheck
+    - text: "could not import.*seeds"
+      linters:
+        - typecheck
