@@ -2,6 +2,9 @@ run:
   timeout: 5m
 
 issues:
+  exclude-files:
+    - "scripts/.*\\.go$"
+    - "seeds/.*\\.go$"
   exclude-dirs:
     - scripts
     - seeds
