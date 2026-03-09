@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -240,7 +241,7 @@ func (h *AppHandler) Signup(c *fiber.Ctx) error {
 
 	// Delete any existing OTPs for this user
 	if err := h.otpRepo.DeleteByUserAndType(ctx, user.ID, appmodels.OTPTypeEmail); err != nil {
-		// Log error but continue
+		log.Printf("Warning: failed to delete existing OTP: %v", err)
 	}
 
 	// Save OTP to database
@@ -344,8 +345,7 @@ func (h *AppHandler) Login(c *fiber.Ctx) error {
 
 	// Update last login
 	if err := h.userRepo.UpdateLastLogin(ctx, user.ID, time.Now()); err != nil {
-		// Log error but don't fail login
-		// log.Printf("Failed to update last login for user %s: %v", user.ID, err)
+		log.Printf("Warning: failed to update last login for user %s: %v", user.ID, err)
 	}
 
 	// Generate JWT token
@@ -445,7 +445,7 @@ func (h *AppHandler) SendOTP(c *fiber.Ctx) error {
 
 	// Delete any existing OTPs for this user and type
 	if err := h.otpRepo.DeleteByUserAndType(ctx, user.ID, otpType); err != nil {
-		// Log error but continue
+		log.Printf("Warning: failed to delete existing OTP: %v", err)
 	}
 
 	// Generate 6-digit OTP code

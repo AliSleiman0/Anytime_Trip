@@ -145,7 +145,7 @@ func (es *EmailService) SendOTPEmail(recipientEmail, code, purpose string) error
 		return nil
 	}
 
-	subject := fmt.Sprintf("Your verification code - Anytime Travel")
+	subject := "Your verification code - Anytime Travel"
 	body := fmt.Sprintf(`
 <!DOCTYPE html>
 <html>
@@ -1313,10 +1313,10 @@ func (es *EmailService) SendHotelBookingEmail(
 	// Build guest list HTML
 	guestsHTML := ""
 	if len(guestNames) > 0 {
-		guestsHTML = fmt.Sprintf(`
+		guestsHTML = `
         <div style="padding: 0 20px; border-bottom: 1px solid rgba(51, 104, 145, 0.31); padding-bottom: 13px;">
           <h2 style="font-size: 20px; font-weight: 700; color: #336891; margin: 13px 0;">Travelers</h2>
-          <div style="background: #FFFFFF; border-left: 2px solid #D24124; padding: 7px 0;">`)
+          <div style="background: #FFFFFF; border-left: 2px solid #D24124; padding: 7px 0;">`
 
 		for _, guest := range guestNames {
 			guestsHTML += fmt.Sprintf(`
@@ -1371,6 +1371,9 @@ func (es *EmailService) SendHotelBookingEmail(
     <div style="background: #336891; padding: 24px 24px 0;">
       <table width="100%%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 16px;">
         <tr>
+          <td width="60" style="width: 60px; vertical-align: middle; padding-right: 12px;">
+            <img src="https://anytimetravel.app/static/admin/images/main-logo.png" alt="Anytime Travel" style="width: 50px; height: 50px; display: block;" />
+          </td>
           <td style="vertical-align: middle;">
             <p style="margin: 0; font-size: 12px; color: rgba(255, 255, 255, 0.9);">ANYTIME TRAVEL & TOURISM</p>
             <h1 style="margin: 4px 0 0 0; font-size: 24px; font-weight: 700; color: #FFFFFF;">Booking Confirmed</h1>
@@ -1557,6 +1560,9 @@ func (es *EmailService) SendCarBookingEmail(
     <div style="background: #336891; padding: 24px 24px 0;">
       <table width="100%%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 16px;">
         <tr>
+          <td width="60" style="width: 60px; vertical-align: middle; padding-right: 12px;">
+            <img src="https://anytimetravel.app/static/admin/images/main-logo.png" alt="Anytime Travel" style="width: 50px; height: 50px; display: block;" />
+          </td>
           <td style="vertical-align: middle;">
             <p style="margin: 0; font-size: 12px; color: rgba(255, 255, 255, 0.9);">ANYTIME TRAVEL & TOURISM</p>
             <h1 style="margin: 4px 0 0 0; font-size: 24px; font-weight: 700; color: #FFFFFF;">Booking Confirmed</h1>
@@ -1783,6 +1789,9 @@ func (es *EmailService) SendTransferBookingEmail(
     <div style="background: #336891; padding: 24px 24px 0;">
       <table width="100%%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 16px;">
         <tr>
+          <td width="60" style="width: 60px; vertical-align: middle; padding-right: 12px;">
+            <img src="https://anytimetravel.app/static/admin/images/main-logo.png" alt="Anytime Travel" style="width: 50px; height: 50px; display: block;" />
+          </td>
           <td style="vertical-align: middle;">
             <p style="margin: 0; font-size: 12px; color: rgba(255, 255, 255, 0.9);">ANYTIME TRAVEL & TOURISM</p>
             <h1 style="margin: 4px 0 0 0; font-size: 24px; font-weight: 700; color: #FFFFFF;">Booking Confirmed</h1>
@@ -1971,7 +1980,8 @@ func (es *EmailService) SendCarBookingReminder(
 </head>
 <body>
   <div class="container">
-    <div class="header">
+    <div class="header" style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+      <img src="https://anytimetravel.app/static/admin/images/main-logo.png" alt="Anytime Travel" style="width: 50px; height: 50px; vertical-align: middle;" />
       <h1>🚗 Upcoming Car Rental</h1>
     </div>
     <div class="content">
@@ -2063,7 +2073,8 @@ func (es *EmailService) SendFlightBookingReminder(
 </head>
 <body>
   <div class="container">
-    <div class="header">
+    <div class="header" style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+      <img src="https://anytimetravel.app/static/admin/images/main-logo.png" alt="Anytime Travel" style="width: 50px; height: 50px; vertical-align: middle;" />
       <h1>✈️ Upcoming Flight</h1>
     </div>
     <div class="content">
@@ -2151,7 +2162,8 @@ func (es *EmailService) SendHotelBookingReminder(
 </head>
 <body>
   <div class="container">
-    <div class="header">
+    <div class="header" style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+      <img src="https://anytimetravel.app/static/admin/images/main-logo.png" alt="Anytime Travel" style="width: 50px; height: 50px; vertical-align: middle;" />
       <h1>🏨 Upcoming Hotel Stay</h1>
     </div>
     <div class="content">
@@ -2238,7 +2250,8 @@ func (es *EmailService) SendTransferBookingReminder(
 </head>
 <body>
   <div class="container">
-    <div class="header">
+    <div class="header" style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+      <img src="https://anytimetravel.app/static/admin/images/main-logo.png" alt="Anytime Travel" style="width: 50px; height: 50px; vertical-align: middle;" />
       <h1>🚖 Upcoming Transfer</h1>
     </div>
     <div class="content">
