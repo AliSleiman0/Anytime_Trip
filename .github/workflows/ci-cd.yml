@@ -1,7 +1,9 @@
-# GitHub Actions CI/CD for Anytime Trip
-# Handles Backend (Go) and Frontend (Admin & Superadmin)
+# Anytime Trip CI/CD Pipeline
+# Automated testing and integration pipeline for backend and frontend
+# Author: Saker
+# Last Updated: March 2026
 
-name: CI/CD Pipeline
+name: 🚀 Anytime Trip CI/CD
 
 # TRIGGERS: When should this workflow run?
 on:
@@ -32,7 +34,7 @@ jobs:
   # ── JOB 1: Backend (Go) ───────────────────────────────────────────────────
   backend:
     runs-on: ubuntu-latest
-    name: Backend Tests & Build
+    name: 🔧 Backend Tests & Build
     
     steps:
       - name: Checkout code
@@ -85,7 +87,7 @@ jobs:
   # ── JOB 2: Frontend Admin ─────────────────────────────────────────────────
   frontend-admin:
     runs-on: ubuntu-latest
-    name: Frontend Admin Build
+    name: 🎨 Frontend Admin Build
     
     steps:
       - name: Checkout code
@@ -116,7 +118,7 @@ jobs:
   # ── JOB 3: Frontend Superadmin ────────────────────────────────────────────
   frontend-superadmin:
     runs-on: ubuntu-latest
-    name: Frontend Superadmin Build
+    name: 👑 Frontend Superadmin Build
     
     steps:
       - name: Checkout code
@@ -136,7 +138,7 @@ jobs:
   # ── JOB 4: Security Scan ──────────────────────────────────────────────────
   security-scan:
     runs-on: ubuntu-latest
-    name: Security & Vulnerability Scan
+    name: 🔒 Security & Vulnerability Scan
     
     steps:
       - name: Checkout code
