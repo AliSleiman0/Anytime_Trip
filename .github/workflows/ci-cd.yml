@@ -67,8 +67,7 @@ jobs:
         working-directory: ./backend
         run: |
           go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-          # Only lint core application code, exclude utility scripts
-          golangci-lint run --skip-dirs scripts,seeds,tmp,build,bin ./...
+          golangci-lint run ./...
 
       - name: Build backend
         working-directory: ./backend
