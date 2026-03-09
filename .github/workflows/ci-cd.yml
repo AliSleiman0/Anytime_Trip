@@ -1,0 +1,344 @@
+# GitHub Actions CI/CD for Anytime Trip
+# Handles Backend (Go) and Frontend (Admin & Superadmin)
+
+name: CI/CD Pipeline
+
+# TRIGGERS: When should this workflow run?
+on:
+  push:
+    branches: [main, develop, staging]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      deploy_environment:
+        description: 'Environment to deploy to'
+        required: false
+        type: choice
+        options:
+          - staging
+          - production
+      deploy_branch:
+        description: 'Branch to deploy'
+        required: false
+
+# Repo-level permissions
+permissions:
+  contents: read
+
+# JOBS: Independent units of work
+jobs:
+
+  # ── JOB 1: Backend (Go) ───────────────────────────────────────────────────
+  backend:
+    runs-on: ubuntu-latest
+    name: Backend Tests & Build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache-dependency-path: backend/go.sum
+
+      - name: Download dependencies
+        working-directory: ./backend
+        run: go mod download
+
+      - name: Verify dependencies
+        working-directory: ./backend
+        run: go mod verify
+
+      - name: Run tests
+        working-directory: ./backend
+        run: go test -v ./...
+
+      - name: Run linter
+        working-directory: ./backend
+        run: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          golangci-lint run --timeout=5m
+
+      - name: Build backend
+        working-directory: ./backend
+        run: go build -v -o bin/server main.go
+
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-binary
+          path: backend/bin/server
+          retention-days: 7
+
+  # ── JOB 2: Frontend Admin ─────────────────────────────────────────────────
+  frontend-admin:
+    runs-on: ubuntu-latest
+    name: Frontend Admin Build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/admin/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend/admin
+        run: npm ci
+
+      - name: Build CSS
+        working-directory: ./frontend/admin
+        run: npm run build:css
+
+      - name: Upload admin build
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-dist
+          path: frontend/admin/dist/
+          retention-days: 7
+
+  # ── JOB 3: Frontend Superadmin ────────────────────────────────────────────
+  frontend-superadmin:
+    runs-on: ubuntu-latest
+    name: Frontend Superadmin Build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check structure
+        working-directory: ./frontend/superadmin
+        run: |
+          echo "Superadmin structure validated"
+          ls -la
+
+  # ── JOB 4: Security Scan ──────────────────────────────────────────────────
+  security-scan:
+    runs-on: ubuntu-latest
+    name: Security & Vulnerability Scan
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Go vulnerability check
+        working-directory: ./backend
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
+
+  # ── JOB 5: Deploy to Staging ──────────────────────────────────────────────
+  # COMMENTED OUT - No droplet/server infrastructure yet
+  # Uncomment when servers are ready
+  # deploy-staging:
+  #   if: github.ref == 'refs/heads/staging' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'staging')
+  #   needs: [backend, frontend-admin, frontend-superadmin]
+  #   runs-on: ubuntu-latest
+  #   name: Deploy to Staging
+  #   
+  #   environment:
+  #     name: staging
+  #     url: https://staging.anytimetrip.com
+  #   
+  #   env:
+  #     DEPLOY_BRANCH: ${{ github.event.inputs.deploy_branch || 'staging' }}
+  #   
+  #   steps:
+  #     - name: Download backend artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: backend-binary
+  #         path: ./artifacts/backend
+  #
+  #     - name: Download admin artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: admin-dist
+  #         path: ./artifacts/admin
+  #
+  #     - name: Deploy to Staging via SSH
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         host: ${{ secrets.STAGING_HOST }}
+  #         username: ${{ secrets.STAGING_USER }}
+  #         key: ${{ secrets.STAGING_SSH_KEY }}
+  #         port: ${{ secrets.STAGING_PORT || 22 }}
+  #         script: |
+  #           echo "🚀 Starting staging deployment..."
+  #           cd ~/anytime-trip
+  #           
+  #           # Pull latest code
+  #           git fetch --all
+  #           git checkout ${{ env.DEPLOY_BRANCH }}
+  #           git pull origin ${{ env.DEPLOY_BRANCH }}
+  #           
+  #           # Backend deployment
+  #           echo "📦 Deploying backend..."
+  #           cd backend
+  #           go build -o bin/server main.go
+  #           sudo systemctl restart anytime-backend
+  #           
+  #           # Frontend deployment
+  #           echo "🎨 Deploying frontend..."
+  #           cd ../frontend/admin
+  #           npm install
+  #           npm run build:css
+  #           
+  #           # Verify services
+  #           echo "✅ Verifying services..."
+  #           sudo systemctl status anytime-backend --no-pager
+  #           
+  #           echo "✨ Staging deployment complete!"
+
+  # ── JOB 6: Deploy to Production ───────────────────────────────────────────
+  # COMMENTED OUT - No droplet/server infrastructure yet
+  # Uncomment when servers are ready
+  # deploy-production:
+  #   if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'production')
+  #   needs: [backend, frontend-admin, frontend-superadmin, security-scan]
+  #   runs-on: ubuntu-latest
+  #   name: Deploy to Production
+  #   
+  #   environment:
+  #     name: production
+  #     url: https://anytimetrip.com
+  #   
+  #   env:
+  #     DEPLOY_BRANCH: ${{ github.event.inputs.deploy_branch || 'main' }}
+  #   
+  #   steps:
+  #     - name: Download backend artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: backend-binary
+  #         path: ./artifacts/backend
+  #
+  #     - name: Download admin artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: admin-dist
+  #         path: ./artifacts/admin
+  #
+  #     - name: Create deployment backup
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         host: ${{ secrets.PRODUCTION_HOST }}
+  #         username: ${{ secrets.PRODUCTION_USER }}
+  #         key: ${{ secrets.PRODUCTION_SSH_KEY }}
+  #         port: ${{ secrets.PRODUCTION_PORT || 22 }}
+  #         script: |
+  #           echo "💾 Creating backup..."
+  #           cd ~/anytime-trip
+  #           tar -czf ~/backups/anytime-trip-$(date +%Y%m%d-%H%M%S).tar.gz .
+  #           
+  #           # Keep only last 5 backups
+  #           cd ~/backups
+  #           ls -t anytime-trip-*.tar.gz | tail -n +6 | xargs -r rm
+  #
+  #     - name: Deploy to Production via SSH
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         host: ${{ secrets.PRODUCTION_HOST }}
+  #         username: ${{ secrets.PRODUCTION_USER }}
+  #         key: ${{ secrets.PRODUCTION_SSH_KEY }}
+  #         port: ${{ secrets.PRODUCTION_PORT || 22 }}
+  #         script: |
+  #           echo "🚀 Starting production deployment..."
+  #           cd ~/anytime-trip
+  #           
+  #           # Pull latest code
+  #           git fetch --all --prune
+  #           git checkout ${{ env.DEPLOY_BRANCH }}
+  #           git pull origin ${{ env.DEPLOY_BRANCH }}
+  #           
+  #           # Backend deployment
+  #           echo "📦 Deploying backend..."
+  #           cd backend
+  #           go build -o bin/server main.go
+  #           sudo systemctl restart anytime-backend
+  #           
+  #           # Frontend deployment
+  #           echo "🎨 Deploying frontend..."
+  #           cd ../frontend/admin
+  #           npm install
+  #           npm run build:css
+  #           
+  #           # Verify services
+  #           echo "✅ Verifying services..."
+  #           sudo systemctl status anytime-backend --no-pager
+  #           
+  #           # Log deployment
+  #           echo "$(date): Deployed commit ${{ github.sha }}" >> ~/deployment.log
+  #           
+  #           echo "✨ Production deployment complete!"
+  #
+  #     - name: Verify deployment
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         host: ${{ secrets.PRODUCTION_HOST }}
+  #         username: ${{ secrets.PRODUCTION_USER }}
+  #         key: ${{ secrets.PRODUCTION_SSH_KEY }}
+  #         port: ${{ secrets.PRODUCTION_PORT || 22 }}
+  #         script: |
+  #           # Health check
+  #           sleep 5
+  #           curl -f http://localhost:8080/health || exit 1
+  #           echo "✅ Health check passed!"
+
+  # ── JOB 7: Rollback Production (Manual) ───────────────────────────────────
+  # COMMENTED OUT - No droplet/server infrastructure yet
+  # Uncomment when servers are ready
+  # rollback-production:
+  #   if: github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'rollback'
+  #   runs-on: ubuntu-latest
+  #   name: Rollback Production
+  #   
+  #   environment:
+  #     name: production
+  #   
+  #   steps:
+  #     - name: Rollback Production
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         host: ${{ secrets.PRODUCTION_HOST }}
+  #         username: ${{ secrets.PRODUCTION_USER }}
+  #         key: ${{ secrets.PRODUCTION_SSH_KEY }}
+  #         port: ${{ secrets.PRODUCTION_PORT || 22 }}
+  #         script: |
+  #           echo "⏮️  Starting rollback..."
+  #           cd ~/anytime-trip
+  #           
+  #           # Restore from latest backup
+  #           LATEST_BACKUP=$(ls -t ~/backups/anytime-trip-*.tar.gz | head -1)
+  #           if [ -z "$LATEST_BACKUP" ]; then
+  #             echo "❌ No backup found!"
+  #             exit 1
+  #           fi
+  #           
+  #           echo "Restoring from: $LATEST_BACKUP"
+  #           tar -xzf "$LATEST_BACKUP" -C ~/anytime-trip
+  #           
+  #           # Restart services
+  #           sudo systemctl restart anytime-backend
+  #           
+  #           echo "✅ Rollback complete!"
