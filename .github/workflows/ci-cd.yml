@@ -56,15 +56,18 @@ jobs:
         working-directory: ./backend
         run: |
           # Exclude scripts folder which has multiple main functions
-          go test -v $(go list ./... | grep -v /scripts) || echo "No tests found or tests skipped"
-        continue-on-error: true
+          TEST_PKGS=$(go list ./... | grep -v /scripts)
+          if [ -z "$TEST_PKGS" ]; then
+            echo "No test files found, skipping tests"
+            exit 0
+          fi
+          go test -v $TEST_PKGS
 
       - name: Run linter
         working-directory: ./backend
         run: |
           go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-          golangci-lint run --timeout=5m
-        continue-on-error: true
+          golangci-lint run
 
       - name: Build backend
         working-directory: ./backend
@@ -150,8 +153,8 @@ jobs:
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
           export PATH=$PATH:$(go env GOPATH)/bin
-          govulncheck $(go list ./... | grep -v /scripts) || echo "Vulnerability check skipped"
-        continue-on-error: true
+          VULN_PKGS=$(go list ./... | grep -v /scripts)
+          govulncheck $VULN_PKGS || true
 
   # ── JOB 5: Deploy to Staging ──────────────────────────────────────────────
   # COMMENTED OUT - No droplet/server infrastructure yet
