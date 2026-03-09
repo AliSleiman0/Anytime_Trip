@@ -6,7 +6,7 @@ name: CI/CD Pipeline
 # TRIGGERS: When should this workflow run?
 on:
   push:
-    branches: [main, develop, staging]
+    branches: [main, develop, staging, ci-cd-saker]
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
