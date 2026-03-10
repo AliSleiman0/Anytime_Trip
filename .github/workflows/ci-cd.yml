@@ -28,6 +28,7 @@ on:
 # Repo-level permissions
 permissions:
   contents: read
+  id-token: write
 
 # JOBS: Independent units of work
 jobs:
@@ -196,6 +197,7 @@ jobs:
           password: ${{ secrets.DEPLOY_PASSWORD }}
           port: 22
           script: |
+            export PATH=$PATH:/usr/local/go/bin
             echo "🚀 Starting staging deployment..."
             mkdir -p ~/anytime-trip-staging
             cd ~/anytime-trip-staging
@@ -206,15 +208,30 @@ jobs:
               git checkout ${{ env.DEPLOY_BRANCH }}
               git pull origin ${{ env.DEPLOY_BRANCH }}
             else
-              git clone https://github.com/${{ github.repository }} . 
+              git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} .
               git checkout ${{ env.DEPLOY_BRANCH }}
             fi
+
+            # Write .env file
+            echo "🔑 Writing .env file..."
+            cat > backend/.env << 'ENVEOF'
+            PORT=${{ secrets.APP_PORT }}
+            MONGO_URI=${{ secrets.MONGO_URI }}
+            MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            ENVIRONMENT=staging
+            SMTP_HOST=${{ secrets.SMTP_HOST }}
+            SMTP_PORT=${{ secrets.SMTP_PORT }}
+            SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}
+            SENDER_EMAIL=${{ secrets.SENDER_EMAIL }}
+            SENDER_PASSWORD=${{ secrets.SENDER_PASSWORD }}
+            ENVEOF
 
             # Backend deployment
             echo "📦 Deploying backend..."
             cd backend
             go build -o bin/server main.go
-            sudo systemctl restart anytime-backend-staging || true
+            sudo systemctl restart anytime-backend-staging
 
             # Frontend deployment
             echo "🎨 Deploying frontend..."
@@ -224,7 +241,7 @@ jobs:
 
             # Verify services
             echo "✅ Verifying services..."
-            sudo systemctl status anytime-backend-staging --no-pager || true
+            sudo systemctl status anytime-backend-staging --no-pager
 
             echo "✨ Staging deployment complete!"
 
@@ -280,6 +297,7 @@ jobs:
           password: ${{ secrets.DEPLOY_PASSWORD }}
           port: 22
           script: |
+            export PATH=$PATH:/usr/local/go/bin
             echo "🚀 Starting production deployment..."
             mkdir -p ~/anytime-trip
             cd ~/anytime-trip
@@ -290,9 +308,24 @@ jobs:
               git checkout ${{ env.DEPLOY_BRANCH }}
               git pull origin ${{ env.DEPLOY_BRANCH }}
             else
-              git clone https://github.com/${{ github.repository }} .
+              git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} .
               git checkout ${{ env.DEPLOY_BRANCH }}
             fi
+
+            # Write .env file
+            echo "🔑 Writing .env file..."
+            cat > backend/.env << 'ENVEOF'
+            PORT=${{ secrets.APP_PORT }}
+            MONGO_URI=${{ secrets.MONGO_URI }}
+            MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            ENVIRONMENT=production
+            SMTP_HOST=${{ secrets.SMTP_HOST }}
+            SMTP_PORT=${{ secrets.SMTP_PORT }}
+            SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}
+            SENDER_EMAIL=${{ secrets.SENDER_EMAIL }}
+            SENDER_PASSWORD=${{ secrets.SENDER_PASSWORD }}
+            ENVEOF
 
             # Backend deployment
             echo "📦 Deploying backend..."
@@ -308,7 +341,7 @@ jobs:
 
             # Verify services
             echo "✅ Verifying services..."
-            sudo systemctl status anytime-backend --no-pager || true
+            sudo systemctl status anytime-backend --no-pager
 
             # Log deployment
             echo "$(date): Deployed commit ${{ github.sha }}" >> ~/deployment.log
