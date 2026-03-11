@@ -223,6 +223,7 @@ func (r *FlightBookingRepository) UpdateRefundRequested(ctx context.Context, id 
 	update := bson.M{
 		"$set": bson.M{
 			"refund_requested": requested,
+			"status":           "review cancellation",
 			"updated_at":       time.Now(),
 		},
 	}

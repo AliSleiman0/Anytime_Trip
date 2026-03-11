@@ -251,12 +251,12 @@ jobs:
             echo "🔧 Setting up Nginx reverse proxy..."
             cd backend/scripts
             chmod +x setup_nginx.sh
-            sudo ./setup_nginx.sh anytimetrip.online ${{ secrets.APP_PORT }} || echo "Nginx already configured"
+            sudo ./setup_nginx.sh anytimetravel.app ${{ secrets.APP_PORT }} || echo "Nginx already configured"
             
             # Setup SSL/HTTPS with Let's Encrypt
             echo "🔒 Setting up SSL/HTTPS..."
             chmod +x setup_ssl.sh
-            sudo ./setup_ssl.sh anytimetrip.online ${{ secrets.ADMIN_EMAIL }} || echo "SSL already configured"
+            sudo ./setup_ssl.sh anytimetravel.app elias.s.sakr10@gmail.com || echo "SSL already configured"
             cd ../..
 
             # Backend deployment

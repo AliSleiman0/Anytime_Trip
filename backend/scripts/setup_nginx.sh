@@ -13,7 +13,7 @@ if ! command -v nginx &> /dev/null; then
 fi
 
 # Get the domain from argument or use default
-DOMAIN=${1:-"anytimetrip.online"}
+DOMAIN=${1:-"anytimetravel.app"}
 BACKEND_PORT=${2:-"8080"}
 
 echo "🌐 Configuring Nginx for domain: $DOMAIN"

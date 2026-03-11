@@ -3,8 +3,8 @@
 
 set -e
 
-DOMAIN=${1:-"anytimetrip.online"}
-EMAIL=${2:-"admin@anytimetrip.online"}
+DOMAIN=${1:-"anytimetravel.app"}
+EMAIL=${2:-"admin@anytimetravel.app"}
 
 echo "🔒 Setting up SSL/HTTPS with Let's Encrypt..."
 echo "🌐 Domain: $DOMAIN"

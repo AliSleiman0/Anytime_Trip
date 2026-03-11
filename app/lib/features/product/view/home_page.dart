@@ -258,8 +258,16 @@ class _HomePageState extends State<HomePage>
         appBar: AppBar(
           backgroundColor: const Color(0xFF1e5a8e),
           elevation: 0,
-          leadingWidth: 0,
-          leading: const SizedBox.shrink(),
+          leadingWidth: 60,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: Image.asset(
+              'assets/images/main-logo.png',
+              width: 40,
+              height: 40,
+              fit: BoxFit.contain,
+            ),
+          ),
           titleSpacing: 0,
           actions: [
             Expanded(

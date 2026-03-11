@@ -211,6 +211,7 @@ func (r *TransferBookingRepository) UpdateRefundRequested(ctx context.Context, i
 	update := bson.M{
 		"$set": bson.M{
 			"refund_requested": requested,
+			"status":           "review cancellation",
 			"updated_at":       time.Now(),
 		},
 	}
