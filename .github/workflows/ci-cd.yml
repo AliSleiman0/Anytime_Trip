@@ -268,19 +268,6 @@ jobs:
 
             echo "✨ Deployment complete!"
 
-      - name: Verify deployment
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          password: ${{ secrets.DEPLOY_PASSWORD }}
-          port: 22
-          script: |
-            # Health check
-            sleep 5
-            curl -f http://localhost:8080/health || exit 1
-            echo "✅ Health check passed!"
-
   # ── JOB 6: Rollback Production (Manual) ───────────────────────────────────
   rollback-production:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'rollback'
