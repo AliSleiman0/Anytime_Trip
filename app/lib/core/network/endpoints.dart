@@ -1,7 +1,6 @@
 class Endpoints {
-  // Base URL - Use 10.0.2.2 for Android Emulator, localhost for iOS Simulator
-  // For physical device, use your computer's IP address (e.g., 192.168.1.x)
-  static const String baseUrl = 'http://10.0.2.2:8080/api';
+  // Base URL - Production server
+  static const String baseUrl = 'https://www.anytimetravel.app/api';
 
   // Auth endpoints
   static const String login = '/app/login';
