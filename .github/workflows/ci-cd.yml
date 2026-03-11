@@ -252,6 +252,11 @@ jobs:
             cd backend/scripts
             chmod +x setup_nginx.sh
             sudo ./setup_nginx.sh anytimetrip.online ${{ secrets.APP_PORT }} || echo "Nginx already configured"
+            
+            # Setup SSL/HTTPS with Let's Encrypt
+            echo "🔒 Setting up SSL/HTTPS..."
+            chmod +x setup_ssl.sh
+            sudo ./setup_ssl.sh anytimetrip.online ${{ secrets.ADMIN_EMAIL }} || echo "SSL already configured"
             cd ../..
 
             # Backend deployment
