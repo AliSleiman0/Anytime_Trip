@@ -8,7 +8,7 @@ name: CI/CD-Saker
 # TRIGGERS: When should this workflow run?
 on:
   push:
-    branches: [main, develop, staging, ci-cd-saker]
+    branches: [main, develop, ci-cd-saker]
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
@@ -18,7 +18,6 @@ on:
         required: false
         type: choice
         options:
-          - staging
           - production
           - rollback
       deploy_branch:
@@ -35,6 +34,7 @@ jobs:
 
   # ── JOB 1: Backend (Go) ───────────────────────────────────────────────────
   backend:
+    if: github.event.inputs.deploy_environment != 'rollback'
     runs-on: ubuntu-latest
     name: Backend Tests & Build
     
@@ -88,6 +88,7 @@ jobs:
 
   # ── JOB 2: Frontend Admin ─────────────────────────────────────────────────
   frontend-admin:
+    if: github.event.inputs.deploy_environment != 'rollback'
     runs-on: ubuntu-latest
     name: Frontend Admin Build
     
@@ -119,6 +120,7 @@ jobs:
 
   # ── JOB 3: Frontend Superadmin ────────────────────────────────────────────
   frontend-superadmin:
+    if: github.event.inputs.deploy_environment != 'rollback'
     runs-on: ubuntu-latest
     name: Frontend Superadmin Build
     
@@ -139,6 +141,7 @@ jobs:
 
   # ── JOB 4: Security Scan ──────────────────────────────────────────────────
   security-scan:
+    if: github.event.inputs.deploy_environment != 'rollback'
     runs-on: ubuntu-latest
     name: Security & Vulnerability Scan
     
@@ -162,92 +165,9 @@ jobs:
           VULN_PKGS=$(go list ./... | grep -v /scripts)
           govulncheck $VULN_PKGS || true
 
-  # ── JOB 5: Deploy to Staging ──────────────────────────────────────────────
-  deploy-staging:
-    if: github.ref == 'refs/heads/staging' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'staging')
-    needs: [backend, frontend-admin, frontend-superadmin]
-    runs-on: ubuntu-latest
-    name: Deploy to Staging
-
-    environment:
-      name: staging
-      url: http://104.248.138.150:8080
-
-    env:
-      DEPLOY_BRANCH: ${{ github.event.inputs.deploy_branch || 'staging' }}
-
-    steps:
-      - name: Download backend artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-binary
-          path: ./artifacts/backend
-
-      - name: Download admin artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: admin-dist
-          path: ./artifacts/admin
-
-      - name: Deploy to Staging via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          password: ${{ secrets.DEPLOY_PASSWORD }}
-          port: 22
-          script: |
-            export PATH=$PATH:/usr/local/go/bin
-            echo "🚀 Starting staging deployment..."
-            mkdir -p ~/anytime-trip-staging
-            cd ~/anytime-trip-staging
-
-            # Pull latest code (or clone if first time)
-            if [ -d ".git" ]; then
-              git fetch --all
-              git checkout ${{ env.DEPLOY_BRANCH }}
-              git pull origin ${{ env.DEPLOY_BRANCH }}
-            else
-              git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} .
-              git checkout ${{ env.DEPLOY_BRANCH }}
-            fi
-
-            # Write .env file
-            echo "🔑 Writing .env file..."
-            cat > backend/.env << 'ENVEOF'
-            PORT=${{ secrets.APP_PORT }}
-            MONGO_URI=${{ secrets.MONGO_URI }}
-            MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            ENVIRONMENT=staging
-            SMTP_HOST=${{ secrets.SMTP_HOST }}
-            SMTP_PORT=${{ secrets.SMTP_PORT }}
-            SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}
-            SENDER_EMAIL=${{ secrets.SENDER_EMAIL }}
-            SENDER_PASSWORD=${{ secrets.SENDER_PASSWORD }}
-            ENVEOF
-
-            # Backend deployment
-            echo "📦 Deploying backend..."
-            cd backend
-            go build -o bin/server main.go
-            sudo systemctl restart anytime-backend-staging
-
-            # Frontend deployment
-            echo "🎨 Deploying frontend..."
-            cd ../frontend/admin
-            npm install
-            npm run build:css
-
-            # Verify services
-            echo "✅ Verifying services..."
-            sudo systemctl status anytime-backend-staging --no-pager
-
-            echo "✨ Staging deployment complete!"
-
-  # ── JOB 6: Deploy to Production ───────────────────────────────────────────
+  # ── JOB 5: Deploy to Production ───────────────────────────────────────────
   deploy-production:
-    if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'production')
+    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'production')
     needs: [backend, frontend-admin, frontend-superadmin, security-scan]
     runs-on: ubuntu-latest
     name: Deploy to Production
@@ -361,7 +281,7 @@ jobs:
             curl -f http://localhost:8080/health || exit 1
             echo "✅ Health check passed!"
 
-  # ── JOB 7: Rollback Production (Manual) ───────────────────────────────────
+  # ── JOB 6: Rollback Production (Manual) ───────────────────────────────────
   rollback-production:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'rollback'
     runs-on: ubuntu-latest
