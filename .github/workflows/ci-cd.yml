@@ -8,7 +8,7 @@ name: CI/CD-Saker
 # TRIGGERS: When should this workflow run?
 on:
   push:
-    branches: [main, develop, ci-cd-saker]
+    branches: [main, develop, staging, ci-cd-saker]
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
@@ -165,19 +165,19 @@ jobs:
           VULN_PKGS=$(go list ./... | grep -v /scripts)
           govulncheck $VULN_PKGS || true
 
-  # ── JOB 5: Deploy to Production ───────────────────────────────────────────
-  deploy-production:
-    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'production')
-    needs: [backend, frontend-admin, frontend-superadmin, security-scan]
+  # ── JOB 5: Deployment ─────────────────────────────────────────────────────
+  deployment:
+    if: github.ref == 'refs/heads/staging'
+    needs: [backend, frontend-admin, frontend-superadmin]
     runs-on: ubuntu-latest
-    name: Deploy to Production
+    name: Deployment
 
     environment:
       name: production
       url: http://104.248.138.150:8080
 
     env:
-      DEPLOY_BRANCH: ${{ github.event.inputs.deploy_branch || 'main' }}
+      DEPLOY_BRANCH: staging
 
     steps:
       - name: Download backend artifact
@@ -209,7 +209,7 @@ jobs:
             cd ~/backups
             ls -t anytime-trip-*.tar.gz 2>/dev/null | tail -n +6 | xargs -r rm
 
-      - name: Deploy to Production via SSH
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -218,7 +218,7 @@ jobs:
           port: 22
           script: |
             export PATH=$PATH:/usr/local/go/bin
-            echo "🚀 Starting production deployment..."
+            echo "🚀 Starting deployment..."
             mkdir -p ~/anytime-trip
             cd ~/anytime-trip
 
@@ -239,7 +239,7 @@ jobs:
             MONGO_URI=${{ secrets.MONGO_URI }}
             MONGO_DB_NAME=${{ secrets.MONGO_DB_NAME }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
-            ENVIRONMENT=production
+            ENVIRONMENT=staging
             SMTP_HOST=${{ secrets.SMTP_HOST }}
             SMTP_PORT=${{ secrets.SMTP_PORT }}
             SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}
@@ -251,7 +251,7 @@ jobs:
             echo "📦 Deploying backend..."
             cd backend
             go build -o bin/server main.go
-            sudo systemctl restart anytime-backend
+            sudo systemctl restart anytime-backend-staging
 
             # Frontend deployment
             echo "🎨 Deploying frontend..."
@@ -261,12 +261,12 @@ jobs:
 
             # Verify services
             echo "✅ Verifying services..."
-            sudo systemctl status anytime-backend --no-pager
+            sudo systemctl status anytime-backend-staging --no-pager
 
             # Log deployment
             echo "$(date): Deployed commit ${{ github.sha }}" >> ~/deployment.log
 
-            echo "✨ Production deployment complete!"
+            echo "✨ Deployment complete!"
 
       - name: Verify deployment
         uses: appleboy/ssh-action@v1.0.3
