@@ -247,6 +247,13 @@ jobs:
             SENDER_PASSWORD=${{ secrets.SENDER_PASSWORD }}
             ENVEOF
 
+            # Setup Nginx reverse proxy (only once, idempotent)
+            echo "🔧 Setting up Nginx reverse proxy..."
+            cd backend/scripts
+            chmod +x setup_nginx.sh
+            sudo ./setup_nginx.sh anytimetrip.online ${{ secrets.APP_PORT }} || echo "Nginx already configured"
+            cd ../..
+
             # Backend deployment
             echo "📦 Deploying backend..."
             cd backend
@@ -262,6 +269,7 @@ jobs:
             # Verify services
             echo "✅ Verifying services..."
             sudo systemctl status anytime-backend-staging --no-pager
+            sudo systemctl status nginx --no-pager
 
             # Log deployment
             echo "$(date): Deployed commit ${{ github.sha }}" >> ~/deployment.log
