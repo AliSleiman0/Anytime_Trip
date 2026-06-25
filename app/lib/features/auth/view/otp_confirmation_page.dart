@@ -87,30 +87,25 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
   }
 
   void _resendOtp() {
-    if (userPhone.isEmpty) {
-      Helpers.showSnackbar('Error', 'Phone number is missing', isError: true);
+    if (userEmail.isEmpty) {
+      Helpers.showSnackbar('Error', 'Email is missing', isError: true);
       return;
     }
-    
+
     // Clear existing OTP inputs
     setState(() {
       otpDigits = ['', '', '', ''];
     });
-    
-    // Send new OTP
-    authController.sendOTP('', userPhone, 'phone');
+
+    // Send new OTP via email
+    authController.sendOTP(userEmail, '', 'email');
   }
 
   Future<void> _confirmOtp() async {
     String otp = otpDigits.join();
-    
+
     if (otp.length < 4) {
       Helpers.showSnackbar('Invalid OTP', 'Please enter the 4-digit code', isError: true);
-      return;
-    }
-
-    if (userPhone.isEmpty) {
-      Helpers.showSnackbar('Error', 'Phone number is missing', isError: true);
       return;
     }
 
@@ -119,10 +114,10 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
       return;
     }
 
-    print('DEBUG [_confirmOtp]: Verifying OTP - phone=$userPhone, code=$otp');
+    print('DEBUG [_confirmOtp]: Verifying OTP - email=$userEmail, code=$otp');
 
-    // Verify OTP
-    final verified = await authController.verifyOTP('', userPhone, otp, 'phone');
+    // Verify OTP via email
+    final verified = await authController.verifyOTP(userEmail, '', otp, 'email');
     
     if (verified) {
       // Activate account
@@ -210,7 +205,7 @@ class _OtpConfirmationPageState extends State<OtpConfirmationPage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Enter the 4-digit code sent to\n$userPhone',
+                        'Enter the 4-digit code sent to\n$userEmail',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 14,

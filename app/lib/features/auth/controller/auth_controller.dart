@@ -101,7 +101,7 @@ class AuthController extends GetxController {
       print('DEBUG Register: Stored email=$email, phone=$phoneNumber');
       print('DEBUG Register: userEmail.value=${userEmail.value}, userPhone.value=${userPhone.value}');
       
-      Helpers.showSnackbar('Account Created', 'Please verify your phone number', isError: false);
+      Helpers.showSnackbar('Account Created', 'Please verify your email', isError: false);
       // Navigate to OTP confirmation page for signup verification
       Get.offAllNamed(AppRoutes.OTP_CONFIRMATION, arguments: {
         'email': email,
@@ -131,10 +131,9 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
       final response = await _authApi.sendOTP(email, phone, type);
-      
-      // OTP will be sent to phone via SMS
-      print('DEBUG: OTP sent to phone');
-      Helpers.showSnackbar('OTP Sent', 'Check your phone for verification code', isError: false);
+
+      final destination = type == 'email' ? 'email' : 'phone';
+      Helpers.showSnackbar('OTP Sent', 'Check your $destination for the verification code', isError: false);
     } catch (e) {
       Helpers.showSnackbar('Error', e.toString(), isError: true);
     } finally {
@@ -146,7 +145,7 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
       final response = await _authApi.verifyOTP(email, phone, code, type);
-      Helpers.showSnackbar('Verified', 'Phone number verified successfully', isError: false);
+      Helpers.showSnackbar('Verified', 'Account verified successfully', isError: false);
       return true;
     } catch (e) {
       Helpers.showSnackbar('Error', e.toString(), isError: true);

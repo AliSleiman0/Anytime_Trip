@@ -179,21 +179,21 @@ func (h *AppHandler) Signup(c *fiber.Ctx) error {
 		})
 	}
 
-	// Generate and send OTP to phone (4 digits for signup)
+	// Generate and send OTP to email (4 digits for signup)
 	code := utils.GenerateOTP(4)
 	otp := &appmodels.OTP{
 		ID:        uuid.New().String(),
 		UserID:    user.ID,
-		Phone:     user.PhoneNumber,
+		Email:     user.Email,
 		Code:      code,
-		Type:      appmodels.OTPTypePhone,
+		Type:      appmodels.OTPTypeEmail,
 		Verified:  false,
 		ExpiresAt: time.Now().Add(10 * time.Minute),
 		CreatedAt: time.Now(),
 	}
 
 	// Delete any existing OTPs for this user
-	if err := h.otpRepo.DeleteByUserAndType(ctx, user.ID, appmodels.OTPTypePhone); err != nil {
+	if err := h.otpRepo.DeleteByUserAndType(ctx, user.ID, appmodels.OTPTypeEmail); err != nil {
 		// Log error but continue
 	}
 
@@ -204,8 +204,10 @@ func (h *AppHandler) Signup(c *fiber.Ctx) error {
 		})
 	}
 
-	// Send OTP via SMS
-	utils.SendSMSOTP(user.PhoneNumber, code)
+	// Send OTP via email. Log on failure but don't fail signup — the user can resend.
+	if err := utils.SendEmailOTP(user.Email, code); err != nil {
+		fmt.Printf("[Signup] Failed to send OTP email to %s: %v\n", user.Email, err)
+	}
 
 	// Generate JWT token
 	token, err := h.generateToken(user)
@@ -216,7 +218,7 @@ func (h *AppHandler) Signup(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message": "User registered successfully. OTP sent to phone.",
+		"message": "User registered successfully. OTP sent to email.",
 		"token":   token,
 		"user": fiber.Map{
 			"id":           user.ID,
@@ -420,8 +422,16 @@ func (h *AppHandler) SendOTP(c *fiber.Ctx) error {
 		})
 	}
 
-	// TODO: Send OTP via email or SMS
-	// For now, we'll just return success (in production, integrate with email/SMS service)
+	// Dispatch via the matching channel. Failures are logged so the client can retry.
+	if otpType == appmodels.OTPTypeEmail {
+		if err := utils.SendEmailOTP(identifier, code); err != nil {
+			fmt.Printf("[SendOTP] Failed to send email to %s: %v\n", identifier, err)
+		}
+	} else {
+		if err := utils.SendSMSOTP(identifier, code); err != nil {
+			fmt.Printf("[SendOTP] Failed to send SMS to %s: %v\n", identifier, err)
+		}
+	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "OTP sent successfully",
