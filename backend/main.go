@@ -67,6 +67,9 @@ func main() {
 	if err := ensureDefaultAdmin(adminRepository); err != nil {
 		log.Printf("warning: unable to seed default admin user: %v", err)
 	}
+	if err := ensureDefaultSuperAdmin(adminRepository); err != nil {
+		log.Printf("warning: unable to seed default super admin user: %v", err)
+	}
 
 	// Initialize WebSocket hub
 	chatHub := ws.NewHub()
@@ -155,6 +158,33 @@ func ensureDefaultAdmin(repo *adminrepo.AdminRepository) error {
 	}
 
 	return repo.Create(ctx, adminUser)
+}
+
+// ensureDefaultSuperAdmin creates a default super admin user if none exists.
+func ensureDefaultSuperAdmin(repo *adminrepo.AdminRepository) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if _, err := repo.FindByEmail(ctx, "superadmin@travel.app"); err == nil {
+		return nil // already exists
+	}
+
+	hashed, err := utils.HashPassword("superadmin123")
+	if err != nil {
+		return err
+	}
+
+	superAdminUser := &adminmodels.AdminUser{
+		ID:          2,
+		Username:    "superadmin",
+		Password:    hashed,
+		Email:       "superadmin@travel.app", // stored lowercase
+		Role:        "superadmin",
+		Permissions: []string{"all"},
+		CreatedAt:   time.Now(),
+	}
+
+	return repo.Create(ctx, superAdminUser)
 }
 
 // getAllowedOrigins returns CORS allowed origins based on environment.
