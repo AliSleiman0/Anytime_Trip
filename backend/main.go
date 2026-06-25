@@ -14,6 +14,7 @@ import (
 	superadminhandlers "travel/backend/internal/handlers/superadmin"
 	"travel/backend/internal/middleware"
 	adminmodels "travel/backend/internal/models/admin"
+	appmodels "travel/backend/internal/models/app"
 	adminrepo "travel/backend/internal/repository/admin"
 	apprepo "travel/backend/internal/repository/app"
 	superadminrepo "travel/backend/internal/repository/superadmin"
@@ -69,6 +70,9 @@ func main() {
 	}
 	if err := ensureDefaultSuperAdmin(adminRepository); err != nil {
 		log.Printf("warning: unable to seed default super admin user: %v", err)
+	}
+	if err := ensureDefaultAppUsers(appRepository); err != nil {
+		log.Printf("warning: unable to seed default app users: %v", err)
 	}
 
 	// Initialize WebSocket hub
@@ -185,6 +189,55 @@ func ensureDefaultSuperAdmin(repo *adminrepo.AdminRepository) error {
 	}
 
 	return repo.Create(ctx, superAdminUser)
+}
+
+// ensureDefaultAppUsers creates a small set of dummy mobile-app users for
+// local/staging testing. Each user is created with IsActive=true so login
+// works without going through the OTP activation flow. Idempotent: skips
+// any user whose email already exists.
+func ensureDefaultAppUsers(repo *apprepo.UserRepository) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	seeds := []struct {
+		id, name, email, phone, password, sex, country string
+	}{
+		{"seed_user_1", "Demo User", "user@travel.app", "+10000000001", "user1234", "Male", "Lebanon"},
+		{"seed_user_2", "Jane Tester", "jane@travel.app", "+10000000002", "jane1234", "Female", "Lebanon"},
+		{"seed_user_3", "John Tester", "john@travel.app", "+10000000003", "john1234", "Male", "United States"},
+	}
+
+	for _, s := range seeds {
+		if _, err := repo.FindByEmail(ctx, s.email); err == nil {
+			continue // already exists
+		}
+
+		hashed, err := utils.HashPassword(s.password)
+		if err != nil {
+			return err
+		}
+
+		user := &appmodels.User{
+			ID:            s.id,
+			Name:          s.name,
+			Email:         s.email,
+			PhoneNumber:   s.phone,
+			PasswordHash:  hashed,
+			Sex:           s.sex,
+			Country:       s.country,
+			IsActive:      true, // bypass OTP activation for seeded users
+			IsFreezed:     false,
+			TotalBookings: 0,
+			CreatedAt:     time.Now(),
+			LastLogin:     time.Now(),
+		}
+
+		if err := repo.Create(ctx, user); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // getAllowedOrigins returns CORS allowed origins based on environment.
