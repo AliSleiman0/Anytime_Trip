@@ -1,4 +1,4 @@
-# Anytime Travel - Flutter App
+# Travel - Flutter App
 
 A Flutter travel application built with **GetX** architecture following clean code principles and best practices.
 

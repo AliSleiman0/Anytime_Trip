@@ -17,13 +17,9 @@ flutter_native_splash:
   # Dark mode background color
   color_dark: "#336891"
   
-  # Splash screen image - centered
-  # Must be PNG format, sized for 4x pixel density
-  # Recommended dimensions: 1152×1152 px (fit within circle 768px diameter)
-  image: assets/images/main-logo.png
-  
-  # Dark mode splash image
-  image_dark: assets/images/main-logo.png
+  # Splash screen image - disabled (solid color splash only)
+  # image: assets/images/main-logo.png
+  # image_dark: assets/images/main-logo.png
   
   # Image positioning (default: center)
   # android_gravity options: center, bottom, top, fill, fill_horizontal, fill_vertical, etc.
@@ -47,10 +43,9 @@ flutter_native_splash:
   # ============================================================================
   
   android_12:
-    # Center logo displayed on splash screen
-    # Should be 960×960 px (with background) or 1152×1152 px (without background)
-    image: assets/images/main-logo.png
-    image_dark: assets/images/main-logo.png
+    # Center logo - disabled (solid color splash only)
+    # image: assets/images/main-logo.png
+    # image_dark: assets/images/main-logo.png
     
     # Background color for Android 12+
     color: "#336891"

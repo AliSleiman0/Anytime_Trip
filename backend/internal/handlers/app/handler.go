@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"Anytime_Travel/backend/core/utils"
-	appmodels "Anytime_Travel/backend/internal/models/app"
-	"Anytime_Travel/backend/internal/repository/app"
+	"travel/backend/core/utils"
+	appmodels "travel/backend/internal/models/app"
+	"travel/backend/internal/repository/app"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -204,9 +204,8 @@ func (h *AppHandler) Signup(c *fiber.Ctx) error {
 		})
 	}
 
-	// Send OTP via SMS (for now just log it)
+	// Send OTP via SMS
 	utils.SendSMSOTP(user.PhoneNumber, code)
-	fmt.Printf("[Signup] Created OTP for user %s: Phone=%s, Code=%s\n", user.ID, user.PhoneNumber, code)
 
 	// Generate JWT token
 	token, err := h.generateToken(user)
@@ -216,11 +215,9 @@ func (h *AppHandler) Signup(c *fiber.Ctx) error {
 		})
 	}
 
-	// Return success response with OTP code (remove in production)
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message":  "User registered successfully. OTP sent to phone.",
-		"token":    token,
-		"otp_code": code, // TODO: Remove in production
+		"message": "User registered successfully. OTP sent to phone.",
+		"token":   token,
 		"user": fiber.Map{
 			"id":           user.ID,
 			"name":         user.Name,

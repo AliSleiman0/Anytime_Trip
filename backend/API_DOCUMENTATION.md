@@ -1,4 +1,4 @@
-# Anytime Travel API Documentation
+# Travel API Documentation
 
 ## Base URL
 ```
@@ -217,7 +217,7 @@ Required environment variables for the backend:
 ```bash
 PORT=8080
 MONGO_URI=mongodb://localhost:27017
-MONGO_DB_NAME=anytime_travel
+MONGO_DB_NAME=travel
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
 ENVIRONMENT=development
 ```

@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"Anytime_Travel/backend/core/utils"
+	"travel/backend/core/utils"
 
 	"github.com/gofiber/fiber/v2"
 )

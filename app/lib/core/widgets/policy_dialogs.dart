@@ -55,7 +55,7 @@ class PolicyDialogs {
                       children: [
                         _buildSectionTitle('1. Acceptance of Terms'),
                         _buildSectionContent(
-                          'By accessing and using Anytime Trip services, you accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to these terms, please do not use our services.',
+                          'By accessing and using Travel services, you accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to these terms, please do not use our services.',
                         ),
                         const SizedBox(height: 16),
                         
@@ -85,7 +85,7 @@ class PolicyDialogs {
                         
                         _buildSectionTitle('6. Liability'),
                         _buildSectionContent(
-                          'Anytime Trip acts as an intermediary between you and service providers. We are not liable for any loss, damage, or injury resulting from services provided by third parties including airlines, hotels, and car rental companies.',
+                          'Travel acts as an intermediary between you and service providers. We are not liable for any loss, damage, or injury resulting from services provided by third parties including airlines, hotels, and car rental companies.',
                         ),
                         const SizedBox(height: 16),
                         
@@ -265,7 +265,7 @@ class PolicyDialogs {
                         
                         _buildSectionTitle('11. Contact Us'),
                         _buildSectionContent(
-                          'For privacy-related questions or to exercise your rights, please contact our Data Protection Officer through the app or at privacy@anytimetrip.com.',
+                          'For privacy-related questions or to exercise your rights, please contact our Data Protection Officer through the app or at privacy@travel.app.',
                         ),
                         const SizedBox(height: 20),
                         

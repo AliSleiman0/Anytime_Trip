@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	"Anytime_Travel/backend/internal/models/admin"
+	"travel/backend/internal/models/admin"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

@@ -1,0 +1,29 @@
+.git
+.gitignore
+.dockerignore
+
+# Node
+**/node_modules
+
+# Flutter app (not built in this Docker image)
+app/
+
+# Build artifacts
+**/build
+**/.dart_tool
+**/vendor
+**/bin
+**/*.exe
+**/*.dll
+
+# Local env / secrets
+**/.env
+**/.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

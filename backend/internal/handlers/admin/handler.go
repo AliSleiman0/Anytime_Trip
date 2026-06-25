@@ -1,14 +1,14 @@
-﻿package admin
+package admin
 
 import (
 	"fmt"
 	"math"
 	"strings"
 
-	adminrepo "Anytime_Travel/backend/internal/repository/admin"
-	"Anytime_Travel/backend/internal/repository/app"
-	superadminrepo "Anytime_Travel/backend/internal/repository/superadmin"
-	"Anytime_Travel/backend/internal/ws"
+	adminrepo "travel/backend/internal/repository/admin"
+	"travel/backend/internal/repository/app"
+	superadminrepo "travel/backend/internal/repository/superadmin"
+	"travel/backend/internal/ws"
 )
 
 // ServiceProviderView is a flattened view model for the table

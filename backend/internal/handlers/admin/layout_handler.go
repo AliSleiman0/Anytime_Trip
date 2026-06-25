@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"Anytime_Travel/backend/internal/middleware"
+	"travel/backend/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )

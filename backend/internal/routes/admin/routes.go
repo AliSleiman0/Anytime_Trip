@@ -1,8 +1,8 @@
 package admin
 
 import (
-	"Anytime_Travel/backend/internal/handlers/admin"
-	"Anytime_Travel/backend/internal/middleware"
+	"travel/backend/internal/handlers/admin"
+	"travel/backend/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"

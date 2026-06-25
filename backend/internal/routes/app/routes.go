@@ -1,8 +1,8 @@
 package app
 
 import (
-	"Anytime_Travel/backend/internal/handlers/app"
-	"Anytime_Travel/backend/internal/middleware"
+	"travel/backend/internal/handlers/app"
+	"travel/backend/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )

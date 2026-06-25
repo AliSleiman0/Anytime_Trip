@@ -19,7 +19,7 @@ func NewEmailService() *EmailService {
 	return &EmailService{
 		smtpHost:       getEnvOrDefault("SMTP_HOST", "smtp.gmail.com"),
 		smtpPort:       getEnvOrDefault("SMTP_PORT", "587"),
-		senderEmail:    getEnvOrDefault("SENDER_EMAIL", "noreply@anytimetravel.com"),
+		senderEmail:    getEnvOrDefault("SENDER_EMAIL", "noreply@travel.app"),
 		senderPassword: getEnvOrDefault("SENDER_PASSWORD", ""),
 	}
 }
@@ -32,7 +32,7 @@ func (es *EmailService) SendPasswordResetEmail(recipientEmail, resetLink string)
 		return nil
 	}
 
-	subject := "Password Reset Request - Anytime Travel"
+	subject := "Password Reset Request - Travel"
 	body := fmt.Sprintf(`
 <!DOCTYPE html>
 <html>
@@ -60,10 +60,10 @@ func (es *EmailService) SendPasswordResetEmail(recipientEmail, resetLink string)
       </p>
       <p>This link will expire in 1 hour.</p>
       <p>If you didn't request a password reset, you can safely ignore this email.</p>
-      <p>Best regards,<br>Anytime Travel Team</p>
+      <p>Best regards,<br>Travel Team</p>
     </div>
     <div class="footer">
-      <p>&copy; 2026 Anytime Travel. All rights reserved.</p>
+      <p>&copy; 2026 Travel. All rights reserved.</p>
     </div>
   </div>
 </body>
@@ -80,7 +80,7 @@ func (es *EmailService) SendPasswordResetCodeEmail(recipientEmail, code string) 
 		return nil
 	}
 
-	subject := "Your password reset code - Anytime Travel"
+	subject := "Your password reset code - Travel"
 	body := fmt.Sprintf(`
 <html>
 <body>
@@ -88,7 +88,7 @@ func (es *EmailService) SendPasswordResetCodeEmail(recipientEmail, code string) 
   <p>Use the verification code below to reset your password. The code expires in 15 minutes.</p>
   <h2 style="letter-spacing:6px;">%s</h2>
   <p>If you didn't request this, ignore this email.</p>
-  <p>Best regards,<br/>Anytime Travel Team</p>
+  <p>Best regards,<br/>Travel Team</p>
 </body>
 </html>
 `, code)

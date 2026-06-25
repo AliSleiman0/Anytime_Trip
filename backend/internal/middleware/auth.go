@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"strings"
 
-	"Anytime_Travel/backend/core/utils"
+	"travel/backend/core/utils"
 
 	"github.com/gofiber/fiber/v2"
 )

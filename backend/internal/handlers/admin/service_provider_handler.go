@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	modelsAdmin "Anytime_Travel/backend/internal/models/admin"
-	"Anytime_Travel/backend/internal/repository/app"
+	modelsAdmin "travel/backend/internal/models/admin"
+	"travel/backend/internal/repository/app"
 
 	"github.com/gofiber/fiber/v2"
 )

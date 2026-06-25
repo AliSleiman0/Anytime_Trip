@@ -1,7 +1,12 @@
 class Endpoints {
-  // Base URL - Use 10.0.2.2 for Android Emulator, localhost for iOS Simulator
-  // For physical device, use your computer's IP address (e.g., 192.168.1.x)
-  static const String baseUrl = 'http://10.0.2.2:8080/api';
+  // Override at build time:
+  //   flutter run --dart-define=API_BASE_URL=https://anytime-backend.onrender.com/api
+  //   flutter build apk --release --dart-define=API_BASE_URL=https://anytime-backend.onrender.com/api
+  // Default targets the Android emulator hitting a local backend on :8080.
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://10.0.2.2:8080/api',
+  );
 
   // Auth endpoints
   static const String login = '/app/login';

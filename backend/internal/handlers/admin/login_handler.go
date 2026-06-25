@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"Anytime_Travel/backend/core/utils"
-	"Anytime_Travel/backend/internal/models/admin"
+	"travel/backend/core/utils"
+	"travel/backend/internal/models/admin"
 
 	"github.com/gofiber/fiber/v2"
 )

@@ -1,4 +1,4 @@
-name: anytime_travel
+name: travel
 description: A Flutter travel application with GetX architecture
 publish_to: 'none'
 version: 1.0.0+1
@@ -57,18 +57,18 @@ flutter_native_splash:
   color: "#336891"
   color_dark: "#336891"
   
-  # Splash image - centered on the screen
-  image: assets/images/main-logo.png
-  image_dark: assets/images/main-logo.png
+  # Splash image - disabled (solid color splash only)
+  # image: assets/images/main-logo.png
+  # image_dark: assets/images/main-logo.png
   
   # Make it fullscreen (hides status bar on Android)
   fullscreen: true
   
   # Android 12+ configuration (uses different splash screen system)
   android_12:
-    # Center logo for Android 12+
-    image: assets/images/main-logo.png
-    image_dark: assets/images/main-logo.png
+    # Center logo for Android 12+ - disabled (solid color splash only)
+    # image: assets/images/main-logo.png
+    # image_dark: assets/images/main-logo.png
     
     # Icon background color
     color: "#336891"

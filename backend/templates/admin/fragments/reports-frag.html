@@ -404,7 +404,7 @@ function generateReportPDF() {
     });
 
     // Save the PDF
-    const fileName = 'Anytime_Trip_Report_' + new Date().toISOString().split('T')[0] + '.pdf';
+    const fileName = 'Travel_Report_' + new Date().toISOString().split('T')[0] + '.pdf';
     doc.save(fileName);
     
     alert('Report generated successfully!');

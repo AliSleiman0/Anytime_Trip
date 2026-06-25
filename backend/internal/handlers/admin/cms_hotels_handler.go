@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	adminmodels "Anytime_Travel/backend/internal/models/admin"
+	adminmodels "travel/backend/internal/models/admin"
 
 	"github.com/gofiber/fiber/v2"
 )

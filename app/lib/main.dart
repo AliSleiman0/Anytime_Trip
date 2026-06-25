@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'app/app.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +23,9 @@ Future<void> _initializeFirebase() async {
     // Check if Firebase is already initialized (e.g., from iOS native config)
     if (Firebase.apps.isEmpty) {
       // Initialize with timeout to prevent hanging
-      await Firebase.initializeApp().timeout(
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      ).timeout(
         const Duration(seconds: 10),
         onTimeout: () {
           debugPrint('Firebase initialization timed out');

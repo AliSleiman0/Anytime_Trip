@@ -9,9 +9,9 @@ import (
 	"math/rand"
 	"time"
 
-	"Anytime_Travel/backend/config"
-	"Anytime_Travel/backend/internal/database"
-	"Anytime_Travel/backend/internal/models/app"
+	"travel/backend/config"
+	"travel/backend/internal/database"
+	"travel/backend/internal/models/app"
 )
 
 // randomLastLogin returns a random timestamp within the past maxDays days.

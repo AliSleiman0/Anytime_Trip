@@ -8,11 +8,11 @@ import (
 	"log"
 	"time"
 
-	"Anytime_Travel/backend/config"
-	"Anytime_Travel/backend/core/utils"
-	"Anytime_Travel/backend/internal/database"
-	adminmodels "Anytime_Travel/backend/internal/models/admin"
-	adminrepo "Anytime_Travel/backend/internal/repository/admin"
+	"travel/backend/config"
+	"travel/backend/core/utils"
+	"travel/backend/internal/database"
+	adminmodels "travel/backend/internal/models/admin"
+	adminrepo "travel/backend/internal/repository/admin"
 )
 
 func main() {
@@ -38,8 +38,8 @@ func main() {
 
 	log.Println("✓ Admin user seeding completed successfully!")
 	log.Println("\nDefault credentials:")
-	log.Println("  Admin: admin@anytime.com / admin123")
-	log.Println("  Super Admin: superadmin@anytime.com / super123")
+	log.Println("  Admin: admin@travel.app / admin123")
+	log.Println("  Super Admin: superadmin@travel.app / super123")
 }
 
 // seedAdminUsers seeds initial admin users into the database
@@ -58,7 +58,7 @@ func seedAdminUsers(repo *adminrepo.AdminRepository) error {
 		{
 			ID:          1,
 			Username:    "admin",
-			Email:       "admin@anytime.com",
+			Email:       "admin@travel.app",
 			Password:    "admin123",
 			Role:        "admin",
 			Permissions: []string{"all"},
@@ -66,7 +66,7 @@ func seedAdminUsers(repo *adminrepo.AdminRepository) error {
 		{
 			ID:          2,
 			Username:    "superadmin",
-			Email:       "superadmin@anytime.com",
+			Email:       "superadmin@travel.app",
 			Password:    "super123",
 			Role:        "superadmin",
 			Permissions: []string{"all"},

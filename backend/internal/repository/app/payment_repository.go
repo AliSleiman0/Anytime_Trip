@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 
-	appmodels "Anytime_Travel/backend/internal/models/app"
+	appmodels "travel/backend/internal/models/app"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

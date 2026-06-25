@@ -8,7 +8,7 @@ import (
 	"sort"
 	"time"
 
-	app "Anytime_Travel/backend/internal/models/app"
+	app "travel/backend/internal/models/app"
 
 	"github.com/gofiber/fiber/v2"
 )

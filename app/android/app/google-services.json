@@ -1,51 +1,26 @@
 {
   "project_info": {
-    "project_number": "913309810071",
-    "project_id": "anytime-travel",
-    "storage_bucket": "anytime-travel.firebasestorage.app"
+    "project_number": "226347353501",
+    "project_id": "travel-demo-fa813",
+    "storage_bucket": "travel-demo-fa813.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:913309810071:android:675dff7350bd45ecc3d8d2",
+        "mobilesdk_app_id": "1:226347353501:android:30cff8dfd06fc620c4db74",
         "android_client_info": {
           "package_name": "com.anytime.travel"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "913309810071-nm97oafqcl4gqcsn6r5045u77s7fra24.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.anytime.travel",
-            "certificate_hash": "f6738390dc260cc632138d055a92d010ed27cb18"
-          }
-        },
-        {
-          "client_id": "913309810071-d1ocm8m6g39a82k04j6ibbigf0n47qjo.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBvSF_Gl1Rea-MGZiCDooCS5xWxGk3QxfU"
+          "current_key": "AIzaSyBvvLYr5ZaXMd2PCr33aYk_J_MvWyI5x8w"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "913309810071-d1ocm8m6g39a82k04j6ibbigf0n47qjo.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "913309810071-i93i3gdg313bh1p4o46gd3osven5kqg3.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.anytime.travel"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

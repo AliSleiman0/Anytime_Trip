@@ -3,23 +3,24 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
-	"Anytime_Travel/backend/config"
-	"Anytime_Travel/backend/core/utils"
-	"Anytime_Travel/backend/internal/database"
-	adminhandlers "Anytime_Travel/backend/internal/handlers/admin"
-	apphandlers "Anytime_Travel/backend/internal/handlers/app"
-	superadminhandlers "Anytime_Travel/backend/internal/handlers/superadmin"
-	"Anytime_Travel/backend/internal/middleware"
-	adminmodels "Anytime_Travel/backend/internal/models/admin"
-	adminrepo "Anytime_Travel/backend/internal/repository/admin"
-	apprepo "Anytime_Travel/backend/internal/repository/app"
-	superadminrepo "Anytime_Travel/backend/internal/repository/superadmin"
-	adminRoutes "Anytime_Travel/backend/internal/routes/admin"
-	appRoutes "Anytime_Travel/backend/internal/routes/app"
-	superAdminRoutes "Anytime_Travel/backend/internal/routes/superadmin"
-	"Anytime_Travel/backend/internal/ws"
+	"travel/backend/config"
+	"travel/backend/core/utils"
+	"travel/backend/internal/database"
+	adminhandlers "travel/backend/internal/handlers/admin"
+	apphandlers "travel/backend/internal/handlers/app"
+	superadminhandlers "travel/backend/internal/handlers/superadmin"
+	"travel/backend/internal/middleware"
+	adminmodels "travel/backend/internal/models/admin"
+	adminrepo "travel/backend/internal/repository/admin"
+	apprepo "travel/backend/internal/repository/app"
+	superadminrepo "travel/backend/internal/repository/superadmin"
+	adminRoutes "travel/backend/internal/routes/admin"
+	appRoutes "travel/backend/internal/routes/app"
+	superAdminRoutes "travel/backend/internal/routes/superadmin"
+	"travel/backend/internal/ws"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -76,7 +77,7 @@ func main() {
 
 	// Initialize handlers
 	appHandler := apphandlers.NewAppHandler(appRepository, otpRepository, paymentMethodRepository, cfg.JWTSecret)
-	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, passwordResetRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, supportTicketRepository, paymentRepository, flightRepository, carRepository, hotelRepository, bannerRepository, travelRepository, popularRepository, predefinedAnswerRepository, loginAttemptRepository, cfg.JWTSecret, chatHub, notifyHub)
+	adminHandler := adminhandlers.NewAdminHandler(adminRepository, notificationPrefsRepository, passwordResetRepository, appRepository, carBookingRepository, flightBookingRepository, hotelBookingRepository, transferBookingRepository, supportTicketRepository, paymentRepository, flightRepository, carRepository, hotelRepository, transferRepository, bannerRepository, travelRepository, popularRepository, predefinedAnswerRepository, loginAttemptRepository, cfg.JWTSecret, chatHub, notifyHub)
 	superAdminHandler := superadminhandlers.NewSuperAdminHandler(superAdminRepository, predefinedAnswerRepository)
 
 	// Initialize Fiber app
@@ -134,7 +135,7 @@ func ensureDefaultAdmin(repo *adminrepo.AdminRepository) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	if _, err := repo.FindByEmail(ctx, "admin@anytime.com"); err == nil {
+	if _, err := repo.FindByEmail(ctx, "admin@travel.app"); err == nil {
 		return nil // already exists
 	}
 
@@ -147,7 +148,7 @@ func ensureDefaultAdmin(repo *adminrepo.AdminRepository) error {
 		ID:          1,
 		Username:    "admin",
 		Password:    hashed,
-		Email:       "admin@anytime.com", // stored lowercase
+		Email:       "admin@travel.app", // stored lowercase
 		Role:        "admin",
 		Permissions: []string{"all"},
 		CreatedAt:   time.Now(),
@@ -156,12 +157,14 @@ func ensureDefaultAdmin(repo *adminrepo.AdminRepository) error {
 	return repo.Create(ctx, adminUser)
 }
 
-// getAllowedOrigins returns CORS allowed origins based on environment
+// getAllowedOrigins returns CORS allowed origins based on environment.
+// In production, set ALLOWED_ORIGINS env var to a comma-separated list of origins.
 func getAllowedOrigins(environment string) string {
-	if environment == "production" {
-		// In production, specify exact domains
-		return "https://yourdomain.com,https://www.yourdomain.com,https://admin.yourdomain.com"
+	if allowed := os.Getenv("ALLOWED_ORIGINS"); allowed != "" {
+		return allowed
 	}
-	// In development, allow localhost origins
+	if environment == "production" {
+		return "*"
+	}
 	return "http://localhost:3000,http://localhost:5173,http://localhost:8080,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:8080"
 }

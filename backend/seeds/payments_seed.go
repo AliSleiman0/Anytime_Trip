@@ -9,8 +9,8 @@ import (
 	"log"
 	"time"
 
-	"Anytime_Travel/backend/config"
-	"Anytime_Travel/backend/internal/database"
+	"travel/backend/config"
+	"travel/backend/internal/database"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

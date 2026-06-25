@@ -199,10 +199,14 @@ class _SetNewPasswordPageState extends State<SetNewPasswordPage> {
               children: [
                 SizedBox(height: size.height * 0.08),
                 // Logo
-                Image.asset(
-                  'assets/images/main-logo.png',
-                  width: 70,
-                  height: 70,
+                const Text(
+                  'Travel',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: -0.5,
+                  ),
                 ),
                 SizedBox(height: size.height * 0.08),
                 // Title

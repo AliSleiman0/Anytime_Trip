@@ -139,10 +139,14 @@ class _RegisterPageState extends State<RegisterPage> {
               children: [
                 SizedBox(height: size.height * 0.12),
                 // Logo
-                Image.asset(
-                  'assets/images/main-logo.png',
-                  width: 90,
-                  height: 90,
+                const Text(
+                  'Travel',
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: -0.5,
+                  ),
                 ),
                 SizedBox(height: size.height * 0.06),
                 // Full Name Input

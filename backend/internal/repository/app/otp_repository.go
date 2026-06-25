@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"Anytime_Travel/backend/internal/models/app"
+	"travel/backend/internal/models/app"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

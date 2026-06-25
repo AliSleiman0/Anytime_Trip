@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"Anytime_Travel/backend/config"
-	"Anytime_Travel/backend/internal/database"
-	adminModel "Anytime_Travel/backend/internal/models/admin"
+	"travel/backend/config"
+	"travel/backend/internal/database"
+	adminModel "travel/backend/internal/models/admin"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"

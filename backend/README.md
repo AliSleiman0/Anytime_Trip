@@ -1,6 +1,6 @@
-# Anytime Travel Backend
+# Travel Backend
 
-Go-based backend server for the Anytime Travel application using MongoDB.
+Go-based backend server for the Travel application using MongoDB.
 
 ## Prerequisites
 
@@ -127,7 +127,7 @@ See [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) for detailed API documentatio
 ### Create Database Indexes
 
 ```bash
-mongosh anytime_travel
+mongosh travel
 ```
 
 ```javascript
@@ -210,22 +210,22 @@ CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bin/server main.go
 
 ### 3. Run with systemd
 
-Create `/etc/systemd/system/anytime-travel.service`:
+Create `/etc/systemd/system/travel.service`:
 
 ```ini
 [Unit]
-Description=Anytime Travel API Server
+Description=Travel API Server
 After=network.target
 
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/opt/anytime-travel/backend
-ExecStart=/opt/anytime-travel/backend/bin/server
+WorkingDirectory=/opt/travel/backend
+ExecStart=/opt/travel/backend/bin/server
 Restart=always
 Environment="PORT=8080"
 Environment="MONGO_URI=mongodb://localhost:27017"
-Environment="MONGO_DB_NAME=anytime_travel"
+Environment="MONGO_DB_NAME=travel"
 Environment="JWT_SECRET=your-secret-here"
 Environment="ENVIRONMENT=production"
 
@@ -235,9 +235,9 @@ WantedBy=multi-user.target
 
 Enable and start:
 ```bash
-sudo systemctl enable anytime-travel
-sudo systemctl start anytime-travel
-sudo systemctl status anytime-travel
+sudo systemctl enable travel
+sudo systemctl start travel
+sudo systemctl status travel
 ```
 
 ## Troubleshooting
@@ -260,7 +260,7 @@ PORT=8081
 
 ```bash
 # Systemd service logs
-sudo journalctl -u anytime-travel -f
+sudo journalctl -u travel -f
 
 # Application logs (if running manually)
 ./bin/server 2>&1 | tee server.log
@@ -268,4 +268,4 @@ sudo journalctl -u anytime-travel -f
 
 ## License
 
-Proprietary - Anytime Travel 2026
+Proprietary - Travel 2026

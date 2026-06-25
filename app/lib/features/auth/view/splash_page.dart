@@ -208,10 +208,14 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             // Logo on left
-                            Image.asset(
-                              'assets/images/main-logo.png',
-                              width: 90,
-                              height: 90,
+                            const Text(
+                              'Travel',
+                              style: TextStyle(
+                                fontSize: 36,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: -0.5,
+                              ),
                             ),
                             // Language button on right
                             GestureDetector(

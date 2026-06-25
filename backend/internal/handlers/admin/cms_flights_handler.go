@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"Anytime_Travel/backend/core/utils"
-	adminmodels "Anytime_Travel/backend/internal/models/admin"
+	"travel/backend/core/utils"
+	adminmodels "travel/backend/internal/models/admin"
 
 	"github.com/gofiber/fiber/v2"
 )

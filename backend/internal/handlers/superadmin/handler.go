@@ -1,8 +1,8 @@
 package superadmin
 
 import (
-	models "Anytime_Travel/backend/internal/models/superadmin"
-	"Anytime_Travel/backend/internal/repository/superadmin"
+	models "travel/backend/internal/models/superadmin"
+	"travel/backend/internal/repository/superadmin"
 	"bytes"
 	"fmt"
 	"html/template"

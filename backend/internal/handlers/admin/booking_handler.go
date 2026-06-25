@@ -1,8 +1,8 @@
 package admin
 
 import (
-	"Anytime_Travel/backend/internal/repository/admin"
-	"Anytime_Travel/backend/internal/repository/app"
+	"travel/backend/internal/repository/admin"
+	"travel/backend/internal/repository/app"
 	"fmt"
 	"html/template"
 	"path/filepath"

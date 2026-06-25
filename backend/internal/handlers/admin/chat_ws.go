@@ -1,8 +1,8 @@
 package admin
 
 import (
-	"Anytime_Travel/backend/internal/models/app"
-	"Anytime_Travel/backend/internal/ws"
+	"travel/backend/internal/models/app"
+	"travel/backend/internal/ws"
 	"context"
 	"encoding/json"
 	"log"

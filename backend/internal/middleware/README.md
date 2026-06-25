@@ -1,6 +1,6 @@
 # JWT Authentication Middleware
 
-This package provides JWT authentication middleware for the Anytime Travel backend API.
+This package provides JWT authentication middleware for the Travel backend API.
 
 ## Features
 
@@ -229,7 +229,7 @@ superAdminGroup.Delete("/users/:id", handler.DeleteUser)
 Tokens are generated using the `utils.GenerateJWT` function:
 
 ```go
-import "Anytime_Travel/backend/core/utils"
+import "travel/backend/core/utils"
 
 token, err := utils.GenerateJWT(
     userEmail,           // Subject (user identifier)
@@ -337,7 +337,7 @@ To test authentication in development:
 1. Login to get a token:
 ```bash
 curl -X POST http://localhost:8080/admin/login \
-  -d "email=admin@anytime.com" \
+  -d "email=admin@travel.app" \
   -d "password=admin123"
 ```
 
